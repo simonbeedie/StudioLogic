@@ -28,16 +28,25 @@ own GCSE and A-Level year folders. KS3 is separate, covering Years 7–9.
 │       └── year-13/
 └── media-studies/
     ├── gcse/
+    │   ├── theory/              # Theory reference pages (media language,
+    │   │                        # representation, industries, audiences).
+    │   │                        # Linked to directly from students' work,
+    │   │                        # so filenames here are stable once published.
     │   ├── year-10/
     │   └── year-11/
     └── a-level/
-        ├── theory/              # Theory reference pages (media language,
-        │                        # representation, industries, audiences).
-        │                        # Linked to directly from students' work,
-        │                        # so filenames here are stable once published.
         ├── year-12/
         └── year-13/
 ```
+
+## Search visibility
+
+The site is intentionally kept out of search engines while it's a work in
+progress: a root `robots.txt` disallows all crawling, and every page carries a
+`<meta name="robots" content="noindex, nofollow">` tag. Pages are still
+reachable by direct link (e.g. for embedding in Firefly or linking from
+students' work) — this only stops them being indexed or turning up in search
+results.
 
 All file and folder names are lowercase and hyphenated (no spaces or capitals),
 since they form part of the site's URLs.
