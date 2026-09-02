@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Ghost Protocol — Programming Assessment</title>
+<style>
+:root {
+  --navy:      #0D1B2A;
+  --navy-light:#13263B;
+  --panel:     #0F2236;
+  --line:      #1F3A52;
+  --teal:      #00B4D8;
+  --teal-dim:  #0A3A4A;
+  --white:     #EAF6FB;
+  --muted:     #7F93A8;
+  --amber:     #F4A300;
+  --fail:      #FF6B6B;
+  --pass:      #3DDC97;
+  --ghost2:    #FF6FCF;
+  --mono: 'Consolas','SFMono-Regular','Menlo','Courier New',monospace;
+  --sans: -apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--navy);color:var(--white);font-family:var(--sans);min-height:100vh;padding:24px 14px 60px;}
+.wrap{max-width:1020px;margin:0 auto;}
+
+/* Header */
+.hdr{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:20px;}
+.hdr-badge{width:46px;height:46px;border-radius:10px;flex-shrink:0;background:linear-gradient(150deg,var(--teal-dim),var(--navy-light));border:1px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:22px;}
+.hdr-text h1{font-family:var(--mono);font-size:17px;letter-spacing:1.5px;}
+.hdr-text p{font-size:12px;color:var(--muted);margin-top:3px;}
+.hdr-meta{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.pill{font-family:var(--mono);font-size:11px;padding:4px 11px;border-radius:999px;border:1px solid var(--line);background:var(--navy-light);color:var(--teal);}
+
+/* Engine banner */
+.engine-banner{display:flex;align-items:center;gap:10px;background:var(--navy-light);border:1px solid var(--line);border-radius:8px;padding:10px 15px;margin-bottom:18px;font-size:12.5px;color:var(--muted);}
+.engine-banner.ready{border-color:var(--pass);color:var(--pass);}
+.engine-banner.error{border-color:var(--fail);color:var(--fail);}
+.spinner{width:12px;height:12px;border-radius:50%;flex-shrink:0;border:2px solid var(--line);border-top-color:var(--teal);animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Level tabs */
+.level-tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--line);padding-bottom:0;}
+.level-tab{font-family:var(--mono);font-size:13px;padding:10px 20px;border-radius:8px 8px 0 0;cursor:pointer;border:1px solid var(--line);border-bottom:none;background:var(--navy-light);color:var(--muted);transition:all .15s;position:relative;bottom:-1px;}
+.level-tab:hover{color:var(--white);}
+.level-tab.active{background:var(--panel);color:var(--teal);border-color:var(--teal);border-bottom:1px solid var(--panel);}
+.level-tab .badge{display:inline-block;width:18px;height:18px;border-radius:50%;background:var(--line);font-size:10px;line-height:18px;text-align:center;margin-left:6px;color:var(--muted);}
+.level-tab.active .badge{background:var(--teal);color:#021a1a;}
+.level-tab.solved .badge{background:var(--pass);color:#021a10;}
+
+/* Level panels */
+.level-panel{display:none;}.level-panel.active{display:block;}
+
+/* Brief */
+.brief-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:18px;}
+.brief-card h2{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--teal);margin-bottom:10px;}
+.brief-card p{font-size:13.5px;color:var(--white);line-height:1.6;margin-bottom:8px;}
+.brief-card p:last-child{margin-bottom:0;}
+.brief-card code{font-family:var(--mono);background:#081420;padding:1px 5px;border-radius:3px;color:var(--amber);}
+
+/* API box */
+.api-box{background:#081420;border:1px solid var(--line);border-radius:7px;padding:12px 14px;margin-top:12px;}
+.api-box-title{font-family:var(--mono);font-size:10px;color:var(--teal);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.api-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;flex-wrap:wrap;}
+.api-row:last-child{margin-bottom:0;}
+.api-call{font-family:var(--mono);font-size:12.5px;color:var(--amber);white-space:nowrap;min-width:180px;}
+.api-desc{font-size:12.5px;color:var(--muted);line-height:1.5;}
+.api-desc b{color:var(--white);}
+
+/* Main layout */
+.main-grid{display:grid;grid-template-columns:1fr 420px;gap:18px;align-items:start;}
+.main-grid.wide{grid-template-columns:1fr;}
+@media(max-width:860px){.main-grid{grid-template-columns:1fr;}}
+
+/* Puzzle row for level 2 */
+.puzzle-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;}
+@media(max-width:860px){.puzzle-row{grid-template-columns:1fr;}}
+.puzzle-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;transition:border-color .2s;}
+.puzzle-card.solved{border-color:var(--pass);}
+.puzzle-card-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--navy-light);border-bottom:1px solid var(--line);}
+.puzzle-card-title{font-family:var(--mono);font-size:12px;color:var(--teal);}
+.puzzle-solved-badge{font-family:var(--mono);font-size:11px;color:var(--pass);display:none;}
+.puzzle-card.solved .puzzle-solved-badge{display:block;}
+canvas.puzzle-canvas{display:block;width:100%;background:#000;}
+
+/* Editor */
+.editor-panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.editor-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--navy-light);}
+.editor-topbar-left{display:flex;align-items:center;gap:7px;}
+.mac-dot{width:10px;height:10px;border-radius:50%;}
+.mac-r{background:#FF5F56;}.mac-y{background:#FFBD2E;}.mac-g{background:#27C93F;}
+.file-label{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:5px;}
+.fn-label{font-family:var(--mono);font-size:11px;color:var(--teal);}
+
+/* Highlighted editor */
+.editor-wrap{position:relative;background:#081420;border-bottom:1px solid var(--line);}
+.editor-wrap textarea,.editor-wrap .editor-highlight{font-family:var(--mono);font-size:13.5px;line-height:1.65;padding:14px;tab-size:4;white-space:pre;overflow-wrap:normal;overflow-x:auto;min-height:180px;width:100%;}
+.editor-wrap textarea{position:absolute;top:0;left:0;height:100%;background:transparent;color:transparent;caret-color:#fff;border:none;outline:none;resize:none;z-index:2;-webkit-text-fill-color:transparent;}
+.editor-wrap .editor-highlight{position:relative;z-index:1;pointer-events:none;color:#cdeaf5;margin:0;overflow:hidden;}
+
+/* Token colours - VS Code Dark+ */
+.tok-kw     {color:#C586C0;}
+.tok-builtin{color:#DCDCAA;}
+.tok-self   {color:#9CDCFE;}
+.tok-num    {color:#B5CEA8;}
+.tok-str    {color:#CE9178;}
+.tok-comment{color:#6A9955;font-style:italic;}
+.tok-obj    {color:#4EC9B0;}
+.tok-obj2   {color:#FF6FCF;}
+.tok-method {color:#DCDCAA;}
+.tok-paren  {color:#FFD700;}
+
+/* Dual editor layout for L3 */
+.dual-editors{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+@media(max-width:860px){.dual-editors{grid-template-columns:1fr;}}
+
+.editor-footer{padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+button.btn-run{font-family:var(--mono);background:var(--teal);color:#02222c;border:none;padding:9px 18px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;transition:filter .15s;}
+button.btn-run:hover:not(:disabled){filter:brightness(1.1);}
+button.btn-run:disabled{opacity:.45;cursor:not-allowed;}
+button.btn-run.g2{background:var(--ghost2);color:#1a0010;}
+button.btn-reset{font-family:var(--mono);background:transparent;color:var(--muted);border:1px solid var(--line);padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;}
+button.btn-reset:hover{color:var(--white);border-color:var(--white);}
+button.btn-hint{font-family:var(--mono);background:transparent;color:var(--amber);border:1px solid var(--amber);padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;margin-left:auto;}
+
+/* Hint */
+.hint-box{margin-top:12px;display:none;background:rgba(244,163,0,0.07);border:1px solid var(--amber);border-radius:8px;padding:14px;}
+.hint-box.show{display:block;}
+.hint-box h3{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--amber);margin-bottom:10px;}
+.hint-box p{font-size:13px;color:var(--white);line-height:1.65;margin-bottom:7px;}
+.hint-box p:last-child{margin-bottom:0;}
+.hint-box code{font-family:var(--mono);background:#081420;padding:1px 4px;border-radius:3px;color:var(--amber);}
+
+/* Feedback */
+.feedback-panel{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.feedback-header{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:9px 14px;border-bottom:1px solid var(--line);background:var(--navy-light);}
+.feedback-body{padding:12px 14px;font-size:13px;line-height:1.6;font-family:var(--mono);color:var(--white);min-height:48px;white-space:pre-wrap;word-break:break-word;}
+
+/* Marking */
+details.mark-panel{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+details.mark-panel summary{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:10px 14px;cursor:pointer;background:var(--navy-light);border-bottom:1px solid var(--line);list-style:none;display:flex;justify-content:space-between;align-items:center;}
+details.mark-panel summary::after{content:'▾';color:var(--teal);}
+details.mark-panel[open] summary::after{content:'▴';}
+.mark-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.mark-table th{font-family:var(--mono);font-size:10px;color:var(--teal);text-transform:uppercase;padding:9px 13px;border-bottom:1px solid var(--line);text-align:left;}
+.mark-table td{padding:9px 13px;border-bottom:1px solid var(--line);color:var(--white);vertical-align:top;}
+.mark-table tr:last-child td{border-bottom:none;}
+.mark-table .marks{font-family:var(--mono);color:var(--amber);}
+.mark-table .lvl{font-family:var(--mono);font-size:10px;color:var(--teal);}
+
+/* Game panel */
+.game-panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.game-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--navy-light);}
+.game-topbar-title{font-family:var(--mono);font-size:11px;color:var(--teal);letter-spacing:1px;text-transform:uppercase;}
+.game-stats{display:flex;gap:12px;font-family:var(--mono);font-size:11px;color:var(--muted);}
+.game-stats span b{color:var(--white);}
+canvas.main-canvas{display:block;width:100%;background:#000;}
+
+/* Coord live */
+.coord-live{display:flex;gap:7px;flex-wrap:wrap;padding:9px 13px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;}
+.coord-live .cl{background:#081420;border:1px solid var(--line);border-radius:4px;padding:4px 9px;color:var(--muted);}
+.coord-live .cl b{color:var(--white);}
+.coord-live .cl.g2 b{color:var(--ghost2);}
+
+/* Move log */
+.move-log{padding:9px 13px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;min-height:34px;color:var(--muted);display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+.move-chip{display:inline-block;font-family:var(--mono);font-size:10px;padding:3px 7px;border-radius:3px;border:1px solid var(--line);background:var(--navy-light);color:var(--muted);margin:2px;}
+.move-chip.active{border-color:var(--teal);color:var(--teal);background:rgba(0,180,216,.1);}
+.move-chip.done{border-color:var(--pass);color:var(--pass);background:rgba(61,220,151,.08);}
+
+/* Game footer */
+.game-footer{padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);align-items:center;}
+button.btn-start{font-family:var(--mono);background:var(--pass);color:#021a10;border:none;padding:9px 18px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;}
+button.btn-start:disabled{opacity:.4;cursor:not-allowed;}
+button.btn-stop{font-family:var(--mono);background:transparent;color:var(--fail);border:1px solid var(--fail);padding:9px 15px;border-radius:6px;font-size:12px;cursor:pointer;}
+.speed-label{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:auto;}
+.speed-label select{font-family:var(--mono);font-size:11px;background:var(--navy-light);color:var(--white);border:1px solid var(--line);border-radius:4px;padding:3px 6px;}
+
+/* Outcome */
+.outcome-overlay{display:none;text-align:center;padding:22px 18px;border-top:1px solid var(--line);}
+.outcome-overlay.show{display:block;}
+.outcome-title{font-family:var(--mono);font-size:18px;letter-spacing:2px;margin-bottom:7px;}
+.outcome-title.win{color:var(--pass);}.outcome-title.lose{color:var(--fail);}
+.outcome-sub{font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.7;}
+.outcome-score{display:inline-block;margin-top:12px;background:var(--navy-light);border:1px solid var(--line);border-radius:7px;padding:9px 20px;font-family:var(--mono);font-size:12px;color:var(--teal);}
+
+/* L2 puzzle feedback row */
+.l2-feedback-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px;}
+@media(max-width:860px){.l2-feedback-row{grid-template-columns:1fr;}}
+.l2-fb{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+.l2-fb-hdr{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:7px 12px;background:var(--navy-light);border-bottom:1px solid var(--line);}
+.l2-fb-body{padding:10px 12px;font-family:var(--mono);font-size:12px;color:var(--white);white-space:pre-wrap;min-height:40px;}
+
+/* L2 shared editor */
+.l2-editor-wrap{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px;}
+
+/* Progress bar for L2 */
+.progress-bar-wrap{background:var(--navy-light);border:1px solid var(--line);border-radius:8px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:16px;}
+.progress-bar-label{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap;}
+.progress-bar-track{flex:1;height:8px;background:#081420;border-radius:4px;overflow:hidden;border:1px solid var(--line);}
+.progress-bar-fill{height:100%;background:var(--teal);border-radius:4px;transition:width .4s;}
+.progress-count{font-family:var(--mono);font-size:12px;color:var(--teal);white-space:nowrap;}
+
+/* L3 dot score */
+.dot-score{font-family:var(--mono);font-size:11px;color:var(--amber);}
+
+footer{text-align:center;color:var(--muted);font-size:10.5px;margin-top:26px;font-family:var(--mono);letter-spacing:.5px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- Header -->
+<div class="hdr">
+  <div class="hdr-badge">👻</div>
+  <div class="hdr-text">
+    <h1>GHOST PROTOCOL — PROGRAMMING ASSESSMENT</h1>
+    <p>Three levels: sequencing → maze solving → patrol &amp; chase logic</p>
+  </div>
+  <div class="hdr-meta">
+    <div class="pill" id="globalPill">Level 1</div>
+  </div>
+</div>
+
+<!-- Engine banner -->
+<div class="engine-banner" id="engineBanner">
+  <div class="spinner" id="engineSpinner"></div>
+  <span id="engineText">Booting Python engine — may take up to 15 seconds on first load…</span>
+</div>
+
+<!-- Level tabs -->
+<div class="level-tabs">
+  <div class="level-tab active" id="tab1" onclick="switchLevel(1)">👻 Level 1 — Sequencing <span class="badge" id="badge1">1</span></div>
+  <div class="level-tab"        id="tab2" onclick="switchLevel(2)">🧩 Level 2 — Maze Puzzles <span class="badge" id="badge2">2</span></div>
+  <div class="level-tab"        id="tab3" onclick="switchLevel(3)">🔥 Level 3 — Patrol &amp; Chase <span class="badge" id="badge3">3</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════ LEVEL 1 ═══ -->
+<div class="level-panel active" id="panel1">
+
+  <div class="brief-card">
+    <h2>📋 Level 1 — Mission Brief</h2>
+    <p>Pac-Man is frozen in place. Call <code>ghost.move(x, y)</code> once per step to navigate the ghost to catch him. The ghost starts at <code>col 3, row 4</code>. Pac-Man is waiting at <code>col 7, row 5</code>.</p>
+    <p><code>x</code> controls columns: <code>+1</code> = right, <code>-1</code> = left. <code>y</code> controls rows: <code>+1</code> = down, <code>-1</code> = up.</p>
+    <div class="api-box">
+      <div class="api-box-title">ghost — quick reference</div>
+      <div class="api-row"><span class="api-call">ghost.move(1, 0)</span><span class="api-desc">Move <b>right</b> one column</span></div>
+      <div class="api-row"><span class="api-call">ghost.move(-1, 0)</span><span class="api-desc">Move <b>left</b> one column</span></div>
+      <div class="api-row"><span class="api-call">ghost.move(0, 1)</span><span class="api-desc">Move <b>down</b> one row</span></div>
+      <div class="api-row"><span class="api-call">ghost.move(0, -1)</span><span class="api-desc">Move <b>up</b> one row</span></div>
+      <div class="api-row" style="border-top:1px solid var(--line);margin-top:8px;padding-top:8px;">
+        <span class="api-call">ghost.pac_col</span><span class="api-desc">Pac-Man's <b>column</b></span>
+      </div>
+      <div class="api-row">
+        <span class="api-call">ghost.pac_row</span><span class="api-desc">Pac-Man's <b>row</b> — use <code>print()</code> to inspect</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <div>
+      <div class="editor-panel">
+        <div class="editor-topbar">
+          <div class="editor-topbar-left"><div class="mac-dot mac-r"></div><div class="mac-dot mac-y"></div><div class="mac-dot mac-g"></div><span class="file-label">ghost_route.py</span></div>
+          <span class="fn-label">ghost.move(x, y)</span>
+        </div>
+        <div class="editor-wrap" id="l1-editorWrap">
+          <pre class="editor-highlight" id="l1-hl" aria-hidden="true"></pre>
+          <textarea id="l1-editor" spellcheck="false" autocomplete="off" aria-label="Level 1 code editor">def run(ghost):
+    ghost.move(1, 0)
+</textarea>
+        </div>
+        <div class="editor-footer">
+          <button class="btn-run" id="l1-btnRun" disabled onclick="l1Load()">▶ Load My Code</button>
+          <button class="btn-reset" onclick="l1Reset()">↺ Reset</button>
+          <button class="btn-hint" onclick="toggleHint('l1-hint')">💡 Hint</button>
+        </div>
+      </div>
+
+      <div class="hint-box" id="l1-hint">
+        <h3>💡 Hints</h3>
+        <p>Each call moves the ghost <strong>one step</strong>. To move two steps right write two calls:</p>
+        <p><code>ghost.move(1, 0)</code><br><code>ghost.move(1, 0)</code></p>
+        <p>Ghost is at col 3, row 4. Pac-Man is at col 7, row 5. That's <strong>4 right</strong> and <strong>1 down</strong>.</p>
+        <p>Not sure? Try: <code>print(ghost.pac_col)</code> and <code>print(ghost.pac_row)</code> — output appears in the console.</p>
+      </div>
+
+      <div class="feedback-panel">
+        <div class="feedback-header">Console Output</div>
+        <div class="feedback-body" id="l1-feedback">Load your code, then press Start Game.</div>
+      </div>
+
+      <details class="mark-panel">
+        <summary>📊 Marking Criteria — Level 1</summary>
+        <table class="mark-table">
+          <thead><tr><th>Criterion</th><th>What the examiner looks for</th><th>Marks</th></tr></thead>
+          <tbody>
+            <tr><td><span class="lvl">STRUCTURE</span></td><td>Function defined correctly; uses <code>ghost.move()</code></td><td class="marks">1</td></tr>
+            <tr><td><span class="lvl">SYNTAX</span></td><td>All calls pass exactly two integer arguments</td><td class="marks">1</td></tr>
+            <tr><td><span class="lvl">LOGIC</span></td><td>Ghost reaches Pac-Man's exact position</td><td class="marks">2</td></tr>
+            <tr><td><span class="lvl">EFFICIENCY</span></td><td>Route uses exactly 5 calls (no wasted steps)</td><td class="marks">1</td></tr>
+            <tr><td><span class="lvl">EXTENSION</span></td><td>Can explain what <code>ghost.move(1,1)</code> would do or why order matters</td><td class="marks">1</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 13px;font-family:var(--mono);font-size:11px;color:var(--muted);border-top:1px solid var(--line);">Total: 6 marks | Screenshot your run for OneNote evidence</div>
+      </details>
+    </div>
+
+    <div>
+      <div class="game-panel">
+        <div class="game-topbar">
+          <div class="game-topbar-title">👻 Level 1 — Static Pac-Man</div>
+          <div class="game-stats"><span>Step: <b id="l1-step">0</b></span><span>Target: <b style="color:var(--amber)">col 7, row 5</b></span></div>
+        </div>
+        <canvas class="main-canvas" id="l1-canvas" width="420" height="210"></canvas>
+        <div class="coord-live">
+          <div class="cl">Ghost: <b id="l1-cg">col 3, row 4</b></div>
+          <div class="cl">Pac-Man: <b id="l1-cp">col 7, row 5</b></div>
+          <div class="cl">Δcol: <b id="l1-dc">+4</b></div>
+          <div class="cl">Δrow: <b id="l1-dr">+1</b></div>
+        </div>
+        <div class="move-log" id="l1-log"><span style="color:var(--muted)">— move log —</span></div>
+        <div class="game-footer">
+          <button class="btn-start" id="l1-btnStart" disabled onclick="l1Start()">▶ Start Game</button>
+          <button class="btn-stop" id="l1-btnStop" style="display:none" onclick="l1Stop()">⏹ Stop</button>
+          <span class="speed-label">Speed: <select id="l1-speed"><option value="600">Slow</option><option value="350" selected>Normal</option><option value="150">Fast</option></select></span>
+        </div>
+        <div class="outcome-overlay" id="l1-outcome">
+          <div class="outcome-title" id="l1-otitle"></div>
+          <div class="outcome-sub"   id="l1-osub"></div>
+          <div class="outcome-score" id="l1-oscore"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /panel1 -->
+
+<!-- ═══════════════════════════════════════════ LEVEL 2 ═══ -->
+<div class="level-panel" id="panel2">
+
+  <div class="brief-card">
+    <h2>🧩 Level 2 — Maze Puzzles</h2>
+    <p>Three mazes, each with Pac-Man hiding in a different location. Write a separate <code>run(ghost)</code> function for each puzzle. All three must be solved to complete the level.</p>
+    <p>The mazes have walls — check the grid carefully before you code. <code>ghost.col</code> and <code>ghost.row</code> tell you the ghost's current position as moves are made.</p>
+    <p>Use the <strong>shared editor</strong> below. Select the puzzle with the <strong>Maze A / B / C tabs</strong> — the game window on the right will update to show that maze. Write your solution, then press <strong>Load &amp; Test</strong>.</p>
+  </div>
+
+  <!-- Hidden canvases and IDs required by JS — not displayed -->
+  <div style="display:none">
+    <canvas id="l2-canvas0" width="300" height="240"></canvas>
+    <canvas id="l2-canvas1" width="300" height="240"></canvas>
+    <canvas id="l2-canvas2" width="300" height="240"></canvas>
+    <div id="l2-pc0"></div><div id="l2-pc1"></div><div id="l2-pc2"></div>
+  </div>
+
+  <div class="main-grid">
+    <div>
+      <!-- Progress bar -->
+      <div class="progress-bar-wrap">
+        <span class="progress-bar-label">Puzzles solved:</span>
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="l2-bar" style="width:0%"></div></div>
+        <span class="progress-count" id="l2-count">0 / 3</span>
+      </div>
+
+      <!-- Shared editor with puzzle selector tabs -->
+      <div class="l2-editor-wrap">
+        <div class="editor-topbar">
+          <div class="editor-topbar-left">
+            <div class="mac-dot mac-r"></div><div class="mac-dot mac-y"></div><div class="mac-dot mac-g"></div>
+            <span class="file-label">maze_solutions.py</span>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn-run" id="l2-tab0" onclick="l2SelectPuzzle(0)" style="padding:5px 12px;font-size:11px;background:var(--teal)">Maze A</button>
+            <button class="btn-run" id="l2-tab1" onclick="l2SelectPuzzle(1)" style="padding:5px 12px;font-size:11px;background:var(--navy-light);color:var(--muted);border:1px solid var(--line)">Maze B</button>
+            <button class="btn-run" id="l2-tab2" onclick="l2SelectPuzzle(2)" style="padding:5px 12px;font-size:11px;background:var(--navy-light);color:var(--muted);border:1px solid var(--line)">Maze C</button>
+          </div>
+        </div>
+        <div class="editor-wrap" id="l2-editorWrap">
+          <pre class="editor-highlight" id="l2-hl" aria-hidden="true"></pre>
+          <textarea id="l2-editor" spellcheck="false" autocomplete="off">def run(ghost):
+    ghost.move(1, 0)
+</textarea>
+        </div>
+        <div class="editor-footer">
+          <button class="btn-run" id="l2-btnRun" disabled onclick="l2Load()">▶ Load &amp; Test</button>
+          <button class="btn-reset" onclick="l2Reset()">↺ Reset</button>
+          <button class="btn-hint" onclick="toggleHint('l2-hint')">💡 Hint</button>
+        </div>
+      </div>
+
+      <div class="hint-box" id="l2-hint">
+        <h3>💡 Hints</h3>
+        <p>Walls block movement — if <code>ghost.move()</code> tries to walk into a wall the game will flag an error. Look at the maze carefully first.</p>
+        <p>You can read the ghost's current position mid-route: <code>ghost.col</code> and <code>ghost.row</code> update after every move.</p>
+        <p>Use <code>print(ghost.col, ghost.row)</code> to trace the route step by step in the console.</p>
+      </div>
+
+      <div class="feedback-panel" style="margin-top:12px;">
+        <div class="feedback-header">Maze A — Output</div>
+        <div class="feedback-body" id="l2-fb0">Not tested yet.</div>
+      </div>
+      <div class="feedback-panel" style="margin-top:8px;">
+        <div class="feedback-header">Maze B — Output</div>
+        <div class="feedback-body" id="l2-fb1">Not tested yet.</div>
+      </div>
+      <div class="feedback-panel" style="margin-top:8px;">
+        <div class="feedback-header">Maze C — Output</div>
+        <div class="feedback-body" id="l2-fb2">Not tested yet.</div>
+      </div>
+
+      <details class="mark-panel" style="margin-top:14px;">
+        <summary>📊 Marking Criteria — Level 2</summary>
+        <table class="mark-table">
+          <thead><tr><th>Criterion</th><th>What the examiner looks for</th><th>Marks</th></tr></thead>
+          <tbody>
+            <tr><td><span class="lvl">MAZE A</span></td><td>Ghost navigates the corridor and catches Pac-Man</td><td class="marks">2</td></tr>
+            <tr><td><span class="lvl">MAZE B</span></td><td>Ghost navigates the corner correctly</td><td class="marks">2</td></tr>
+            <tr><td><span class="lvl">MAZE C</span></td><td>Ghost finds the detour route around the wall</td><td class="marks">3</td></tr>
+            <tr><td><span class="lvl">EFFICIENCY</span></td><td>Each route uses the minimum number of moves</td><td class="marks">2</td></tr>
+            <tr><td><span class="lvl">DEBUGGING</span></td><td>Evidence of using <code>print()</code> to check positions</td><td class="marks">1</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 13px;font-family:var(--mono);font-size:11px;color:var(--muted);border-top:1px solid var(--line);">Total: 10 marks | Screenshot all three solved mazes</div>
+      </details>
+    </div>
+
+    <div>
+      <div class="game-panel">
+        <div class="game-topbar">
+          <div class="game-topbar-title">🧩 Maze: <b id="l2-whichmaze" style="color:var(--teal)">A</b></div>
+          <div class="game-stats"><span>Step: <b id="l2-step">0</b></span></div>
+        </div>
+        <canvas class="main-canvas" id="l2-bigcanvas" width="420" height="336"></canvas>
+        <div class="coord-live">
+          <div class="cl">Ghost: <b id="l2-cg">—</b></div>
+          <div class="cl">Pac-Man: <b id="l2-cp">—</b></div>
+          <div class="cl">Δcol: <b id="l2-dc">—</b></div>
+          <div class="cl">Δrow: <b id="l2-dr">—</b></div>
+        </div>
+        <div class="move-log" id="l2-log"><span style="color:var(--muted)">— move log —</span></div>
+        <div class="game-footer">
+          <button class="btn-start" id="l2-btnStart" disabled onclick="l2Start()">▶ Play Selected Maze</button>
+          <button class="btn-stop" id="l2-btnStop" style="display:none" onclick="l2Stop()">⏹ Stop</button>
+          <span class="speed-label">Speed: <select id="l2-speed"><option value="600">Slow</option><option value="350" selected>Normal</option><option value="150">Fast</option></select></span>
+        </div>
+        <div class="outcome-overlay" id="l2-outcome">
+          <div class="outcome-title" id="l2-otitle"></div>
+          <div class="outcome-sub"   id="l2-osub"></div>
+          <div class="outcome-score" id="l2-oscore"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /panel2 -->
+
+<!-- ═══════════════════════════════════════════ LEVEL 3 ═══ -->
+<div class="level-panel" id="panel3">
+
+  <div class="brief-card">
+    <h2>🔥 Level 3 — Loops &amp; Patrol</h2>
+    <p>Pac-Man is now moving — eating dots across the maze. You control <strong>two ghosts</strong>: <code>ghost1</code> (blue 👻) and <code>ghost2</code> (pink 👻). Each has its own editor.</p>
+    <p>Write a sequence of moves using <code>for</code> loops inside <code>run(ghost)</code>. Your entire move list is collected first, then played back <strong>one step per game tick</strong> — so a loop of 7 moves plays out over 7 ticks. Plan a route that intercepts Pac-Man!</p>
+    <div class="api-box">
+      <div class="api-box-title">Commands you can use inside run(ghost)</div>
+      <div class="api-row"><span class="api-call">ghost.move(1, 0)</span><span class="api-desc">Move <b>right</b> one step</span></div>
+      <div class="api-row"><span class="api-call">ghost.move(-1, 0)</span><span class="api-desc">Move <b>left</b> one step</span></div>
+      <div class="api-row"><span class="api-call">ghost.move(0, 1)</span><span class="api-desc">Move <b>down</b> one step</span></div>
+      <div class="api-row"><span class="api-call">ghost.move(0, -1)</span><span class="api-desc">Move <b>up</b> one step</span></div>
+      <div class="api-row" style="border-top:1px solid var(--line);margin-top:8px;padding-top:8px;"><span class="api-call">for i in range(n):</span><span class="api-desc">Repeat a move <b>n times</b> — each repetition adds one step to your route</span></div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <div>
+      <!-- Ghost 1 editor -->
+      <div class="editor-panel" style="margin-bottom:12px;">
+        <div class="editor-topbar">
+          <div class="editor-topbar-left"><div class="mac-dot mac-r"></div><div class="mac-dot mac-y"></div><div class="mac-dot mac-g"></div><span class="file-label" style="color:var(--teal)">ghost1.py 👻</span></div>
+          <span class="fn-label">Blue ghost</span>
+        </div>
+        <div class="editor-wrap" id="l3-editorWrap1">
+          <pre class="editor-highlight" id="l3-hl1" aria-hidden="true"></pre>
+          <textarea id="l3-editor1" spellcheck="false" autocomplete="off">def run(ghost):
+    # Move right 7 steps
+    for i in range(7):
+        ghost.move(1, 0)
+    # Then move down 4 steps
+    for i in range(4):
+        ghost.move(0, 1)
+</textarea>
+        </div>
+        <div class="editor-footer">
+          <button class="btn-run" id="l3-btnRun1" disabled onclick="l3Load(1)">▶ Load Ghost 1</button>
+          <button class="btn-reset" onclick="l3Reset(1)">↺ Reset</button>
+        </div>
+      </div>
+
+      <!-- Ghost 2 editor -->
+      <div class="editor-panel" style="margin-bottom:12px;">
+        <div class="editor-topbar">
+          <div class="editor-topbar-left"><div class="mac-dot mac-r"></div><div class="mac-dot mac-y"></div><div class="mac-dot mac-g"></div><span class="file-label" style="color:var(--ghost2)">ghost2.py 👻</span></div>
+          <span class="fn-label">Pink ghost</span>
+        </div>
+        <div class="editor-wrap" id="l3-editorWrap2">
+          <pre class="editor-highlight" id="l3-hl2" aria-hidden="true"></pre>
+          <textarea id="l3-editor2" spellcheck="false" autocomplete="off">def run(ghost):
+    # Move down 7 steps
+    for i in range(7):
+        ghost.move(0, 1)
+    # Then move left 4 steps
+    for i in range(4):
+        ghost.move(-1, 0)
+</textarea>
+        </div>
+        <div class="editor-footer">
+          <button class="btn-run g2" id="l3-btnRun2" disabled onclick="l3Load(2)">▶ Load Ghost 2</button>
+          <button class="btn-reset" onclick="l3Reset(2)">↺ Reset</button>
+        </div>
+      </div>
+
+      <div class="hint-box show" id="l3-hint">
+        <h3>💡 Level 3 — How it works</h3>
+        <p>When you press <strong>Load Ghost</strong>, Python runs your entire <code>run(ghost)</code> function and collects every <code>ghost.move()</code> call into a list. Then when you press <strong>Start Game</strong>, those moves play back <strong>one per tick</strong> — so loops produce the repeated steps you expect.</p>
+        <p>Ghost 1 starts at <strong>col 1, row 1</strong> (top-left). Ghost 2 starts at <strong>col 13, row 13</strong> (bottom-right). Pac-Man starts at <strong>col 7, row 7</strong> (centre) and moves randomly. Plan a route that aims to intercept where Pac-Man is likely to be.</p>
+        <p>You can mix loops and single moves to build your route:</p>
+        <p><code>def run(ghost):<br>&nbsp;&nbsp;&nbsp;&nbsp;for i in range(6):<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ghost.move(1, 0)&nbsp;&nbsp;# right 6<br>&nbsp;&nbsp;&nbsp;&nbsp;for i in range(6):<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ghost.move(0, 1)&nbsp;&nbsp;# down 6<br>&nbsp;&nbsp;&nbsp;&nbsp;ghost.move(1, 0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# one more right</code></p>
+        <p><strong>Extension:</strong> can you make your route loop — so the ghost keeps patrolling after its first sequence finishes? Add another set of loops to bring it back to the start and try again.</p>
+      </div>
+
+      <div class="feedback-panel" style="margin-top:12px;">
+        <div class="feedback-header">Console Output</div>
+        <div class="feedback-body" id="l3-feedback">Load both ghosts, then press Start Game.</div>
+      </div>
+
+      <details class="mark-panel" style="margin-top:14px;">
+        <summary>📊 Marking Criteria — Level 3</summary>
+        <table class="mark-table">
+          <thead><tr><th>Criterion</th><th>What the examiner looks for</th><th>Marks</th></tr></thead>
+          <tbody>
+            <tr><td><span class="lvl">STRUCTURE</span></td><td>Both ghost functions defined correctly; uses <code>ghost.move()</code> with valid arguments inside <code>run(ghost)</code></td><td class="marks">2</td></tr>
+            <tr><td><span class="lvl">LOOPS</span></td><td>Uses <code>for i in range(n):</code> to repeat moves — at least one loop in each ghost</td><td class="marks">3</td></tr>
+            <tr><td><span class="lvl">ROUTE LOGIC</span></td><td>Route is planned with purpose — ghost heads toward Pac-Man's starting area or a likely intercept point</td><td class="marks">3</td></tr>
+            <tr><td><span class="lvl">COORDINATION</span></td><td>The two ghosts take different routes and approach from different directions</td><td class="marks">2</td></tr>
+            <tr><td><span class="lvl">EXTENSION</span></td><td>Route loops back to patrol an area — ghost continues moving after initial sequence rather than stopping</td><td class="marks">2</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 13px;font-family:var(--mono);font-size:11px;color:var(--muted);border-top:1px solid var(--line);">Total: 12 marks | Screenshot the caught outcome with tick count visible</div>
+      </details>
+    </div>
+
+    <div>
+      <div class="game-panel">
+        <div class="game-topbar">
+          <div class="game-topbar-title">🔥 Level 3 — Live Game</div>
+          <div class="game-stats">
+            <span>Tick: <b id="l3-tick">0</b></span>
+            <span class="dot-score">Dots: <b id="l3-dots">—</b></span>
+            <span>Score: <b id="l3-score">0</b></span>
+          </div>
+        </div>
+        <canvas class="main-canvas" id="l3-canvas" width="420" height="420"></canvas>
+        <div class="coord-live">
+          <div class="cl">Ghost 1: <b id="l3-cg1">—</b></div>
+          <div class="cl g2">Ghost 2: <b id="l3-cg2">—</b></div>
+          <div class="cl">Pac-Man: <b id="l3-cp">—</b></div>
+        </div>
+        <div class="game-footer">
+          <button class="btn-start" id="l3-btnStart" disabled onclick="l3Start()">▶ Start Game</button>
+          <button class="btn-stop" id="l3-btnStop" style="display:none" onclick="l3Stop()">⏹ Stop</button>
+          <span class="speed-label">Speed: <select id="l3-speed"><option value="500">Slow</option><option value="250" selected>Normal</option><option value="100">Fast</option></select></span>
+        </div>
+        <div class="outcome-overlay" id="l3-outcome">
+          <div class="outcome-title" id="l3-otitle"></div>
+          <div class="outcome-sub"   id="l3-osub"></div>
+          <div class="outcome-score" id="l3-oscore"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /panel3 -->
+
+<footer>GHOST PROTOCOL · ALL LEVELS · RUNS REAL PYTHON VIA PYODIDE · REQUIRES INTERNET ACCESS</footer>
+</div><!-- /wrap -->
+
+<script>
+(function(){
+'use strict';
+
+/* ═══════════════════════════ PYODIDE WORKER ═══════════════════════════ */
+var WORKER_SRC = [
+'self.pyodideReady=false;',
+'importScripts("https://cdn.jsdelivr.net/pyodide/v0.26.3/full/pyodide.js");',
+'async function init(){',
+'  try{',
+'    self.pyodide=await loadPyodide({indexURL:"https://cdn.jsdelivr.net/pyodide/v0.26.3/full/"});',
+'    self.pyodideReady=true;',
+'    self.postMessage({type:"ready"});',
+'  }catch(e){self.postMessage({type:"load-error",error:String(e)});}',
+'}',
+'init();',
+'self.onmessage=function(e){',
+'  var d=e.data;',
+'  if(!self.pyodideReady){self.postMessage({id:d.id,ok:false,error:"Engine loading."});return;}',
+'  try{',
+'    var setup=[',
+'      "import sys,io,json",',
+'      "sys.stdout=io.StringIO()",',
+'      "class Ghost:",',
+'      "    def __init__(self,col,row,pac_col,pac_row,zone_col,zone_row):",',
+'      "        self._moves=[];self.col=col;self.row=row",',
+'      "        self.pac_col=pac_col;self.pac_row=pac_row",',
+'      "        self.zone_col=zone_col;self.zone_row=zone_row",',
+'      "    def move(self,x,y):",',
+'      "        if not isinstance(x,(int,float)) or not isinstance(y,(int,float)):",',
+'      "            raise TypeError(\'ghost.move() needs two numbers\')",',
+'      "        self.col+=int(x);self.row+=int(y)",',
+'      "        self._moves.append({\'x\':int(x),\'y\':int(y)})",',
+'      "ghost=Ghost("+d.gc+","+d.gr+","+d.pc+","+d.pr+","+d.zc+","+d.zr+")"',
+'    ].join("\\n");',
+'    self.pyodide.runPython(setup);',
+'    self.pyodide.runPython(d.code);',
+'    self.pyodide.runPython("run(ghost)");',
+'    var result=self.pyodide.runPython("json.dumps(ghost._moves)");',
+'    var stdout=self.pyodide.runPython("sys.stdout.getvalue()");',
+'    self.postMessage({id:d.id,ok:true,result:result,stdout:stdout});',
+'  }catch(err){self.postMessage({id:d.id,ok:false,error:String(err)});}',
+'};'
+].join('\n');
+
+var workerBlob=URL.createObjectURL(new Blob([WORKER_SRC],{type:'application/javascript'}));
+var worker=null, pyodideReady=false;
+var pendingResolve=null, pendingTimeout=null;
+
+function startWorker(){
+  worker=new Worker(workerBlob);
+  worker.onmessage=function(e){
+    var d=e.data;
+    if(d.type==='ready'){pyodideReady=true;setBanner('ready','✓ Python engine ready.');enableRunButtons();return;}
+    if(d.type==='load-error'){setBanner('error','⚠️ Engine failed to load. Check internet and refresh.');return;}
+    if(pendingResolve){clearTimeout(pendingTimeout);var r=pendingResolve;pendingResolve=null;pendingTimeout=null;r(d);}
+  };
+  worker.onerror=function(){setBanner('error','⚠️ Engine error. Refresh the page.');};
+}
+startWorker();
+
+function callWorker(code,gc,gr,pc,pr,zc,zr){
+  return new Promise(function(resolve){
+    pendingResolve=resolve;
+    pendingTimeout=setTimeout(function(){pendingResolve=null;resolve({ok:false,timeout:true});},8000);
+    worker.postMessage({id:Date.now(),code:code,gc:gc,gr:gr,pc:pc,pr:pr,zc:zc||0,zr:zr||0});
+  });
+}
+
+function setBanner(kind,text){
+  var b=document.getElementById('engineBanner'),s=document.getElementById('engineSpinner');
+  b.className='engine-banner'+(kind==='ready'?' ready':kind==='error'?' error':'');
+  s.style.display=(kind==='loading')?'':'none';
+  document.getElementById('engineText').textContent=text;
+}
+function enableRunButtons(){
+  ['l1-btnRun','l2-btnRun','l3-btnRun1','l3-btnRun2'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.disabled=false;
+  });
+}
+
+/* ═══════════════════════════ TAB SWITCHING ═══════════════════════════ */
+function switchLevel(n){
+  [1,2,3].forEach(function(i){
+    document.getElementById('panel'+i).classList.toggle('active',i===n);
+    document.getElementById('tab'+i).classList.toggle('active',i===n);
+  });
+  document.getElementById('globalPill').textContent='Level '+n;
+}
+window.switchLevel=switchLevel;
+
+function toggleHint(id){
+  var el=document.getElementById(id);
+  el.className=el.className.includes('show')?'hint-box':'hint-box show';
+}
+window.toggleHint=toggleHint;
+
+/* ═══════════════════════════ SYNTAX HIGHLIGHTER ═══════════════════════ */
+function escH(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function highlight(code){
+  var lines=code.split('\n');
+  return lines.map(function(line){
+    var ci=-1,inStr=false,sc='';
+    for(var i=0;i<line.length;i++){
+      var ch=line[i];
+      if(!inStr&&(ch==='"'||ch==="'")){inStr=true;sc=ch;}
+      else if(inStr&&ch===sc){inStr=false;}
+      else if(!inStr&&ch==='#'){ci=i;break;}
+    }
+    var code2=ci>=0?line.slice(0,ci):line;
+    var cmt=ci>=0?line.slice(ci):'';
+    var toks=[];
+    var prot=code2.replace(/(["'])(?:(?!\1).)*\1/g,function(m){
+      var i=toks.length;toks.push('<span class="tok-str">'+escH(m)+'</span>');return'\x00S'+i+'\x00';
+    });
+    var h=escH(prot);
+    h=h.replace(/\b(def|return|if|elif|else|for|while|in|not|and|or|pass|True|False|None)\b/g,'<span class="tok-kw">$1</span>');
+    h=h.replace(/\b(print|range|len|int|float|str|abs|isinstance|type|input)\b/g,'<span class="tok-builtin">$1</span>');
+    h=h.replace(/\bself\b/g,'<span class="tok-self">self</span>');
+    h=h.replace(/\bghost2\b/g,'<span class="tok-obj2">ghost2</span>');
+    h=h.replace(/\bghost1\b/g,'<span class="tok-obj">ghost1</span>');
+    h=h.replace(/\bghost\b/g,'<span class="tok-obj">ghost</span>');
+    h=h.replace(/\.(move|pac_col|pac_row|col|row|zone_col|zone_row)\b/g,'.<span class="tok-method">$1</span>');
+    h=h.replace(/\b(-?\d+)\b/g,'<span class="tok-num">$1</span>');
+    h=h.replace(/([()])/g,'<span class="tok-paren">$1</span>');
+    h=h.replace(/\x00S(\d+)\x00/g,function(_,i){return toks[parseInt(i,10)];});
+    return h+(cmt?'<span class="tok-comment">'+escH(cmt)+'</span>':'');
+  }).join('\n')+'\n';
+}
+
+function bindEditor(editorId,hlId,wrapId){
+  var ta=document.getElementById(editorId);
+  var hl=document.getElementById(hlId);
+  var wrap=document.getElementById(wrapId);
+  function sync(){
+    hl.innerHTML=highlight(ta.value);
+    hl.scrollTop=ta.scrollTop;hl.scrollLeft=ta.scrollLeft;
+    var h=Math.max(180,ta.scrollHeight);
+    if(wrap){wrap.style.minHeight=h+'px';ta.style.height=h+'px';}
+  }
+  ta.addEventListener('input',sync);
+  ta.addEventListener('scroll',function(){hl.scrollTop=this.scrollTop;hl.scrollLeft=this.scrollLeft;});
+  ta.addEventListener('keydown',function(e){
+    if(e.key==='Tab'){e.preventDefault();var s=this.selectionStart,end=this.selectionEnd;
+      this.value=this.value.slice(0,s)+'    '+this.value.slice(end);
+      this.selectionStart=this.selectionEnd=s+4;sync();}
+  });
+  sync();
+  return sync;
+}
+
+var l1Sync=bindEditor('l1-editor','l1-hl','l1-editorWrap');
+var l2Sync=bindEditor('l2-editor','l2-hl','l2-editorWrap');
+var l3Sync1=bindEditor('l3-editor1','l3-hl1','l3-editorWrap1');
+var l3Sync2=bindEditor('l3-editor2','l3-hl2','l3-editorWrap2');
+
+/* ═══════════════════════════ DRAWING UTILS ═══════════════════════════ */
+function drawGrid(ctx,maze,cell,cols,rows){
+  ctx.fillStyle='#000';ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
+  for(var r=0;r<rows;r++){for(var c=0;c<cols;c++){
+    var x=c*cell,y=r*cell;
+    if(maze[r][c]===1){
+      ctx.fillStyle='#1a52a8';ctx.fillRect(x,y,cell,cell);
+      ctx.strokeStyle='#2266cc';ctx.lineWidth=0.5;ctx.strokeRect(x+1,y+1,cell-2,cell-2);
+    }else{
+      ctx.strokeStyle='rgba(31,58,82,0.3)';ctx.lineWidth=0.5;ctx.strokeRect(x,y,cell,cell);
+      ctx.fillStyle='rgba(127,147,168,0.18)';ctx.font='7px monospace';ctx.fillText(c+','+r,x+2,y+8);
+    }
+  }}
+}
+
+function drawDots(ctx,dots,cell,cols){
+  ctx.fillStyle='#fff';
+  for(var i=0;i<dots.length;i++){
+    if(dots[i]){var c=i%cols,r=Math.floor(i/cols);ctx.beginPath();ctx.arc(c*cell+cell/2,r*cell+cell/2,2,0,Math.PI*2);ctx.fill();}
+  }
+}
+
+function drawGhost(ctx,cx,cy,cell,clr){
+  var r=cell/2-2;
+  ctx.fillStyle=clr;ctx.beginPath();ctx.arc(cx,cy-1,r,Math.PI,0);
+  ctx.lineTo(cx+r,cy+r-1);var w=r*2/3;
+  ctx.quadraticCurveTo(cx+r-w/2,cy+r+3,cx,cy+r-1);
+  ctx.quadraticCurveTo(cx-r+w/2,cy+r+3,cx-r,cy+r-1);
+  ctx.lineTo(cx-r,cy-1);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx-3,cy-2,2.2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(cx+3,cy-2,2.2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#0044aa';ctx.beginPath();ctx.arc(cx-2.5,cy-2,1,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(cx+3.5,cy-2,1,0,Math.PI*2);ctx.fill();
+}
+
+function drawPacman(ctx,cx,cy,cell,mouthOpen){
+  var r=cell/2-2,ang=mouthOpen?0.22:0.04;
+  ctx.fillStyle='#FFD600';ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,ang*Math.PI,(2-ang)*Math.PI);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#000';ctx.beginPath();ctx.arc(cx+2,cy-r*0.38,1.4,0,Math.PI*2);ctx.fill();
+}
+
+function isWall(maze,rows,cols,c,r){
+  return r<0||r>=rows||c<0||c>=cols||maze[r][c]===1;
+}
+
+function getHintMsg(err){
+  if(/IndentationError/.test(err)) return '💡 Check indentation — 4 spaces inside your function.';
+  if(/SyntaxError/.test(err))      return '💡 Check for a missing colon after def run(ghost): or mismatched brackets.';
+  if(/TypeError.*ghost/.test(err)) return '💡 ghost.move() needs two numbers: ghost.move(1, 0).';
+  if(/NameError.*ghost/.test(err)) return '💡 Make sure ghost.move() is inside the run(ghost) function.';
+  return '💡 Read the error above — it usually points to the exact line.';
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LEVEL 1
+═══════════════════════════════════════════════════════════════════════ */
+var L1={
+  COLS:11,ROWS:7,
+  GHOST_C:3,GHOST_R:4,PAC_C:7,PAC_R:5,
+  ghostC:3,ghostR:4,
+  moves:null,stepIdx:0,stepCount:0,running:false,loopId:null,
+  canvas:null,ctx:null,cell:0,maze:null
+};
+
+(function(){
+  L1.canvas=document.getElementById('l1-canvas');
+  L1.ctx=L1.canvas.getContext('2d');
+  L1.cell=Math.floor(Math.min(L1.canvas.width/L1.COLS,L1.canvas.height/L1.ROWS));
+  L1.canvas.width=L1.COLS*L1.cell;L1.canvas.height=L1.ROWS*L1.cell;
+  L1.maze=buildBorderMaze(L1.ROWS,L1.COLS);
+  l1Reset2();
+})();
+
+function buildBorderMaze(rows,cols){
+  var m=[];for(var r=0;r<rows;r++){m[r]=[];for(var c=0;c<cols;c++)m[r][c]=(r===0||r===rows-1||c===0||c===cols-1)?1:0;}return m;
+}
+
+function l1Reset2(){
+  L1.ghostC=L1.GHOST_C;L1.ghostR=L1.GHOST_R;
+  L1.stepIdx=0;L1.stepCount=0;L1.moves=null;
+  l1UpdateCoords();l1Draw();
+  document.getElementById('l1-log').innerHTML='<span style="color:var(--muted)">— move log —</span>';
+  document.getElementById('l1-step').textContent='0';
+  document.getElementById('l1-outcome').className='outcome-overlay';
+}
+
+function l1Draw(){
+  drawGrid(L1.ctx,L1.maze,L1.cell,L1.COLS,L1.ROWS);
+  drawGhost(L1.ctx,L1.ghostC*L1.cell+L1.cell/2,L1.ghostR*L1.cell+L1.cell/2,L1.cell,'#00B4D8');
+  drawPacman(L1.ctx,L1.PAC_C*L1.cell+L1.cell/2,L1.PAC_R*L1.cell+L1.cell/2,L1.cell,true);
+}
+
+function l1UpdateCoords(){
+  document.getElementById('l1-cg').textContent='col '+L1.ghostC+', row '+L1.ghostR;
+  var dc=L1.PAC_C-L1.ghostC,dr=L1.PAC_R-L1.ghostR;
+  document.getElementById('l1-dc').textContent=(dc>=0?'+':'')+dc;
+  document.getElementById('l1-dr').textContent=(dr>=0?'+':'')+dr;
+}
+
+function l1BuildChips(moves){
+  var log=document.getElementById('l1-log');log.innerHTML='';
+  moves.forEach(function(m,i){
+    var chip=document.createElement('span');chip.className='move-chip';chip.id='l1c'+i;
+    chip.textContent='('+m.x+','+m.y+')';log.appendChild(chip);
+  });
+}
+function l1TickChip(i){
+  if(i>0){var p=document.getElementById('l1c'+(i-1));if(p)p.className='move-chip done';}
+  var c=document.getElementById('l1c'+i);if(c)c.className='move-chip active';
+}
+
+window.l1Load=function(){
+  if(!pyodideReady)return;
+  var code=document.getElementById('l1-editor').value;
+  document.getElementById('l1-feedback').textContent='Checking…';
+  document.getElementById('l1-btnRun').disabled=true;
+  callWorker(code,L1.GHOST_C,L1.GHOST_R,L1.PAC_C,L1.PAC_R,0,0).then(function(res){
+    document.getElementById('l1-btnRun').disabled=false;
+    if(!res.ok){
+      var e=res.timeout?'Timed out.':(res.error||'Error');
+      document.getElementById('l1-feedback').textContent='⚠️ '+e+'\n\n'+getHintMsg(e);
+      L1.moves=null;document.getElementById('l1-btnStart').disabled=true;return;
+    }
+    var parsed;try{parsed=JSON.parse(res.result);}catch(ex){
+      document.getElementById('l1-feedback').textContent='⚠️ Could not read moves. Make sure you call ghost.move() inside run(ghost).';
+      L1.moves=null;document.getElementById('l1-btnStart').disabled=true;return;
+    }
+    if(!parsed.length){
+      document.getElementById('l1-feedback').textContent='⚠️ No ghost.move() calls found. Add some!';
+      L1.moves=null;document.getElementById('l1-btnStart').disabled=true;return;
+    }
+    L1.moves=parsed;l1BuildChips(parsed);
+    var prev=parsed.map(function(m,i){return '  '+(i+1)+'. ghost.move('+m.x+','+m.y+')'}).join('\n');
+    var out=res.stdout?'\n\nPrint output:\n'+res.stdout:'';
+    document.getElementById('l1-feedback').textContent='✓ '+parsed.length+' move(s) loaded:\n'+prev+out+'\n\nPress Start Game.';
+    document.getElementById('l1-btnStart').disabled=false;
+    document.getElementById('l1-outcome').className='outcome-overlay';
+  });
+};
+
+window.l1Start=function(){
+  if(!L1.moves)return;
+  var savedMoves=L1.moves;
+  l1Reset2();
+  L1.moves=savedMoves;
+  l1BuildChips(L1.moves);
+  var f=document.getElementById('l1c0');if(f)f.className='move-chip active';
+  document.getElementById('l1-btnStart').style.display='none';
+  document.getElementById('l1-btnStop').style.display='';
+  document.getElementById('l1-outcome').className='outcome-overlay';
+  L1.running=true;l1Draw();
+  var tick=function(){
+    if(!L1.running)return;
+    if(L1.stepIdx>=L1.moves.length){l1End(false,'out');return;}
+    var m=L1.moves[L1.stepIdx];
+    var nc=L1.ghostC+m.x,nr=L1.ghostR+m.y;
+    if(isWall(L1.maze,L1.ROWS,L1.COLS,nc,nr)){l1End(false,'wall');return;}
+    L1.ghostC=nc;L1.ghostR=nr;L1.stepIdx++;L1.stepCount++;
+    l1TickChip(L1.stepIdx);l1UpdateCoords();
+    document.getElementById('l1-step').textContent=L1.stepCount;
+    l1Draw();
+    if(L1.ghostC===L1.PAC_C&&L1.ghostR===L1.PAC_R){l1End(true,'');return;}
+    L1.loopId=setTimeout(tick,parseInt(document.getElementById('l1-speed').value));
+  };
+  L1.loopId=setTimeout(tick,parseInt(document.getElementById('l1-speed').value));
+};
+
+function l1End(caught,reason){
+  L1.running=false;clearTimeout(L1.loopId);
+  var lc=document.getElementById('l1c'+(L1.stepIdx-1));if(lc&&caught)lc.className='move-chip done';
+  l1Draw();
+  var ov=document.getElementById('l1-outcome');ov.className='outcome-overlay show';
+  var ti=document.getElementById('l1-otitle'),su=document.getElementById('l1-osub'),sc=document.getElementById('l1-oscore');
+  if(caught){
+    ti.className='outcome-title win';ti.textContent='👻 GHOST CAUGHT PAC-MAN!';
+    su.textContent='Correct route! Screenshot for your OneNote evidence.';
+    sc.textContent='Caught in '+L1.stepCount+' step(s) | Marks: '+(L1.stepCount===5?'5–6':L1.stepCount<=7?'4–5':'2–3')+' / 6';
+    document.getElementById('tab1').classList.add('solved');
+  }else{
+    ti.className='outcome-title lose';
+    if(reason==='wall'){ti.textContent='💥 GHOST HIT A WALL!';su.textContent='A move ran into a wall. Check your x/y values.';}
+    else{var dc=L1.PAC_C-L1.ghostC,dr=L1.PAC_R-L1.ghostR;ti.textContent='🟡 PAC-MAN NOT REACHED';su.textContent='Out of moves. Still '+Math.abs(dc)+' col(s) and '+Math.abs(dr)+' row(s) away.';}
+    sc.textContent='Ghost ended at col '+L1.ghostC+', row '+L1.ghostR;
+  }
+  document.getElementById('l1-btnStart').style.display='';document.getElementById('l1-btnStart').textContent='▶ Try Again';
+  document.getElementById('l1-btnStop').style.display='none';
+}
+
+window.l1Stop=function(){L1.running=false;clearTimeout(L1.loopId);document.getElementById('l1-btnStart').style.display='';document.getElementById('l1-btnStart').textContent='▶ Start Game';document.getElementById('l1-btnStop').style.display='none';};
+window.l1Reset=function(){document.getElementById('l1-editor').value='def run(ghost):\n    ghost.move(1, 0)\n';l1Sync();L1.moves=null;document.getElementById('l1-btnStart').disabled=true;document.getElementById('l1-btnStart').textContent='▶ Start Game';document.getElementById('l1-feedback').textContent='Code reset.';L1.running=false;clearTimeout(L1.loopId);l1Reset2();};
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LEVEL 2 — THREE MAZES
+═══════════════════════════════════════════════════════════════════════ */
+
+// Maze definitions: 0=open, 1=wall. Ghost start marked by position, pac by position.
+var L2_MAZES=[
+  {
+    name:'A',rows:8,cols:10,
+    ghostC:1,ghostR:1,pacC:8,pacR:1,
+    // Corridor — straight run right along row 1, walls above and below
+    grid:[
+      [1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,1],
+      [1,0,1,1,0,1,1,0,0,1],
+      [1,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1]
+    ]
+  },
+  {
+    name:'B',rows:8,cols:10,
+    ghostC:1,ghostR:1,pacC:8,pacR:6,
+    // Corner — must go right then down
+    grid:[
+      [1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,1],
+      [1,0,1,1,1,1,1,1,0,1],
+      [1,0,1,0,0,0,0,1,0,1],
+      [1,0,1,0,1,1,0,1,0,1],
+      [1,0,1,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1]
+    ]
+  },
+  {
+    name:'C',rows:8,cols:10,
+    ghostC:1,ghostR:3,pacC:8,pacR:3,
+    // Detour — wall blocks direct path, must go around
+    grid:[
+      [1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,1],
+      [1,0,1,1,1,1,1,1,0,1],
+      [1,0,0,0,1,0,0,0,0,1],
+      [1,0,1,0,1,0,1,1,0,1],
+      [1,0,1,0,0,0,0,1,0,1],
+      [1,0,0,0,1,1,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1]
+    ]
+  }
+];
+
+var L2={
+  selected:0,
+  solved:[false,false,false],
+  loadedMoves:[null,null,null],
+  savedCode:['def run(ghost):\n    ghost.move(1, 0)\n',
+             'def run(ghost):\n    ghost.move(1, 0)\n',
+             'def run(ghost):\n    ghost.move(1, 0)\n'],
+  ghostC:0,ghostR:0,stepIdx:0,stepCount:0,running:false,loopId:null,
+  bigCtx:null,bigCell:0
+};
+
+// Draw mini canvases
+(function(){
+  L2_MAZES.forEach(function(maze,i){
+    var cv=document.getElementById('l2-canvas'+i);
+    var cell=Math.floor(Math.min(cv.width/maze.cols,cv.height/maze.rows));
+    cv.width=maze.cols*cell;cv.height=maze.rows*cell;
+    var ctx=cv.getContext('2d');
+    drawGrid(ctx,maze.grid,cell,maze.cols,maze.rows);
+    drawGhost(ctx,maze.ghostC*cell+cell/2,maze.ghostR*cell+cell/2,cell,'#00B4D8');
+    drawPacman(ctx,maze.pacC*cell+cell/2,maze.pacR*cell+cell/2,cell,true);
+    maze.miniCtx=ctx;maze.cell=cell;
+  });
+  var bc=document.getElementById('l2-bigcanvas');
+  L2.bigCtx=bc.getContext('2d');
+})();
+
+function l2DrawMini(idx){
+  var maze=L2_MAZES[idx];
+  drawGrid(maze.miniCtx,maze.grid,maze.cell,maze.cols,maze.rows);
+  var gc=L2.selected===idx?L2.ghostC:maze.ghostC;
+  var gr=L2.selected===idx?L2.ghostR:maze.ghostR;
+  drawGhost(maze.miniCtx,gc*maze.cell+maze.cell/2,gr*maze.cell+maze.cell/2,maze.cell,'#00B4D8');
+  drawPacman(maze.miniCtx,maze.pacC*maze.cell+maze.cell/2,maze.pacR*maze.cell+maze.cell/2,maze.cell,true);
+}
+
+function l2DrawBig(ghostC,ghostR){
+  var maze=L2_MAZES[L2.selected];
+  var bc=document.getElementById('l2-bigcanvas');
+  var cell=Math.floor(Math.min(bc.width/maze.cols,bc.height/maze.rows));
+  bc.width=maze.cols*cell;bc.height=maze.rows*cell;
+  var ctx=L2.bigCtx=bc.getContext('2d');
+  drawGrid(ctx,maze.grid,cell,maze.cols,maze.rows);
+  drawGhost(ctx,ghostC*cell+cell/2,ghostR*cell+cell/2,cell,'#00B4D8');
+  drawPacman(ctx,maze.pacC*cell+cell/2,maze.pacR*cell+cell/2,cell,true);
+  document.getElementById('l2-cg').textContent='col '+ghostC+', row '+ghostR;
+  document.getElementById('l2-cp').textContent='col '+maze.pacC+', row '+maze.pacR;
+  var dc=maze.pacC-ghostC,dr=maze.pacR-ghostR;
+  document.getElementById('l2-dc').textContent=(dc>=0?'+':'')+dc;
+  document.getElementById('l2-dr').textContent=(dr>=0?'+':'')+dr;
+}
+
+function l2SelectPuzzle(idx){
+  // Save current code
+  L2.savedCode[L2.selected]=document.getElementById('l2-editor').value;
+  L2.selected=idx;
+  document.getElementById('l2-editor').value=L2.savedCode[idx];
+  l2Sync();
+  document.getElementById('l2-whichmaze').textContent=L2_MAZES[idx].name;
+  // Style tabs
+  [0,1,2].forEach(function(i){
+    var btn=document.getElementById('l2-tab'+i);
+    if(i===idx){btn.style.background='var(--teal)';btn.style.color='#02222c';btn.style.border='none';}
+    else{btn.style.background='var(--navy-light)';btn.style.color='var(--muted)';btn.style.border='1px solid var(--line)';}
+  });
+  var maze=L2_MAZES[idx];
+  L2.ghostC=maze.ghostC;L2.ghostR=maze.ghostR;
+  l2DrawBig(L2.ghostC,L2.ghostR);
+  l2DrawMini(idx);
+  document.getElementById('l2-btnStart').disabled=!L2.loadedMoves[idx];
+  document.getElementById('l2-outcome').className='outcome-overlay';
+}
+window.l2SelectPuzzle=l2SelectPuzzle;
+// Init first puzzle display
+(function(){l2DrawBig(L2_MAZES[0].ghostC,L2_MAZES[0].ghostR);l2DrawMini(0);l2DrawMini(1);l2DrawMini(2);})();
+
+window.l2Load=function(){
+  if(!pyodideReady)return;
+  var idx=L2.selected,maze=L2_MAZES[idx];
+  var code=document.getElementById('l2-editor').value;
+  L2.savedCode[idx]=code;
+  document.getElementById('l2-fb'+idx).textContent='Checking…';
+  document.getElementById('l2-btnRun').disabled=true;
+  callWorker(code,maze.ghostC,maze.ghostR,maze.pacC,maze.pacR,0,0).then(function(res){
+    document.getElementById('l2-btnRun').disabled=false;
+    if(!res.ok){
+      var e=res.timeout?'Timed out.':(res.error||'Error');
+      document.getElementById('l2-fb'+idx).textContent='⚠️ '+e+'\n'+getHintMsg(e);
+      L2.loadedMoves[idx]=null;document.getElementById('l2-btnStart').disabled=true;return;
+    }
+    var parsed;try{parsed=JSON.parse(res.result);}catch(ex){
+      document.getElementById('l2-fb'+idx).textContent='⚠️ No valid move list returned.';
+      L2.loadedMoves[idx]=null;document.getElementById('l2-btnStart').disabled=true;return;
+    }
+    if(!parsed.length){
+      document.getElementById('l2-fb'+idx).textContent='⚠️ No ghost.move() calls found.';
+      L2.loadedMoves[idx]=null;document.getElementById('l2-btnStart').disabled=true;return;
+    }
+    L2.loadedMoves[idx]=parsed;
+    var out=res.stdout?'\nPrint output:\n'+res.stdout:'';
+    document.getElementById('l2-fb'+idx).textContent='✓ '+parsed.length+' move(s) queued.'+out+'\nPress Play to test.';
+    document.getElementById('l2-btnStart').disabled=false;
+    document.getElementById('l2-outcome').className='outcome-overlay';
+  });
+};
+
+window.l2Start=function(){
+  var idx=L2.selected,maze=L2_MAZES[idx];
+  var moves=L2.loadedMoves[idx];if(!moves)return;
+  L2.ghostC=maze.ghostC;L2.ghostR=maze.ghostR;L2.stepIdx=0;L2.stepCount=0;L2.running=true;
+  document.getElementById('l2-step').textContent='0';
+  document.getElementById('l2-btnStart').style.display='none';
+  document.getElementById('l2-btnStop').style.display='';
+  document.getElementById('l2-outcome').className='outcome-overlay';
+  // Build chips
+  var log=document.getElementById('l2-log');log.innerHTML='';
+  moves.forEach(function(m,i){var ch=document.createElement('span');ch.className='move-chip';ch.id='l2c'+i;ch.textContent='('+m.x+','+m.y+')';log.appendChild(ch);});
+  var fc=document.getElementById('l2c0');if(fc)fc.className='move-chip active';
+  l2DrawBig(L2.ghostC,L2.ghostR);
+  var tick=function(){
+    if(!L2.running)return;
+    if(L2.stepIdx>=moves.length){l2End(false,'out');return;}
+    var m=moves[L2.stepIdx];
+    var nc=L2.ghostC+m.x,nr=L2.ghostR+m.y;
+    if(isWall(maze.grid,maze.rows,maze.cols,nc,nr)){l2End(false,'wall');return;}
+    L2.ghostC=nc;L2.ghostR=nr;L2.stepIdx++;L2.stepCount++;
+    var prev=document.getElementById('l2c'+(L2.stepIdx-2));if(prev)prev.className='move-chip done';
+    var cur=document.getElementById('l2c'+(L2.stepIdx-1));if(cur)cur.className='move-chip active';
+    document.getElementById('l2-step').textContent=L2.stepCount;
+    l2DrawBig(L2.ghostC,L2.ghostR);l2DrawMini(idx);
+    if(L2.ghostC===maze.pacC&&L2.ghostR===maze.pacR){l2End(true,'');return;}
+    L2.loopId=setTimeout(tick,parseInt(document.getElementById('l2-speed').value));
+  };
+  L2.loopId=setTimeout(tick,parseInt(document.getElementById('l2-speed').value));
+};
+
+function l2End(caught,reason){
+  L2.running=false;clearTimeout(L2.loopId);
+  var idx=L2.selected,maze=L2_MAZES[idx];
+  l2DrawBig(L2.ghostC,L2.ghostR);l2DrawMini(idx);
+  var ov=document.getElementById('l2-outcome');ov.className='outcome-overlay show';
+  var ti=document.getElementById('l2-otitle'),su=document.getElementById('l2-osub'),sc=document.getElementById('l2-oscore');
+  if(caught){
+    ti.className='outcome-title win';ti.textContent='👻 MAZE '+maze.name+' SOLVED!';
+    su.textContent='Caught in '+L2.stepCount+' moves. Screenshot this for evidence.';
+    sc.textContent='Maze '+maze.name+' complete ✓';
+    if(!L2.solved[idx]){L2.solved[idx]=true;document.getElementById('l2-pc'+idx).classList.add('solved');l2UpdateProgress();}
+    document.getElementById('l2-fb'+idx).textContent='✓ SOLVED in '+L2.stepCount+' moves!';
+    l2DrawMini(idx);
+  }else{
+    ti.className='outcome-title lose';
+    if(reason==='wall'){ti.textContent='💥 HIT A WALL!';su.textContent='Check your moves — one walked into a wall.';}
+    else{ti.textContent='🟡 NOT REACHED';su.textContent='Ran out of moves. Ghost at col '+L2.ghostC+', row '+L2.ghostR+'. Pac-Man at col '+maze.pacC+', row '+maze.pacR+'.';}
+    sc.textContent='Try again with a different route.';
+  }
+  document.getElementById('l2-btnStart').style.display='';document.getElementById('l2-btnStart').textContent='▶ Try Again';
+  document.getElementById('l2-btnStop').style.display='none';
+}
+
+function l2UpdateProgress(){
+  var n=L2.solved.filter(Boolean).length;
+  document.getElementById('l2-bar').style.width=(n/3*100)+'%';
+  document.getElementById('l2-count').textContent=n+' / 3';
+  if(n===3){document.getElementById('tab2').classList.add('solved');}
+}
+
+window.l2Stop=function(){L2.running=false;clearTimeout(L2.loopId);document.getElementById('l2-btnStart').style.display='';document.getElementById('l2-btnStart').textContent='▶ Play Selected Maze';document.getElementById('l2-btnStop').style.display='none';};
+window.l2Reset=function(){document.getElementById('l2-editor').value='def run(ghost):\n    ghost.move(1, 0)\n';l2Sync();L2.loadedMoves[L2.selected]=null;document.getElementById('l2-btnStart').disabled=true;document.getElementById('l2-btnStart').textContent='▶ Play Selected Maze';document.getElementById('l2-fb'+L2.selected).textContent='Code reset.';L2.running=false;clearTimeout(L2.loopId);var maze=L2_MAZES[L2.selected];L2.ghostC=maze.ghostC;L2.ghostR=maze.ghostR;l2DrawBig(L2.ghostC,L2.ghostR);document.getElementById('l2-outcome').className='outcome-overlay';};
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LEVEL 3 — PAC-MAN MOVES, TWO GHOSTS, DOTS
+═══════════════════════════════════════════════════════════════════════ */
+var L3_COLS=15,L3_ROWS=15;
+var L3_TEMPLATE=[
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,1,1,1,0,1,0,1,0,1,1,1,0,1],
+  [1,0,1,0,0,0,1,0,1,0,0,0,1,0,1],
+  [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
+  [1,0,0,0,1,0,0,0,0,0,1,0,0,0,1],
+  [1,1,1,0,1,0,1,0,1,0,1,0,1,1,1],
+  [1,0,0,0,0,0,1,0,1,0,0,0,0,0,1],
+  [1,1,1,0,1,0,1,0,1,0,1,0,1,1,1],
+  [1,0,0,0,1,0,0,0,0,0,1,0,0,0,1],
+  [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
+  [1,0,1,0,0,0,1,0,1,0,0,0,1,0,1],
+  [1,0,1,1,1,0,1,0,1,0,1,1,1,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+];
+
+var L3={
+  canvas:null,ctx:null,cell:0,
+  maze:null,dots:null,totalDots:0,dotsEaten:0,
+  g1c:1,g1r:1,g2c:13,g2r:13,
+  pacC:7,pacR:7,pacDir:'right',mouthOpen:true,mouthTick:0,
+  code1:null,code2:null,
+  running:false,loopId:null,tick:0,score:0,
+  caught:false
+};
+var L3_PAC_DIRS=['right','down','left','up'];
+
+(function(){
+  L3.canvas=document.getElementById('l3-canvas');
+  L3.ctx=L3.canvas.getContext('2d');
+  L3.cell=Math.floor(Math.min(L3.canvas.width/L3_COLS,L3.canvas.height/L3_ROWS));
+  L3.canvas.width=L3_COLS*L3.cell;L3.canvas.height=L3_ROWS*L3.cell;
+  l3InitMaze();l3Draw();
+})();
+
+function l3InitMaze(){
+  L3.maze=[];L3.dots=[];L3.totalDots=0;L3.dotsEaten=0;L3.score=0;
+  for(var r=0;r<L3_ROWS;r++){L3.maze[r]=[];for(var c=0;c<L3_COLS;c++){
+    var v=L3_TEMPLATE[r][c];L3.maze[r][c]=v;
+    var hasDot=(v===0);L3.dots.push(hasDot?1:0);if(hasDot)L3.totalDots++;
+  }}
+  // clear ghost and pac start cells of dots
+  [L3.g1c,L3.g1r,L3.g2c,L3.g2r,L3.pacC,L3.pacR].forEach(function(_,i,a){if(i%2===0){var idx=(a[i+1])*L3_COLS+a[i];L3.dots[idx]=0;}});
+  document.getElementById('l3-dots').textContent=L3.totalDots;
+}
+
+function l3DotIdx(c,r){return r*L3_COLS+c;}
+function l3Wall(c,r){return r<0||r>=L3_ROWS||c<0||c>=L3_COLS||L3.maze[r][c]===1;}
+
+function l3Draw(){
+  drawGrid(L3.ctx,L3.maze,L3.cell,L3_COLS,L3_ROWS);
+  drawDots(L3.ctx,L3.dots,L3.cell,L3_COLS);
+  drawGhost(L3.ctx,L3.g1c*L3.cell+L3.cell/2,L3.g1r*L3.cell+L3.cell/2,L3.cell,'#00B4D8');
+  drawGhost(L3.ctx,L3.g2c*L3.cell+L3.cell/2,L3.g2r*L3.cell+L3.cell/2,L3.cell,'#FF6FCF');
+  drawPacman(L3.ctx,L3.pacC*L3.cell+L3.cell/2,L3.pacR*L3.cell+L3.cell/2,L3.cell,L3.mouthOpen);
+  document.getElementById('l3-cg1').textContent='col '+L3.g1c+', row '+L3.g1r;
+  document.getElementById('l3-cg2').textContent='col '+L3.g2c+', row '+L3.g2r;
+  document.getElementById('l3-cp').textContent='col '+L3.pacC+', row '+L3.pacR;
+  document.getElementById('l3-tick').textContent=L3.tick;
+  document.getElementById('l3-score').textContent=L3.score;
+  document.getElementById('l3-dots').textContent=L3.totalDots-L3.dotsEaten;
+}
+
+function l3MovePac(){
+  // Try current direction, else pick random open direction
+  function tryDir(d){var nc=L3.pacC,nr=L3.pacR;if(d==='right')nc++;else if(d==='left')nc--;else if(d==='down')nr++;else nr--;return l3Wall(nc,nr)?null:{c:nc,r:nr};}
+  var res=tryDir(L3.pacDir);
+  if(!res||Math.random()<0.25){
+    var dirs=L3_PAC_DIRS.slice().sort(function(){return Math.random()-.5;});
+    for(var i=0;i<dirs.length;i++){res=tryDir(dirs[i]);if(res){L3.pacDir=dirs[i];break;}}
+  }
+  if(res){L3.pacC=res.c;L3.pacR=res.r;}
+  // Eat dot
+  var di=l3DotIdx(L3.pacC,L3.pacR);
+  if(L3.dots[di]){L3.dots[di]=0;L3.dotsEaten++;L3.score+=10;
+    if(L3.dotsEaten>=L3.totalDots){for(var r=0;r<L3_ROWS;r++)for(var c=0;c<L3_COLS;c++)if(L3_TEMPLATE[r][c]===0){L3.dots[l3DotIdx(c,r)]=1;}L3.dotsEaten=0;L3.score+=200;}
+  }
+  L3.mouthTick++;if(L3.mouthTick%2===0)L3.mouthOpen=!L3.mouthOpen;
+}
+
+function l3RunGhostCode(gNum,gc,gr,zc,zr,code){
+  return callWorker(code,gc,gr,L3.pacC,L3.pacR,zc,zr).then(function(res){
+    if(!res.ok)return null;
+    var parsed;try{parsed=JSON.parse(res.result);}catch(e){return null;}
+    if(!parsed||!parsed.length)return null;
+    return parsed[0]; // just first move per tick
+  });
+}
+
+window.l3Load=function(gNum){
+  if(!pyodideReady)return;
+  var edId='l3-editor'+gNum,btnId='l3-btnRun'+gNum;
+  var code=document.getElementById(edId).value;
+  document.getElementById('l3-feedback').textContent='Checking Ghost '+gNum+'…';
+  document.getElementById(btnId).disabled=true;
+  var gc=gNum===1?1:13, gr=gNum===1?1:13;
+  callWorker(code,gc,gr,7,7,0,0).then(function(res){
+    document.getElementById(btnId).disabled=false;
+    if(!res.ok){
+      var e=res.timeout?'Timed out.':(res.error||'Error');
+      document.getElementById('l3-feedback').textContent='⚠️ Ghost '+gNum+' error:\n'+e+'\n'+getHintMsg(e);
+      if(gNum===1)L3.moves1=null;else L3.moves2=null;
+      document.getElementById('l3-btnStart').disabled=true;return;
+    }
+    var parsed;try{parsed=JSON.parse(res.result);}catch(ex){parsed=[];}
+    if(!parsed.length){
+      document.getElementById('l3-feedback').textContent='⚠️ Ghost '+gNum+': no ghost.move() calls found. Add some!';
+      if(gNum===1)L3.moves1=null;else L3.moves2=null;
+      document.getElementById('l3-btnStart').disabled=true;return;
+    }
+    if(gNum===1)L3.moves1=parsed;else L3.moves2=parsed;
+    var stdout=res.stdout?'\nPrint output:\n'+res.stdout:'';
+    var ready=L3.moves1&&L3.moves2;
+    document.getElementById('l3-feedback').textContent=
+      '\u2713 Ghost '+gNum+' loaded \u2014 '+parsed.length+' move(s) planned.'+stdout+
+      (ready?'\n\nBoth ghosts ready \u2014 press Start Game!':'\n\nNow load Ghost '+(gNum===1?2:1)+' too.');
+    document.getElementById('l3-btnStart').disabled=!ready;
+  });
+};
+
+window.l3Start=function(){
+  if(!L3.moves1||!L3.moves2)return;
+  L3.g1c=1;L3.g1r=1;L3.g2c=13;L3.g2r=13;
+  L3.pacC=7;L3.pacR=7;L3.pacDir='right';L3.mouthOpen=true;L3.mouthTick=0;
+  L3.tick=0;L3.caught=false;L3.running=true;
+  L3.idx1=0;L3.idx2=0;
+  l3InitMaze();l3Draw();
+  document.getElementById('l3-outcome').className='outcome-overlay';
+  document.getElementById('l3-btnStart').style.display='none';
+  document.getElementById('l3-btnStop').style.display='';
+  var speed=parseInt(document.getElementById('l3-speed').value);
+  var tick=function(){
+    if(!L3.running)return;
+    L3.tick++;
+    l3MovePac();
+    if(L3.idx1<L3.moves1.length){
+      var m1=L3.moves1[L3.idx1++];
+      var nc=L3.g1c+m1.x,nr=L3.g1r+m1.y;
+      if(!l3Wall(nc,nr)){L3.g1c=nc;L3.g1r=nr;}
+    }
+    if(L3.idx2<L3.moves2.length){
+      var m2=L3.moves2[L3.idx2++];
+      var nc2=L3.g2c+m2.x,nr2=L3.g2r+m2.y;
+      if(!l3Wall(nc2,nr2)){L3.g2c=nc2;L3.g2r=nr2;}
+    }
+    l3Draw();
+    var g1catch=(Math.abs(L3.g1c-L3.pacC)<=1&&Math.abs(L3.g1r-L3.pacR)<=1);
+    var g2catch=(Math.abs(L3.g2c-L3.pacC)<=1&&Math.abs(L3.g2r-L3.pacR)<=1);
+    if(g1catch||g2catch){l3End(true,g1catch?1:2);return;}
+    if(L3.idx1>=L3.moves1.length&&L3.idx2>=L3.moves2.length){l3End(false,0);return;}
+    if(L3.tick>=300){l3End(false,0);return;}
+    if(L3.running)L3.loopId=setTimeout(tick,speed);
+  };
+  L3.loopId=setTimeout(tick,speed);
+};
+
+function l3End(caught,gNum){
+  L3.running=false;clearTimeout(L3.loopId);l3Draw();
+  var ov=document.getElementById('l3-outcome');ov.className='outcome-overlay show';
+  var ti=document.getElementById('l3-otitle'),su=document.getElementById('l3-osub'),sc=document.getElementById('l3-oscore');
+  if(caught){
+    ti.className='outcome-title win';ti.textContent='\ud83d\udc7b GHOST '+(gNum===1?'1 (BLUE)':'2 (PINK)')+' CAUGHT PAC-MAN!';
+    su.textContent='Pac-Man caught in '+L3.tick+' ticks. Score: '+L3.score+' points.\nScreenshot for your OneNote evidence.';
+    var marks=L3.tick<=50?'10\u201312':L3.tick<=100?'7\u20139':'4\u20136';
+    sc.textContent='Caught: tick '+L3.tick+' | Dots: '+L3.dotsEaten*10+' pts | Marks: ~'+marks+' / 12';
+    document.getElementById('tab3').classList.add('solved');
+  }else{
+    ti.className='outcome-title lose';ti.textContent='\ud83d\udfe1 PAC-MAN ESCAPED!';
+    var reason=L3.idx1>=L3.moves1.length&&L3.idx2>=L3.moves2.length?'All moves used up.':'300 ticks reached.';
+    su.textContent=reason+'\nTry a longer route or aim for where Pac-Man is likely to go.';
+    sc.textContent='Ghost 1: col '+L3.g1c+', row '+L3.g1r+' | Ghost 2: col '+L3.g2c+', row '+L3.g2r;
+  }
+  document.getElementById('l3-btnStart').style.display='';document.getElementById('l3-btnStart').textContent='\u25b6 Play Again';
+  document.getElementById('l3-btnStop').style.display='none';
+}
+
+window.l3Stop=function(){
+  L3.running=false;clearTimeout(L3.loopId);
+  document.getElementById('l3-btnStart').style.display='';
+  document.getElementById('l3-btnStart').textContent='\u25b6 Start Game';
+  document.getElementById('l3-btnStop').style.display='none';
+};
+
+window.l3Reset=function(gNum){
+  var starters={
+    1:'def run(ghost):\n    # Move right 7 steps\n    for i in range(7):\n        ghost.move(1, 0)\n    # Then move down 4 steps\n    for i in range(4):\n        ghost.move(0, 1)\n',
+    2:'def run(ghost):\n    # Move down 7 steps\n    for i in range(7):\n        ghost.move(0, 1)\n    # Then move left 4 steps\n    for i in range(4):\n        ghost.move(-1, 0)\n'
+  };
+  document.getElementById('l3-editor'+gNum).value=starters[gNum];
+  if(gNum===1){l3Sync1();L3.moves1=null;}else{l3Sync2();L3.moves2=null;}
+  document.getElementById('l3-btnStart').disabled=true;
+  document.getElementById('l3-feedback').textContent='Ghost '+gNum+' reset.';
+};
+
+})();
+</script>
+</body>
+</html>
