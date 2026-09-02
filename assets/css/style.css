@@ -1,0 +1,153 @@
+/* StudioLogic shared site style
+   Palette: near-black background, gold accent, Georgia serif headings.
+   Used by index.html and intended to be shared with the media-studies/theory pages. */
+
+:root {
+  --bg: #0d0d0d;
+  --bg-panel: #161514;
+  --border: #2a2721;
+  --gold: #c9a84c;
+  --gold-dim: #8f7a3d;
+  --text: #e8e4d8;
+  --text-dim: #a8a297;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.6;
+}
+
+body,
+p,
+li,
+a {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+h1,
+h2,
+h3,
+.site-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: normal;
+  color: var(--text);
+}
+
+a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.site-header {
+  border-bottom: 1px solid var(--border);
+  padding: 2.5rem 1.5rem 2rem;
+  text-align: center;
+}
+
+.site-title {
+  font-size: 2.2rem;
+  letter-spacing: 0.03em;
+  margin: 0 0 0.5rem;
+  color: var(--gold);
+}
+
+.site-tagline {
+  color: var(--text-dim);
+  margin: 0;
+  font-size: 1rem;
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.section {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.75rem 2rem;
+  margin-bottom: 2rem;
+}
+
+.section h2 {
+  font-size: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 0.4rem;
+  color: var(--gold);
+}
+
+.section-description {
+  color: var(--text-dim);
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  font-size: 0.95rem;
+}
+
+.subsection {
+  margin-top: 1.25rem;
+}
+
+.subsection h3 {
+  font-size: 1.05rem;
+  margin: 0 0 0.5rem;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.35rem;
+}
+
+.link-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.link-list li {
+  font-size: 0.95rem;
+}
+
+.link-list a,
+.coming-soon {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.link-list a {
+  border-color: var(--gold-dim);
+}
+
+.coming-soon {
+  color: var(--text-dim);
+  font-style: italic;
+  border-style: dashed;
+}
+
+.site-footer {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  padding: 2rem 1.5rem 3rem;
+  border-top: 1px solid var(--border);
+}
