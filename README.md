@@ -27,13 +27,14 @@ own GCSE and A-Level year folders. KS3 is separate, covering Years 7–9.
 │       ├── year-12/
 │       └── year-13/
 └── media-studies/
-    ├── theory/                 # Reusable theory reference pages (media language,
-    │                           # representation, industries, audiences) shared by
-    │                           # both GCSE and A-Level Media Studies
     ├── gcse/
     │   ├── year-10/
     │   └── year-11/
     └── a-level/
+        ├── theory/              # Theory reference pages (media language,
+        │                        # representation, industries, audiences).
+        │                        # Linked to directly from students' work,
+        │                        # so filenames here are stable once published.
         ├── year-12/
         └── year-13/
 ```
