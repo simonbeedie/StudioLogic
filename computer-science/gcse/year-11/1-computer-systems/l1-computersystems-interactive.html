@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Computer Systems Revision | ICT Wiki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#14213D;
+    --blue:#3A86FF;
+    --green:#6BCB77;
+    --amber:#FFD166;
+    --red:#EF476F;
+    --bg:#F7F9FC;
+    --card:#FFFFFF;
+    --text:#1B1F2A;
+    --muted:#5B6478;
+    --trace:#C7D2E8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    line-height:1.55;
+  }
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif; margin:0;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:var(--navy);
+    color:#fff;
+    padding:56px 24px 78px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-inner{max-width:820px; margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.78rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--amber);
+    margin-bottom:14px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow::before{
+    content:""; width:8px;height:8px; background:var(--amber); border-radius:50%;
+    box-shadow:0 0 0 4px rgba(255,209,102,0.25);
+  }
+  .hero h1{font-size:clamp(2rem, 5vw, 2.8rem); font-weight:700; line-height:1.1; margin-bottom:14px;}
+  .hero p{color:#B9C2DC; font-size:1.03rem; max-width:600px;}
+  .circuit-deco{position:absolute; top:0; right:-40px; width:340px; height:100%; opacity:0.45; z-index:1; pointer-events:none;}
+
+  /* ---------- TABS ---------- */
+  .wrap{max-width:900px; margin:-40px auto 80px; padding:0 24px; position:relative; z-index:3;}
+  .tabbar{
+    display:flex; flex-wrap:wrap; gap:8px;
+    background:var(--card);
+    border:1px solid #E4E9F5;
+    border-radius:16px;
+    padding:8px;
+    box-shadow:0 6px 22px rgba(20,33,61,0.09);
+    margin-bottom:24px;
+  }
+  .tabbtn{
+    flex:1 1 auto;
+    min-width:120px;
+    background:transparent;
+    border:none;
+    border-radius:11px;
+    padding:12px 14px;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    font-size:0.92rem;
+    color:var(--muted);
+    cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease;
+  }
+  .tabbtn:hover{background:#F0F5FF; color:var(--navy);}
+  .tabbtn.active{background:var(--navy); color:#fff;}
+
+  .panel{display:none;}
+  .panel.active{display:block; animation:fadein 0.25s ease;}
+  @keyframes fadein{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+  .card{
+    background:var(--card);
+    border:1px solid #E4E9F5;
+    border-radius:14px;
+    padding:28px 30px;
+    box-shadow:0 2px 10px rgba(20,33,61,0.04);
+    margin-bottom:20px;
+  }
+  .card h2{font-size:1.4rem; color:var(--navy); margin-bottom:6px;}
+  .card .tagline{
+    font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--blue);
+    text-transform:uppercase; letter-spacing:0.08em; margin-bottom:16px; display:block;
+  }
+  .card p.lead{margin:0 0 16px; color:var(--muted);}
+  .card ul{margin:0 0 16px; padding-left:20px;}
+  .card li{margin-bottom:8px;}
+  .card li b{color:var(--navy);}
+
+  .callout{background:#F0F5FF; border-left:4px solid var(--blue); border-radius:8px; padding:14px 18px; margin:16px 0; font-size:0.95rem;}
+  .callout.tip{background:#FFF8E6; border-left-color:var(--amber);}
+  .callout.warn{background:#FFF0F3; border-left-color:var(--red);}
+
+  /* ---------- TRUE/FALSE REVEAL ---------- */
+  .tf{margin-top:16px; border:2px solid var(--navy); border-radius:10px; overflow:hidden;}
+  .tf summary{
+    background:var(--navy); color:#fff; padding:13px 18px; font-weight:600; font-size:0.92rem;
+    cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:12px; list-style:none;
+  }
+  .tf summary::-webkit-details-marker{display:none;}
+  .tf summary::after{content:"Tap to reveal \25be"; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--green); white-space:nowrap; flex-shrink:0;}
+  .tf[open] summary::after{content:"Hide \25b4";}
+  .tf-a{background:#EFFBF0; font-size:0.9rem; padding:13px 18px;}
+  .tf-a b{color:#2F7A38;}
+
+  /* ---------- CPU / FE DIAGRAM ---------- */
+  .diagram-wrap{background:#0F1B33; border-radius:14px; padding:18px; margin:18px 0;}
+  svg{width:100%; height:auto; display:block; font-family:'JetBrains Mono',monospace;}
+  .box{fill:#1E2E57; stroke:#3A86FF; stroke-width:2; transition:fill 0.25s ease, stroke 0.25s ease, stroke-width 0.25s ease;}
+  .box.mem{fill:#1E2E57; stroke:#B9C2DC;}
+  .box-label{fill:#fff; font-size:13px; font-weight:600; text-anchor:middle; pointer-events:none;}
+  .box-sub{fill:#B9C2DC; font-size:9px; text-anchor:middle; pointer-events:none;}
+  .clickable{cursor:pointer;}
+  .clickable:hover{stroke-width:3;}
+  .box.selected{fill:#3A86FF; stroke:#fff;}
+  .box.active{fill:var(--amber); stroke:#fff; stroke-width:3;}
+  .box.active .box-label{fill:#14213D;}
+  .bus-line{stroke:#3A5578; stroke-width:2.5; fill:none; transition:stroke 0.2s ease, stroke-width 0.2s ease;}
+  .bus-line.on{stroke-width:4;}
+  .bus-line.address.on{stroke:var(--blue);}
+  .bus-line.data.on{stroke:var(--green);}
+  .bus-line.control.on{stroke:var(--amber);}
+  .bus-dot{transition:cx 1.1s ease, cy 1.1s ease;}
+  .bus-caption{fill:#B9C2DC; font-size:10px; text-anchor:middle;}
+
+  #cpu-info{
+    background:#F0F5FF; border-radius:10px; padding:14px 18px; margin-top:14px;
+    font-size:0.92rem; min-height:44px;
+  }
+  #cpu-info b{color:var(--navy);}
+
+  /* ---------- BUSES TAB CONTROLS ---------- */
+  .ctrl-row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:14px;}
+  .btn{
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:0.9rem;
+    background:var(--blue); color:#fff; border:none; border-radius:999px;
+    padding:11px 22px; cursor:pointer; transition:transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .btn:hover{transform:translateY(-1px); box-shadow:0 6px 16px rgba(58,134,255,0.35);}
+  .btn:disabled{opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none;}
+  .btn.ghost{background:transparent; border:2px solid var(--navy); color:var(--navy); padding:9px 20px;}
+  .btn.green{background:var(--green); box-shadow:none;}
+  #bus-caption-box, #fe-caption-box{
+    margin-top:14px; background:#0F1B33; color:#fff; border-radius:10px; padding:14px 18px; font-size:0.93rem; min-height:26px;
+  }
+  .stage-badge{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; font-weight:700;
+    letter-spacing:0.06em; padding:4px 10px; border-radius:999px; margin-right:10px; text-transform:uppercase;
+  }
+  .stage-badge.fetch{background:var(--blue); color:#fff;}
+  .stage-badge.decode{background:var(--amber); color:#14213D;}
+  .stage-badge.execute{background:var(--green); color:#0E3B14;}
+  .step-progress{font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--muted);}
+
+  /* ---------- MEMORY RACE ---------- */
+  .race-track{margin:14px 0;}
+  .race-label{display:flex; justify-content:space-between; font-size:0.85rem; color:var(--muted); margin-bottom:4px;}
+  .race-label b{color:var(--navy);}
+  .track{
+    position:relative; background:#EAF1FF; border-radius:999px; height:38px; overflow:hidden;
+    border:1px solid #D6E1FA;
+  }
+  .track::after{
+    content:"FINISH"; position:absolute; right:10px; top:50%; transform:translateY(-50%);
+    font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.05em;
+  }
+  .token{
+    position:absolute; top:50%; left:4px; transform:translate(0,-50%);
+    width:30px; height:30px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:1rem;
+    background:var(--navy); color:#fff;
+    transition:left 0.8s ease;
+  }
+  .track.cache .token{background:var(--blue);}
+  .track.ram .token{background:var(--green);}
+  .track.storage .token{background:var(--red);}
+
+  /* ---------- QUIZ ---------- */
+  .qitem{border:1px solid #E4E9F5; border-radius:12px; padding:18px 20px; margin-bottom:16px;}
+  .qitem p.qtext{font-weight:600; color:var(--navy); margin:0 0 12px;}
+  .qopt{display:flex; align-items:flex-start; gap:10px; padding:8px 10px; border-radius:8px; margin-bottom:6px; cursor:pointer;}
+  .qopt:hover{background:#F7F9FC;}
+  .qopt input{margin-top:3px;}
+  .explain{display:none; margin-top:10px; font-size:0.88rem; padding:10px 14px; border-radius:8px; background:#F0F5FF; color:var(--muted);}
+  .quiz.checked .explain{display:block;}
+  .quiz.checked .qopt.correct{background:#EFFBF0; outline:2px solid var(--green);}
+  .quiz.checked .qopt.incorrect{background:#FFF0F3; outline:2px solid var(--red);}
+  #quiz-score{
+    background:var(--navy); color:#fff; border-radius:12px; padding:16px 20px; margin-bottom:20px;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.05rem; text-align:center; display:none;
+  }
+  #quiz-score.show{display:block;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <svg class="circuit-deco" viewBox="0 0 340 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M340 40 H240 V120 H180" stroke="#FFD166" stroke-width="2" opacity="0.5"/>
+    <path d="M340 160 H260 V240" stroke="#3A86FF" stroke-width="2" opacity="0.5"/>
+    <path d="M340 300 H220 V380 H160 V440" stroke="#6BCB77" stroke-width="2" opacity="0.5"/>
+    <circle cx="180" cy="120" r="6" fill="#FFD166"/>
+    <circle cx="260" cy="240" r="6" fill="#3A86FF"/>
+    <circle cx="160" cy="440" r="6" fill="#6BCB77"/>
+  </svg>
+  <div class="hero-inner">
+    <div class="eyebrow">ICT Wiki · Computer Systems</div>
+    <h1>Computer Systems Revision</h1>
+    <p>How the CPU is built, how its parts talk to each other, and how one instruction actually gets carried out. Work through each tab, try the animations, then check yourself in the quiz.</p>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="tabbar" role="tablist">
+    <button class="tabbtn active" data-tab="cpu">CPU Components</button>
+    <button class="tabbtn" data-tab="buses">Buses</button>
+    <button class="tabbtn" data-tab="fe">Fetch-Execute Cycle</button>
+    <button class="tabbtn" data-tab="mem">Memory Hierarchy</button>
+    <button class="tabbtn" data-tab="quiz">Quiz</button>
+  </div>
+
+  <!-- ============ TAB 1: CPU COMPONENTS ============ -->
+  <div class="panel active" id="panel-cpu">
+    <div class="card">
+      <span class="tagline">The basics</span>
+      <h2>🖥️ What's Inside the CPU?</h2>
+      <p class="lead">The <b>CPU (Central Processing Unit)</b> is the part of the computer that fetches, decodes and executes instructions. It's built from several components working together — click any box in the diagram to find out what it does.</p>
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 640 300" id="cpu-svg">
+          <rect x="20" y="90" width="150" height="110" rx="8" class="box mem"></rect>
+          <text x="95" y="140" class="box-label">MAIN</text>
+          <text x="95" y="158" class="box-label">MEMORY</text>
+          <text x="95" y="176" class="box-sub">stores instructions</text>
+          <text x="95" y="188" class="box-sub">&amp; data</text>
+
+          <rect x="280" y="10" width="340" height="270" rx="10" fill="none" stroke="#3A5578" stroke-width="1.5" stroke-dasharray="4 4"></rect>
+          <text x="300" y="30" class="box-sub" text-anchor="start" style="fill:#B9C2DC; font-size:11px;">CPU</text>
+
+          <g class="clickable" data-key="pc">
+            <rect x="300" y="42" width="140" height="36" rx="6" class="box"></rect>
+            <text x="370" y="65" class="box-label">PC</text>
+          </g>
+          <g class="clickable" data-key="mar">
+            <rect x="300" y="92" width="140" height="36" rx="6" class="box"></rect>
+            <text x="370" y="115" class="box-label">MAR</text>
+          </g>
+          <g class="clickable" data-key="mbr">
+            <rect x="300" y="142" width="140" height="36" rx="6" class="box"></rect>
+            <text x="370" y="165" class="box-label">MBR</text>
+          </g>
+          <g class="clickable" data-key="cir">
+            <rect x="460" y="42" width="140" height="36" rx="6" class="box"></rect>
+            <text x="530" y="65" class="box-label">CIR</text>
+          </g>
+          <g class="clickable" data-key="cu">
+            <rect x="460" y="92" width="140" height="36" rx="6" class="box"></rect>
+            <text x="530" y="115" class="box-label">CU</text>
+          </g>
+          <g class="clickable" data-key="alu">
+            <rect x="460" y="142" width="140" height="36" rx="6" class="box"></rect>
+            <text x="530" y="165" class="box-label">ALU</text>
+          </g>
+          <g class="clickable" data-key="acc">
+            <rect x="380" y="200" width="140" height="36" rx="6" class="box"></rect>
+            <text x="450" y="223" class="box-label">ACC</text>
+          </g>
+          <g class="clickable" data-key="clock">
+            <circle cx="580" cy="240" r="24" class="box"></circle>
+            <text x="580" y="244" class="box-label" style="font-size:11px;">CLK</text>
+          </g>
+        </svg>
+        <div id="cpu-info">👆 Click a component above to see what it does.</div>
+      </div>
+
+      <details class="tf">
+        <summary>True or False? The ALU performs calculations and logical comparisons.</summary>
+        <div class="tf-a"><b>✔ True</b> — the Arithmetic Logic Unit handles all the arithmetic (like +, −) and logical (like &gt;, =) operations.</div>
+      </details>
+      <details class="tf">
+        <summary>True or False? The Control Unit stores the result of a calculation.</summary>
+        <div class="tf-a"><b>✘ False</b> — that's the Accumulator's job. The Control Unit decodes instructions and directs the other components.</div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ============ TAB 2: BUSES ============ -->
+  <div class="panel" id="panel-buses">
+    <div class="card">
+      <span class="tagline">How components talk to each other</span>
+      <h2>🚌 The Three Buses</h2>
+      <p class="lead">A <b>bus</b> is a set of wires that carries signals between the CPU and memory. There are three buses, each carrying something different. Press play to watch each one in action.</p>
+      <ul>
+        <li><b>Address bus</b> — carries a memory <b>address</b>, one direction only: from the CPU to memory.</li>
+        <li><b>Data bus</b> — carries the actual <b>data or instruction</b>, and works in both directions.</li>
+        <li><b>Control bus</b> — carries <b>signals</b> such as read/write commands, so memory knows what to do with the address and data it's just received.</li>
+      </ul>
+
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 640 300" id="bus-svg">
+          <rect x="20" y="90" width="150" height="110" rx="8" class="box mem"></rect>
+          <text x="95" y="145" class="box-label">MAIN</text>
+          <text x="95" y="163" class="box-label">MEMORY</text>
+
+          <rect x="470" y="60" width="150" height="170" rx="10" class="box"></rect>
+          <text x="545" y="150" class="box-label">CPU</text>
+
+          <line x1="470" y1="100" x2="170" y2="100" class="bus-line address" id="bl-address"></line>
+          <line x1="170" y1="150" x2="470" y2="150" class="bus-line data" id="bl-data"></line>
+          <line x1="470" y1="200" x2="170" y2="200" class="bus-line control" id="bl-control"></line>
+
+          <text x="320" y="90" class="bus-caption">ADDRESS BUS</text>
+          <text x="320" y="140" class="bus-caption">DATA BUS</text>
+          <text x="320" y="190" class="bus-caption">CONTROL BUS</text>
+
+          <circle cx="470" cy="100" r="6" fill="#3A86FF" class="bus-dot" id="dot-address"></circle>
+          <circle cx="170" cy="150" r="6" fill="#6BCB77" class="bus-dot" id="dot-data"></circle>
+          <circle cx="470" cy="200" r="6" fill="#FFD166" class="bus-dot" id="dot-control"></circle>
+        </svg>
+        <div id="bus-caption-box">Press "Play buses" to see each one work in turn.</div>
+      </div>
+      <div class="ctrl-row">
+        <button class="btn" id="btn-play-buses">▶ Play buses</button>
+        <button class="btn ghost" id="btn-reset-buses">Reset</button>
+      </div>
+
+      <details class="tf" style="margin-top:20px;">
+        <summary>True or False? The address bus can carry data in both directions.</summary>
+        <div class="tf-a"><b>✘ False</b> — the address bus is one-directional: only the CPU sends addresses to memory.</div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ============ TAB 3: FETCH-EXECUTE CYCLE ============ -->
+  <div class="panel" id="panel-fe">
+    <div class="card">
+      <span class="tagline">The heart of every program</span>
+      <h2>🔁 The Fetch-Execute Cycle</h2>
+      <p class="lead">Every single instruction a computer runs goes through the same three stages, over and over: <b>Fetch</b>, <b>Decode</b>, <b>Execute</b>. Click "Next step" to walk through one full cycle.</p>
+
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 640 300" id="fe-svg">
+          <rect x="20" y="90" width="150" height="110" rx="8" class="box mem" id="fe-mem"></rect>
+          <text x="95" y="140" class="box-label">MAIN</text>
+          <text x="95" y="158" class="box-label">MEMORY</text>
+
+          <rect x="280" y="10" width="340" height="270" rx="10" fill="none" stroke="#3A5578" stroke-width="1.5" stroke-dasharray="4 4"></rect>
+
+          <rect x="300" y="42" width="140" height="36" rx="6" class="box" id="fe-pc"></rect>
+          <text x="370" y="65" class="box-label">PC</text>
+          <rect x="300" y="92" width="140" height="36" rx="6" class="box" id="fe-mar"></rect>
+          <text x="370" y="115" class="box-label">MAR</text>
+          <rect x="300" y="142" width="140" height="36" rx="6" class="box" id="fe-mbr"></rect>
+          <text x="370" y="165" class="box-label">MBR</text>
+          <rect x="460" y="42" width="140" height="36" rx="6" class="box" id="fe-cir"></rect>
+          <text x="530" y="65" class="box-label">CIR</text>
+          <rect x="460" y="92" width="140" height="36" rx="6" class="box" id="fe-cu"></rect>
+          <text x="530" y="115" class="box-label">CU</text>
+          <rect x="460" y="142" width="140" height="36" rx="6" class="box" id="fe-alu"></rect>
+          <text x="530" y="165" class="box-label">ALU</text>
+          <rect x="380" y="200" width="140" height="36" rx="6" class="box" id="fe-acc"></rect>
+          <text x="450" y="223" class="box-label">ACC</text>
+
+          <line x1="300" y1="107" x2="170" y2="107" class="bus-line address" id="fe-bl-address"></line>
+          <line x1="170" y1="157" x2="300" y2="157" class="bus-line data" id="fe-bl-data"></line>
+        </svg>
+
+        <div id="fe-caption-box">
+          <span class="stage-badge fetch" id="fe-stage-badge">FETCH</span>
+          <span id="fe-caption-text">Press "Next step" to begin the cycle.</span>
+        </div>
+      </div>
+
+      <div class="ctrl-row">
+        <button class="btn ghost" id="btn-fe-prev" disabled>◀ Previous</button>
+        <button class="btn" id="btn-fe-next">Next step ▶</button>
+        <button class="btn ghost" id="btn-fe-reset">Reset</button>
+        <span class="step-progress" id="fe-progress">Step 0 of 8</span>
+      </div>
+
+      <div class="callout tip" style="margin-top:20px;">
+        <b>Exam tip:</b> you should be able to name the three stages (Fetch, Decode, Execute) and describe what happens at each one — including which registers are involved.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TAB 4: MEMORY HIERARCHY ============ -->
+  <div class="panel" id="panel-mem">
+    <div class="card">
+      <span class="tagline">Not all storage is equal</span>
+      <h2>🏁 Cache vs RAM vs Secondary Storage</h2>
+      <p class="lead">Cache, RAM and secondary storage (like an SSD or HDD) all store data — but at very different speeds. Press "Start race" to see how they compare. <i>(This shows relative speed only, not real figures.)</i></p>
+
+      <div class="race-track">
+        <div class="race-label"><b>Cache</b><span>tiny, built into/near the CPU</span></div>
+        <div class="track cache"><div class="token" id="token-cache">⚡</div></div>
+      </div>
+      <div class="race-track">
+        <div class="race-label"><b>RAM</b><span>holds the programs &amp; data in use right now</span></div>
+        <div class="track ram"><div class="token" id="token-ram">💾</div></div>
+      </div>
+      <div class="race-track">
+        <div class="race-label"><b>Secondary Storage</b><span>SSD / HDD — permanent, largest capacity</span></div>
+        <div class="track storage"><div class="token" id="token-storage">🗄️</div></div>
+      </div>
+
+      <div class="ctrl-row">
+        <button class="btn green" id="btn-race-start">▶ Start race</button>
+        <button class="btn ghost" id="btn-race-reset">Reset</button>
+      </div>
+
+      <div class="callout" style="margin-top:20px;">
+        Speed and capacity are a trade-off: <b>cache</b> is fastest but tiny and expensive per byte; <b>secondary storage</b> is slowest but huge and cheap per byte; <b>RAM</b> sits in between.
+      </div>
+
+      <details class="tf" style="margin-top:16px;">
+        <summary>True or False? Secondary storage is usually bigger in capacity than RAM.</summary>
+        <div class="tf-a"><b>✔ True</b> — secondary storage (like an SSD) typically holds far more than RAM, but is much slower to access.</div>
+      </details>
+      <details class="tf">
+        <summary>True or False? Data in RAM is kept permanently, even when the power is off.</summary>
+        <div class="tf-a"><b>✘ False</b> — RAM is volatile, meaning its contents are lost when the power is turned off. Secondary storage keeps data permanently.</div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ============ TAB 5: QUIZ ============ -->
+  <div class="panel" id="panel-quiz">
+    <div class="card">
+      <span class="tagline">Check what you've learned</span>
+      <h2>📝 Computer Systems Quiz</h2>
+      <p class="lead">Answer all the questions, then press "Check my answers" at the bottom.</p>
+
+      <div id="quiz-score"></div>
+
+      <form id="quiz-form">
+        <div class="qitem quiz" data-correct="alu">
+          <p class="qtext">1. Which component performs calculations and logical comparisons?</p>
+          <label class="qopt"><input type="radio" name="q1" value="cu"> Control Unit</label>
+          <label class="qopt"><input type="radio" name="q1" value="alu"> ALU</label>
+          <label class="qopt"><input type="radio" name="q1" value="pc"> Program Counter</label>
+          <label class="qopt"><input type="radio" name="q1" value="clock"> Clock</label>
+          <div class="explain">The ALU (Arithmetic Logic Unit) carries out all arithmetic and logical operations.</div>
+        </div>
+
+        <div class="qitem quiz" data-correct="pc">
+          <p class="qtext">2. Which register holds the address of the <em>next</em> instruction to be fetched?</p>
+          <label class="qopt"><input type="radio" name="q2" value="mar"> MAR</label>
+          <label class="qopt"><input type="radio" name="q2" value="mbr"> MBR</label>
+          <label class="qopt"><input type="radio" name="q2" value="pc"> PC</label>
+          <label class="qopt"><input type="radio" name="q2" value="cir"> CIR</label>
+          <div class="explain">The Program Counter (PC) always holds the address of the next instruction.</div>
+        </div>
+
+        <div class="qitem quiz" data-correct="one">
+          <p class="qtext">3. How many directions can the address bus carry signals in?</p>
+          <label class="qopt"><input type="radio" name="q3" value="one"> One — CPU to memory only</label>
+          <label class="qopt"><input type="radio" name="q3" value="two"> Two — both directions</label>
+          <label class="qopt"><input type="radio" name="q3" value="three"> Three</label>
+          <label class="qopt"><input type="radio" name="q3" value="zero"> It doesn't carry signals</label>
+          <div class="explain">The address bus is one-directional: only the CPU sends memory addresses.</div>
+        </div>
+
+        <div class="qitem quiz" data-correct="data">
+          <p class="qtext">4. Which bus carries the actual instruction or value being transferred?</p>
+          <label class="qopt"><input type="radio" name="q4" value="address"> Address bus</label>
+          <label class="qopt"><input type="radio" name="q4" value="data"> Data bus</label>
+          <label class="qopt"><input type="radio" name="q4" value="control"> Control bus</label>
+          <label class="qopt"><input type="radio" name="q4" value="clock"> Clock</label>
+          <div class="explain">The data bus physically carries the data or instruction itself.</div>
+        </div>
+
+        <div class="qitem quiz" data-correct="mbr">
+          <p class="qtext">5. Once an instruction has travelled from memory to the CPU, which register temporarily holds it?</p>
+          <label class="qopt"><input type="radio" name="q5" value="mar"> MAR</label>
+          <label class="qopt"><input type="radio" name="q5" value="mbr"> MBR</label>
+          <label class="qopt"><input type="radio" name="q5" value="acc"> ACC</label>
+          <label class="qopt"><input type="radio" name="q5" value="cu"> CU</label>
+          <div class="explain">The MBR (Memory Buffer Register) holds data or an instruction just fetched from memory, before it moves to the CIR.</div>
+        </div>
+
+        <div class="qitem quiz" data-correct="cu">
+          <p class="qtext">6. Which component decodes an instruction to work out what it means?</p>
+          <label class="qopt"><input type="radio" name="q6" value="alu"> ALU</label>
+          <label class="qopt"><input type="radio" name="q6" value="cu"> Control Unit</label>
+          <label class="qopt"><input type="radio" name="q6" value="mar"> MAR</label>
+          <label class="qopt"><input type="radio" name="q6" value="pc"> PC</label>
+          <div class="explain">The Control Unit (CU) decodes the instruction in the CIR and directs the rest of the CPU.</div>
+        </div>
+
+        <div class="qitem quiz" data-correct="three">
+          <p class="qtext">7. How many main stages are there in the Fetch-Execute cycle?</p>
+          <label class="qopt"><input type="radio" name="q7" value="two"> Two</label>
+          <label class="qopt"><input type="radio" name="q7" value="three"> Three</label>
+          <label class="qopt"><input type="radio" name="q7" value="four"> Four</label>
+          <label class="qopt"><input type="radio" name="q7" value="five"> Five</label>
+          <div class="explain">Fetch, Decode, Execute — three stages, repeated for every instruction.</div>
+        </div>
+
+        <div class="qitem quiz" data-correct="cache">
+          <p class="qtext">8. Which type of storage is fastest, but also smallest in capacity?</p>
+          <label class="qopt"><input type="radio" name="q8" value="cache"> Cache</label>
+          <label class="qopt"><input type="radio" name="q8" value="ram"> RAM</label>
+          <label class="qopt"><input type="radio" name="q8" value="ssd"> SSD</label>
+          <label class="qopt"><input type="radio" name="q8" value="hdd"> HDD</label>
+          <div class="explain">Cache is the fastest, but it's also the smallest and most expensive per byte.</div>
+        </div>
+
+        <div class="qitem quiz" data-correct="false">
+          <p class="qtext">9. True or false: RAM keeps its data permanently, even without power.</p>
+          <label class="qopt"><input type="radio" name="q9" value="true"> True</label>
+          <label class="qopt"><input type="radio" name="q9" value="false"> False</label>
+          <div class="explain">False — RAM is volatile. Its contents are lost when the power is switched off.</div>
+        </div>
+
+        <div class="qitem quiz" data-correct="acc">
+          <p class="qtext">10. Where might the result of an ALU calculation be stored?</p>
+          <label class="qopt"><input type="radio" name="q10" value="mar"> MAR</label>
+          <label class="qopt"><input type="radio" name="q10" value="pc"> PC</label>
+          <label class="qopt"><input type="radio" name="q10" value="acc"> Accumulator</label>
+          <label class="qopt"><input type="radio" name="q10" value="cir"> CIR</label>
+          <div class="explain">The Accumulator (ACC) is used to store the result of a calculation.</div>
+        </div>
+
+        <div class="ctrl-row">
+          <button type="button" class="btn" id="btn-check-quiz">Check my answers</button>
+          <button type="button" class="btn ghost" id="btn-reset-quiz">Reset quiz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- TAB SWITCHING ----------
+  const tabBtns = document.querySelectorAll('.tabbtn');
+  const panels = document.querySelectorAll('.panel');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---------- CPU COMPONENTS: click to reveal ----------
+  const cpuInfo = {
+    pc:   ["Program Counter (PC)", "Holds the memory address of the <b>next</b> instruction to be fetched."],
+    mar:  ["Memory Address Register (MAR)", "Holds the address currently being used to access memory — copied from the PC."],
+    mbr:  ["Memory Buffer Register (MBR)", "Temporarily holds data or an instruction that has just been fetched from memory."],
+    cir:  ["Current Instruction Register (CIR)", "Holds the instruction currently being decoded and executed."],
+    cu:   ["Control Unit (CU)", "Decodes instructions and sends out the signals that coordinate the rest of the CPU."],
+    alu:  ["Arithmetic Logic Unit (ALU)", "Carries out arithmetic (e.g. +, −) and logical (e.g. &gt;, =) operations."],
+    acc:  ["Accumulator (ACC)", "A register used to store the result of a calculation performed by the ALU."],
+    clock:["Clock", "Sends out regular electrical pulses that keep every part of the CPU working in time with each other. Clock speed is measured in Hertz (Hz)."]
+  };
+  document.querySelectorAll('#cpu-svg .clickable').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('#cpu-svg .box').forEach(b => b.classList.remove('selected'));
+      el.querySelector('.box').classList.add('selected');
+      const [name, desc] = cpuInfo[el.dataset.key];
+      document.getElementById('cpu-info').innerHTML = '<b>' + name + '</b> — ' + desc;
+    });
+  });
+
+  // ---------- BUSES ANIMATION ----------
+  const busPositions = {
+    address: { start: 470, end: 170, y: 100 },
+    data:    { start: 170, end: 470, y: 150 },
+    control: { start: 470, end: 170, y: 200 }
+  };
+  function resetBuses(){
+    ['address','data','control'].forEach(k => {
+      const dot = document.getElementById('dot-' + k);
+      dot.style.transition = 'none';
+      dot.setAttribute('cx', busPositions[k].start);
+      document.getElementById('bl-' + k).classList.remove('on');
+    });
+    document.getElementById('bus-caption-box').textContent = 'Press "Play buses" to see each one work in turn.';
+  }
+  const busCaptions = {
+    address: 'Address bus: the CPU sends the memory address it wants to access.',
+    data: 'Data bus: the requested data or instruction travels back from memory to the CPU.',
+    control: 'Control bus: the CPU sends a read/write signal so memory knows what to do.'
+  };
+  function playBuses(){
+    resetBuses();
+    let delay = 150;
+    ['address','data','control'].forEach((k, i) => {
+      setTimeout(() => {
+        document.getElementById('bl-' + k).classList.add('on');
+        document.getElementById('bus-caption-box').textContent = busCaptions[k];
+        const dot = document.getElementById('dot-' + k);
+        dot.style.transition = 'cx 1.1s ease';
+        dot.setAttribute('cx', busPositions[k].end);
+      }, delay);
+      delay += 1400;
+    });
+  }
+  document.getElementById('btn-play-buses').addEventListener('click', playBuses);
+  document.getElementById('btn-reset-buses').addEventListener('click', resetBuses);
+  resetBuses();
+
+  // ---------- FETCH-EXECUTE STEPPER ----------
+  const feSteps = [
+    { stage:'fetch', comps:['fe-pc'], bus:null, text:'The Program Counter (PC) holds the address of the next instruction.' },
+    { stage:'fetch', comps:['fe-pc','fe-mar'], bus:null, text:'That address is copied from the PC into the Memory Address Register (MAR).' },
+    { stage:'fetch', comps:['fe-mar','fe-mem'], bus:'address', text:'The address travels from the MAR to Main Memory along the address bus.' },
+    { stage:'fetch', comps:['fe-mem','fe-mbr'], bus:'data', text:'The instruction stored at that address travels back along the data bus into the Memory Buffer Register (MBR).' },
+    { stage:'fetch', comps:['fe-mbr','fe-cir','fe-pc'], bus:null, text:'The instruction moves from the MBR into the Current Instruction Register (CIR), and the PC is incremented to point to the next instruction.' },
+    { stage:'decode', comps:['fe-cir','fe-cu'], bus:null, text:'The Control Unit (CU) decodes the instruction sitting in the CIR to work out what it means.' },
+    { stage:'execute', comps:['fe-cu','fe-alu','fe-acc'], bus:null, text:'The instruction is executed — for example, the ALU performs a calculation and stores the result in the Accumulator (ACC).' },
+    { stage:'execute', comps:['fe-pc'], bus:null, text:'The cycle repeats from Fetch, using the new address now held in the PC, for the next instruction.' }
+  ];
+  let feIndex = -1;
+  function renderFE(){
+    document.querySelectorAll('#fe-svg .box').forEach(b => b.classList.remove('active'));
+    document.getElementById('fe-bl-address').classList.remove('on');
+    document.getElementById('fe-bl-data').classList.remove('on');
+    const badge = document.getElementById('fe-stage-badge');
+    const text = document.getElementById('fe-caption-text');
+    const progress = document.getElementById('fe-progress');
+    if(feIndex < 0){
+      badge.textContent = 'FETCH';
+      badge.className = 'stage-badge fetch';
+      text.textContent = 'Press "Next step" to begin the cycle.';
+      progress.textContent = 'Step 0 of ' + feSteps.length;
+    } else {
+      const step = feSteps[feIndex];
+      step.comps.forEach(id => document.getElementById(id).classList.add('active'));
+      if(step.bus === 'address') document.getElementById('fe-bl-address').classList.add('on');
+      if(step.bus === 'data') document.getElementById('fe-bl-data').classList.add('on');
+      badge.textContent = step.stage.toUpperCase();
+      badge.className = 'stage-badge ' + step.stage;
+      text.textContent = step.text;
+      progress.textContent = 'Step ' + (feIndex + 1) + ' of ' + feSteps.length;
+    }
+    document.getElementById('btn-fe-prev').disabled = feIndex <= 0;
+    document.getElementById('btn-fe-next').disabled = feIndex >= feSteps.length - 1;
+  }
+  document.getElementById('btn-fe-next').addEventListener('click', () => { if(feIndex < feSteps.length - 1){ feIndex++; renderFE(); } });
+  document.getElementById('btn-fe-prev').addEventListener('click', () => { if(feIndex > 0){ feIndex--; renderFE(); } });
+  document.getElementById('btn-fe-reset').addEventListener('click', () => { feIndex = -1; renderFE(); });
+  renderFE();
+
+  // ---------- MEMORY RACE ----------
+  function resetRace(){
+    ['cache','ram','storage'].forEach(k => {
+      const t = document.getElementById('token-' + k);
+      t.style.transition = 'none';
+      t.style.left = '4px';
+    });
+  }
+  function startRace(){
+    resetRace();
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      document.getElementById('token-cache').style.transition = 'left 0.7s ease';
+      document.getElementById('token-cache').style.left = 'calc(100% - 38px)';
+      document.getElementById('token-ram').style.transition = 'left 2.4s ease';
+      document.getElementById('token-ram').style.left = 'calc(100% - 38px)';
+      document.getElementById('token-storage').style.transition = 'left 5.5s ease';
+      document.getElementById('token-storage').style.left = 'calc(100% - 38px)';
+    }));
+  }
+  document.getElementById('btn-race-start').addEventListener('click', startRace);
+  document.getElementById('btn-race-reset').addEventListener('click', resetRace);
+  resetRace();
+
+  // ---------- QUIZ ----------
+  document.getElementById('btn-check-quiz').addEventListener('click', () => {
+    const items = document.querySelectorAll('.qitem');
+    let score = 0;
+    items.forEach(item => {
+      item.classList.add('checked');
+      const correct = item.dataset.correct;
+      const radios = item.querySelectorAll('input[type="radio"]');
+      let answered = false;
+      radios.forEach(r => {
+        const label = r.closest('.qopt');
+        label.classList.remove('correct','incorrect');
+        if(r.checked){
+          answered = true;
+          if(r.value === correct){ label.classList.add('correct'); score++; }
+          else{ label.classList.add('incorrect'); }
+        }
+        if(r.value === correct) label.classList.add('correct');
+      });
+    });
+    const scoreBox = document.getElementById('quiz-score');
+    scoreBox.textContent = 'You scored ' + score + ' out of ' + items.length + '!';
+    scoreBox.classList.add('show');
+    scoreBox.scrollIntoView({behavior:'smooth', block:'center'});
+  });
+  document.getElementById('btn-reset-quiz').addEventListener('click', () => {
+    document.getElementById('quiz-form').reset();
+    document.querySelectorAll('.qitem').forEach(item => {
+      item.classList.remove('checked');
+      item.querySelectorAll('.qopt').forEach(o => o.classList.remove('correct','incorrect'));
+    });
+    document.getElementById('quiz-score').classList.remove('show');
+  });
+</script>
+
+</body>
+</html>
