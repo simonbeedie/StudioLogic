@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crane Control — Level 1: Simple Lift</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f0f7ff;
+    --card: #ffffff;
+    --border: #d0e4f7;
+    --text: #1a1a2e;
+    --muted: #5a6a80;
+    --hint: #9baabb;
+    --blue: #1a6fc4;
+    --blue-bg: #e6f1fb;
+    --blue-text: #0c447c;
+    --green: #1D9E75;
+    --green-bg: #e8f7f0;
+    --green-text: #0d6e47;
+    --green-border: #9fe1cb;
+    --red-bg: #fdeaea;
+    --red-text: #922020;
+    --red-border: #f7c1c1;
+    --warn-bg: #faeeda;
+    --warn-text: #633806;
+    --warn-border: #FAC775;
+    --crane: #1a6fc4;
+    --ball: #e05c2a;
+    --basket: #2d9e5f;
+    --track: #c8d8e8;
+    --ground: #8bad6b;
+  }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  header { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; gap: 1rem; height: 56px; }
+  .level-pill { background: var(--green-bg); color: var(--green-text); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; }
+  header h1 { font-size: 16px; font-weight: 600; }
+  .main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+  .main-top { grid-column: 1 / -1; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem; }
+  .card h2 { font-size: 18px; font-weight: 600; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px; }
+  .card p { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 0.75rem; }
+  .card p:last-child { margin-bottom: 0; }
+  .task-box { background: var(--blue-bg); border: 1px solid #b5d4f4; border-radius: 10px; padding: 1rem 1.25rem; margin-top: 0.75rem; }
+  .task-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--blue); margin-bottom: 6px; }
+  .task-box p { color: var(--blue-text); margin: 0; font-size: 14px; }
+  .steps-list { list-style: none; counter-reset: steps; margin-top: 0.75rem; }
+  .steps-list li { counter-increment: steps; display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--muted); margin-bottom: 8px; line-height: 1.6; }
+  .steps-list li::before { content: counter(steps); min-width: 22px; height: 22px; background: var(--blue); color: white; border-radius: 50%; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .scene-wrapper { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; margin-bottom: 1rem; }
+  .scene-wrapper canvas { display: block; width: 100%; border-radius: 8px; border: 1px solid var(--border); }
+  .controls-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; }
+  .controls-card h3 { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .cmd-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.25rem; }
+  .cmd-btn { font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 7px 13px; background: #f0f6ff; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; color: var(--text); display: flex; align-items: center; gap: 6px; }
+  .cmd-btn:hover { background: #dbeafe; }
+  .cmd-btn:active { transform: scale(0.97); }
+  .program-area { background: #f5f8ff; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; min-height: 100px; margin-bottom: 1rem; font-family: 'JetBrains Mono', monospace; }
+  .prog-empty { font-size: 13px; color: var(--hint); padding: 8px 0; }
+  .prog-line { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+  .prog-num { color: var(--hint); font-size: 12px; min-width: 18px; }
+  .prog-text { font-size: 13px; color: var(--text); flex: 1; }
+  .prog-del { background: none; border: none; color: var(--hint); cursor: pointer; font-size: 16px; line-height: 1; padding: 0 4px; }
+  .prog-del:hover { color: #922020; }
+  .type-row { display: flex; gap: 6px; margin-bottom: 1rem; }
+  .type-input { flex: 1; font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; background: #f5f8ff; color: var(--text); outline: none; }
+  .type-input:focus { border-color: var(--blue); background: #fff; }
+  .type-add-btn { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 14px; background: var(--blue); color: white; border: none; border-radius: 8px; cursor: pointer; }
+  .type-add-btn:hover { background: #0c447c; }
+  .btn-row { display: flex; gap: 8px; }
+  .run-btn { background: var(--blue); color: white; border: none; border-radius: 10px; padding: 10px 24px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .run-btn:hover { background: #0c447c; }
+  .run-btn:active { transform: scale(0.98); }
+  .clear-btn { background: none; border: 1px solid var(--border); border-radius: 10px; padding: 10px 18px; font-size: 14px; cursor: pointer; color: var(--muted); font-family: 'Inter', sans-serif; }
+  .clear-btn:hover { background: #f0f6ff; }
+  .feedback { margin-top: 1rem; border-radius: 10px; padding: 12px 16px; font-size: 14px; line-height: 1.6; display: none; }
+  .feedback.success { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
+  .feedback.fail { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border); }
+  .feedback.warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
+  .feedback.info { background: var(--blue-bg); color: var(--blue-text); border: 1px solid #b5d4f4; }
+  code { font-family: 'JetBrains Mono', monospace; background: rgba(0,0,0,0.07); padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+  .tip-box { background: #f5f8ff; border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0; padding: 0.75rem 1rem; margin-top: 1rem; }
+  .tip-box p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.6; }
+  @media (max-width: 700px) { .main { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <span class="level-pill">Level 1</span>
+  <h1>Crane Control — Simple Lift</h1>
+</header>
+<div class="main">
+  <div class="main-top">
+    <div class="card">
+      <h2>🏗️ Your mission</h2>
+      <p>You are programming a crane to pick up a ball and drop it into a basket. The crane moves along a track at the top. Its hook can be lowered and raised. You must write a sequence of commands to complete the task.</p>
+      <p>The crane always starts at the <strong>left side</strong> of the track with its hook fully raised.</p>
+      <div class="task-box">
+        <div class="task-label">Task</div>
+        <p>Move the crane over the ball → lower the hook to grab it → move to the basket → drop the ball in.</p>
+      </div>
+      <ul class="steps-list" style="margin-top:1rem;">
+        <li>Use <code>move_right(n)</code> to slide the crane along the track. Each unit = one grid square.</li>
+        <li>Use <code>lower_hook(n)</code> to extend the cable downward.</li>
+        <li>Use <code>grab()</code> when the hook is at the same height as the ball to pick it up.</li>
+        <li>Use <code>raise_hook(n)</code> to lift the ball clear, then <code>move_right(n)</code> to the basket.</li>
+        <li>Use <code>drop()</code> above the basket to release the ball. If it's directly above, it falls in!</li>
+      </ul>
+    </div>
+  </div>
+  <div class="scene-wrapper">
+    <canvas id="scene" width="500" height="320"></canvas>
+    <p style="font-size:12px; color:var(--hint); margin-top:8px; text-align:center;">The crane track runs across the top. Ball and basket positions are marked with grid numbers.</p>
+  </div>
+  <div>
+    <div class="controls-card">
+      <h3>Commands</h3>
+      <div class="cmd-grid">
+        <button class="cmd-btn" onclick="addCmd('move_right(1)')">→ move_right(1)</button>
+        <button class="cmd-btn" onclick="addCmd('move_right(2)')">→→ move_right(2)</button>
+        <button class="cmd-btn" onclick="addCmd('move_right(3)')">→×3 move_right(3)</button>
+        <button class="cmd-btn" onclick="addCmd('move_left(1)')">← move_left(1)</button>
+        <button class="cmd-btn" onclick="addCmd('lower_hook(1)')">↧ lower_hook(1)</button>
+        <button class="cmd-btn" onclick="addCmd('lower_hook(2)')">↧↧ lower_hook(2)</button>
+        <button class="cmd-btn" onclick="addCmd('lower_hook(3)')">↧×3 lower_hook(3)</button>
+        <button class="cmd-btn" onclick="addCmd('raise_hook(1)')">↥ raise_hook(1)</button>
+        <button class="cmd-btn" onclick="addCmd('raise_hook(2)')">↥↥ raise_hook(2)</button>
+        <button class="cmd-btn" onclick="addCmd('raise_hook(3)')">↥×3 raise_hook(3)</button>
+        <button class="cmd-btn" onclick="addCmd('grab()')">✊ grab()</button>
+        <button class="cmd-btn" onclick="addCmd('drop()')">✋ drop()</button>
+      </div>
+      <h3>Your program</h3>
+      <div class="type-row">
+        <input class="type-input" id="type-input" type="text" placeholder="Type a command e.g. move_right(2)" autocomplete="off" onkeydown="if(event.key==='Enter') addTyped()" />
+        <button class="type-add-btn" onclick="addTyped()">Add</button>
+      </div>
+      <div class="program-area" id="program-area">
+        <p class="prog-empty">Click a command to start your program...</p>
+      </div>
+      <div class="btn-row">
+        <button class="run-btn" onclick="runProgram()">▶ Run program</button>
+        <button class="clear-btn" onclick="clearAll()">Clear</button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+      <div class="tip-box">
+        <p><strong>Hint:</strong> The ball is at grid position 3, sitting on the ground (row 5). The basket is at position 7. You need to count carefully — the hook must be at exactly the right height to grab the ball!</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+
+const canvas = document.getElementById('scene');
+const ctx = canvas.getContext('2d');
+
+const COLS = 10;
+const ROWS = 6;
+const CW = canvas.width / COLS;
+const CH = (canvas.height - 40) / ROWS;
+const TRACK_Y = 30;
+
+const BALL_COL = 3;
+const BALL_ROW = 5;
+const BASKET_COL = 7;
+
+let state = {
+  craneX: 0,
+  hookRows: 0,
+  hasBall: false,
+  ballDropped: false,
+  ballInBasket: false
+};
+
+let program = [];
+let animating = false;
+
+function colToX(c) { return c * CW + CW / 2; }
+function rowToY(r) { return TRACK_Y + r * CH + CH / 2; }
+
+function drawScene(st) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = '#ddeeff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const groundY = TRACK_Y + ROWS * CH;
+  ctx.fillStyle = '#8bad6b';
+  ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+
+  for (let c = 0; c <= COLS; c++) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(c * CW, TRACK_Y); ctx.lineTo(c * CW, groundY); ctx.stroke();
+  }
+  for (let r = 0; r <= ROWS; r++) {
+    ctx.beginPath(); ctx.moveTo(0, TRACK_Y + r * CH); ctx.lineTo(canvas.width, TRACK_Y + r * CH); ctx.stroke();
+  }
+
+  for (let c = 0; c < COLS; c++) {
+    ctx.fillStyle = '#7a90a0';
+    ctx.font = '10px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(c, c * CW + CW / 2, TRACK_Y - 8);
+  }
+
+  ctx.fillStyle = '#1a4a7a';
+  ctx.fillRect(0, 18, canvas.width, 12);
+  ctx.fillStyle = '#2a6aaa';
+  ctx.fillRect(0, 26, canvas.width, 4);
+
+  const cx = colToX(st.craneX);
+  ctx.fillStyle = '#1a6fc4';
+  ctx.fillRect(cx - 28, 10, 56, 22);
+  ctx.fillStyle = '#0c447c';
+  ctx.fillRect(cx - 6, 8, 12, 26);
+
+  const hookTopY = TRACK_Y + 2;
+  const hookBottomY = TRACK_Y + (st.hookRows + 1) * CH;
+  ctx.strokeStyle = '#555';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath(); ctx.moveTo(cx, hookTopY); ctx.lineTo(cx, hookBottomY); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = '#333';
+  ctx.beginPath();
+  ctx.arc(cx, hookBottomY, 7, Math.PI, 2 * Math.PI);
+  ctx.fill();
+  ctx.fillRect(cx - 4, hookBottomY, 8, 5);
+
+  if (st.hasBall) {
+    ctx.fillStyle = '#e05c2a';
+    ctx.beginPath();
+    ctx.arc(cx, hookBottomY + 16, 13, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.strokeStyle = '#a03a10';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  if (!st.hasBall && !st.ballDropped && !st.ballInBasket) {
+    const bx = colToX(BALL_COL);
+    const by = rowToY(BALL_ROW);
+    ctx.fillStyle = '#e05c2a';
+    ctx.beginPath();
+    ctx.arc(bx, by, 13, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.strokeStyle = '#a03a10';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.beginPath();
+    ctx.arc(bx - 4, by - 4, 5, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+
+  const bkx = colToX(BASKET_COL);
+  const bky = groundY;
+  ctx.fillStyle = '#2d9e5f';
+  ctx.beginPath();
+  ctx.moveTo(bkx - 22, bky - 30);
+  ctx.lineTo(bkx - 18, bky);
+  ctx.lineTo(bkx + 18, bky);
+  ctx.lineTo(bkx + 22, bky - 30);
+  ctx.stroke();
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = '#2d9e5f';
+  ctx.beginPath();
+  ctx.moveTo(bkx - 22, bky - 30);
+  ctx.lineTo(bkx - 18, bky);
+  ctx.lineTo(bkx + 18, bky);
+  ctx.lineTo(bkx + 22, bky - 30);
+  ctx.stroke();
+  ctx.lineWidth = 1;
+
+  if (st.ballInBasket) {
+    ctx.fillStyle = '#e05c2a';
+    ctx.beginPath();
+    ctx.arc(bkx, bky - 15, 13, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.strokeStyle = '#a03a10';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = '#e05c2a';
+  ctx.font = 'bold 11px Inter, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('BALL', colToX(BALL_COL), rowToY(BALL_ROW) + 28);
+  ctx.fillStyle = '#2d9e5f';
+  ctx.fillText('BASKET', colToX(BASKET_COL), groundY + 14);
+
+  ctx.fillStyle = '#1a6fc4';
+  ctx.font = 'bold 10px Inter, sans-serif';
+  ctx.fillText('CRANE', cx, 16);
+}
+
+function addCmd(cmd) { program.push(cmd); renderProgram(); }
+
+function addTyped() {
+  const input = document.getElementById('type-input');
+  const cmd = input.value.trim();
+  if (!cmd) return;
+  const valid = /^move_right\(\d+\)$/.test(cmd) || /^move_left\(\d+\)$/.test(cmd) ||
+                /^lower_hook\(\d+\)$/.test(cmd) || /^raise_hook\(\d+\)$/.test(cmd) ||
+                cmd === 'grab()' || cmd === 'drop()';
+  if (!valid) {
+    showFeedback('fail', `❌ <strong>Unknown command:</strong> <code>${cmd}</code>. Try something like <code>move_right(2)</code> or <code>grab()</code>.`);
+    return;
+  }
+  document.getElementById('feedback').style.display = 'none';
+  program.push(cmd);
+  renderProgram();
+  input.value = '';
+  input.focus();
+}
+
+function removeCmd(i) { program.splice(i, 1); renderProgram(); }
+
+function renderProgram() {
+  const area = document.getElementById('program-area');
+  if (!program.length) { area.innerHTML = '<p class="prog-empty">Click a command to start your program...</p>'; return; }
+  area.innerHTML = program.map((c, i) =>
+    `<div class="prog-line"><span class="prog-num">${i+1}.</span><span class="prog-text">${c}</span><button class="prog-del" onclick="removeCmd(${i})">×</button></div>`
+  ).join('');
+}
+
+function clearAll() {
+  program = [];
+  renderProgram();
+  state = { craneX: 0, hookRows: 0, hasBall: false, ballDropped: false, ballInBasket: false };
+  drawScene(state);
+  document.getElementById('feedback').style.display = 'none';
+}
+
+function showFeedback(type, msg) {
+  const f = document.getElementById('feedback');
+  f.style.display = 'block';
+  f.className = 'feedback ' + type;
+  f.innerHTML = msg;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function runProgram() {
+  if (animating || !program.length) { if (!program.length) showFeedback('info', 'Add some commands first!'); return; }
+  animating = true;
+  document.getElementById('feedback').style.display = 'none';
+
+  let st = { craneX: 0, hookRows: 0, hasBall: false, ballDropped: false, ballInBasket: false };
+  let grabbed = false;
+  let success = false;
+  let error = null;
+
+  for (const cmd of program) {
+    const mr = cmd.match(/^move_right\((\d+)\)$/);
+    const ml = cmd.match(/^move_left\((\d+)\)$/);
+    const lh = cmd.match(/^lower_hook\((\d+)\)$/);
+    const rh = cmd.match(/^raise_hook\((\d+)\)$/);
+    const grab = cmd === 'grab()';
+    const drop = cmd === 'drop()';
+
+    if (!mr && !ml && !lh && !rh && !grab && !drop) {
+      error = `I don't recognise: <code>${cmd}</code>`;
+      break;
+    }
+
+    if (mr) {
+      const n = parseInt(mr[1]);
+      for (let i = 0; i < n; i++) {
+        st = { ...st, craneX: Math.min(COLS - 1, st.craneX + 1) };
+        drawScene(st); await sleep(180);
+      }
+    } else if (ml) {
+      const n = parseInt(ml[1]);
+      for (let i = 0; i < n; i++) {
+        st = { ...st, craneX: Math.max(0, st.craneX - 1) };
+        drawScene(st); await sleep(180);
+      }
+    } else if (lh) {
+      const n = parseInt(lh[1]);
+      for (let i = 0; i < n; i++) {
+        st = { ...st, hookRows: Math.min(ROWS - 1, st.hookRows + 1) };
+        drawScene(st); await sleep(200);
+      }
+    } else if (rh) {
+      const n = parseInt(rh[1]);
+      for (let i = 0; i < n; i++) {
+        st = { ...st, hookRows: Math.max(0, st.hookRows - 1) };
+        drawScene(st); await sleep(200);
+      }
+    } else if (grab) {
+      const hookAtBallCol = st.craneX === BALL_COL;
+      const hookAtBallRow = st.hookRows === BALL_ROW - 1;
+      if (hookAtBallCol && hookAtBallRow && !st.hasBall && !st.ballDropped) {
+        st = { ...st, hasBall: true };
+        grabbed = true;
+      } else if (st.hasBall) {
+        // already holding
+      } else {
+        error = `grab() failed — the hook isn't at the ball's position. The ball is at column ${BALL_COL}, row ${BALL_ROW}. Your hook is at column ${st.craneX}, hook depth ${st.hookRows + 1}.`;
+        break;
+      }
+      drawScene(st); await sleep(300);
+    } else if (drop) {
+      if (!st.hasBall) {
+        error = `drop() called but the crane isn't holding the ball yet. Use grab() first.`;
+        break;
+      }
+      st = { ...st, hasBall: false, ballDropped: true };
+      if (st.craneX === BASKET_COL) {
+        st = { ...st, ballInBasket: true };
+        success = true;
+      }
+      drawScene(st); await sleep(300);
+    }
+  }
+
+  drawScene(st);
+
+  if (error) {
+    showFeedback('fail', `❌ <strong>Error:</strong> ${error}`);
+  } else if (success) {
+    showFeedback('success', `🎉 <strong>Perfect!</strong> The crane lifted the ball and dropped it into the basket. You wrote a sequence of ${program.length} instructions — that's an algorithm!`);
+  } else if (st.ballDropped && !st.ballInBasket) {
+    showFeedback('fail', `❌ <strong>Missed the basket!</strong> The ball was dropped at column ${st.craneX}, but the basket is at column ${BASKET_COL}. Move the crane to the right position before dropping.`);
+  } else if (!grabbed) {
+    showFeedback('warn', `⚠️ <strong>Ball not grabbed.</strong> Your program finished without picking up the ball. Make sure you move over column ${BALL_COL}, lower the hook to row ${BALL_ROW}, then use grab().`);
+  } else {
+    showFeedback('warn', `⚠️ <strong>Almost!</strong> You grabbed the ball but didn't drop it. After raising the hook, move to column ${BASKET_COL} and use drop().`);
+  }
+  animating = false;
+}
+
+drawScene(state);
+</script>
+</body>
+</html>

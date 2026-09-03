@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foundational C# with Microsoft — Homework Hub</title>
+<style>
+  :root {
+    --navy: #0D1B2A;
+    --navy-soft: #16263b;
+    --teal: #00B4D8;
+    --teal-dark: #0087a8;
+    --ink: #1b2430;
+    --paper: #ffffff;
+    --paper-alt: #f4f7f9;
+    --line: #dde3e8;
+    --muted: #5c6b7a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--paper-alt);
+    color: var(--ink);
+    line-height: 1.55;
+  }
+
+  a { color: var(--teal-dark); text-decoration: none; border-bottom: 1px solid rgba(0,135,168,0.35); }
+  a:hover { border-bottom-color: var(--teal-dark); }
+
+  header.hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-soft) 100%);
+    color: #fff;
+    padding: 56px 24px 48px;
+    text-align: center;
+  }
+  header.hero .eyebrow {
+    color: var(--teal);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+  header.hero h1 {
+    margin: 0 0 12px;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  header.hero p.sub {
+    color: #c7d3de;
+    max-width: 640px;
+    margin: 0 auto;
+    font-size: 16px;
+  }
+
+  nav.progress {
+    max-width: 920px;
+    margin: -28px auto 0;
+    background: var(--paper);
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(13,27,42,0.14);
+    padding: 18px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+  }
+  nav.progress a {
+    border: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    background: var(--paper-alt);
+  }
+  nav.progress a:hover { background: #eaf7fb; border-color: var(--teal); }
+
+  main {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 48px 20px 80px;
+  }
+
+  section.block {
+    margin-bottom: 40px;
+  }
+
+  h2.section-title {
+    font-size: 22px;
+    color: var(--navy);
+    border-bottom: 2px solid var(--teal);
+    padding-bottom: 8px;
+    margin: 0 0 16px;
+  }
+
+  .callout {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--teal);
+    border-radius: 10px;
+    padding: 20px 22px;
+    box-shadow: 0 2px 8px rgba(13,27,42,0.04);
+  }
+  .callout h3 { margin-top: 0; font-size: 16px; color: var(--navy); }
+  .callout p:last-child { margin-bottom: 0; }
+
+  .setup-list {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px 24px;
+  }
+  .setup-list li { margin-bottom: 10px; }
+  .setup-list li:last-child { margin-bottom: 0; }
+
+  details.week {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(13,27,42,0.05);
+  }
+  details.week[open] { box-shadow: 0 6px 18px rgba(13,27,42,0.10); }
+
+  summary.week-head {
+    list-style: none;
+    cursor: pointer;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--navy);
+    color: #fff;
+  }
+  summary.week-head::-webkit-details-marker { display: none; }
+  summary.week-head .badge {
+    background: var(--teal);
+    color: var(--navy);
+    font-weight: 800;
+    font-size: 13px;
+    border-radius: 999px;
+    padding: 4px 12px;
+    white-space: nowrap;
+  }
+  summary.week-head .wk-title { font-weight: 700; font-size: 16px; flex: 1; }
+  summary.week-head .chev {
+    transition: transform 0.2s ease;
+    color: var(--teal);
+    font-size: 14px;
+  }
+  details.week[open] summary.week-head .chev { transform: rotate(90deg); }
+
+  .week-body { padding: 20px 22px 24px; }
+
+  .subhead {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--teal-dark);
+    margin: 18px 0 8px;
+  }
+  .subhead:first-child { margin-top: 0; }
+
+  .fcc-link {
+    display: inline-block;
+    background: #eaf7fb;
+    border: 1px solid #bfe6f0;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .fcc-link, .fcc-link a { border-bottom: none; }
+
+  ol.modules {
+    margin: 0;
+    padding-left: 20px;
+  }
+  ol.modules li { margin-bottom: 8px; }
+  ol.modules li:last-child { margin-bottom: 0; }
+
+  .path-line {
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .video-box {
+    margin-top: 14px;
+    font-size: 14px;
+    background: var(--paper-alt);
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .video-box strong { color: var(--navy); }
+
+  .exam-block {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-soft) 100%);
+    color: #fff;
+    border-radius: 14px;
+    padding: 28px 26px;
+  }
+  .exam-block h2 { color: #fff; border-bottom-color: var(--teal); }
+  .exam-block a { color: var(--teal); border-bottom-color: rgba(0,180,216,0.4); }
+  .exam-block p { color: #dce6ee; }
+
+  footer {
+    text-align: center;
+    padding: 30px 20px 50px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  @media (max-width: 600px) {
+    summary.week-head { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">AS/A-level Computer Science · 7516 / 7517</div>
+  <h1>Foundational C# with Microsoft</h1>
+  <p class="sub">Your homework hub for the full certification. Work through one course per week — this page tells you exactly what to do and links you straight to the right pages.</p>
+</header>
+
+<nav class="progress">
+  <a href="#setup">Setup</a>
+  <a href="#week-1">Week 1</a>
+  <a href="#week-2">Week 2</a>
+  <a href="#week-3">Week 3</a>
+  <a href="#week-4">Week 4</a>
+  <a href="#week-5">Week 5</a>
+  <a href="#week-6">Week 6</a>
+  <a href="#week-7">Week 7 — Exam</a>
+</nav>
+
+<main>
+
+  <section class="block">
+    <h2 class="section-title">What is this, and why two websites?</h2>
+    <div class="callout">
+      <h3>Two sites, one course</h3>
+      <p><strong>Microsoft Learn</strong> hosts the actual lessons — the explanations, examples, and interactive code exercises. This is where you do the learning.</p>
+      <p><strong>freeCodeCamp</strong> tracks your progress and hosts the final certification exam. Completing a module on Microsoft Learn earns you a "trophy" — freeCodeCamp checks off that section once you confirm you've done it.</p>
+      <p>You need both: do the learning on Microsoft Learn, then tick it off on freeCodeCamp so your certificate progress is recorded. At the end of all 6 courses, you'll sit the official exam on freeCodeCamp to earn the <em>Foundational C# with Microsoft</em> certificate.</p>
+    </div>
+  </section>
+
+  <section class="block" id="setup">
+    <h2 class="section-title">One-Time Setup (do this first)</h2>
+    <ul class="setup-list">
+      <li>Install <strong>Visual Studio Code</strong> (not Visual Studio) — <a href="https://code.visualstudio.com/" target="_blank" rel="noopener">code.visualstudio.com</a></li>
+      <li>Install the <strong>C# Dev Kit</strong> extension from inside VS Code (Extensions tab → search "C# Dev Kit")</li>
+      <li>Create a free account at <a href="https://www.freecodecamp.org/" target="_blank" rel="noopener">freecodecamp.org</a> and start the course here: <a href="https://www.freecodecamp.org/learn/foundational-c-sharp-with-microsoft/" target="_blank" rel="noopener">Foundational C# with Microsoft</a></li>
+    </ul>
+  </section>
+
+  <!-- WEEK 1 -->
+  <details class="week" id="week-1" open>
+    <summary class="week-head">
+      <span class="badge">Week 1</span>
+      <span class="wk-title">Write Your First Code Using C#</span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="week-body">
+      <div class="subhead">Do this on freeCodeCamp (tracks your certificate progress)</div>
+      <div class="fcc-link"><a href="https://www.freecodecamp.org/learn/foundational-c-sharp-with-microsoft/#write-your-first-code-using-c-sharp" target="_blank" rel="noopener">freecodecamp.org → Write Your First Code Using C#</a></div>
+
+      <div class="subhead">Microsoft Learn modules (the actual content)</div>
+      <ol class="modules">
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-write-first/" target="_blank" rel="noopener">Write your first C# code</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-literals-variables/" target="_blank" rel="noopener">Store and retrieve data using literal and variable values in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-basic-formatting/" target="_blank" rel="noopener">Perform basic string formatting in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-basic-operations/" target="_blank" rel="noopener">Perform basic operations on numbers in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/guided-project-calculate-print-student-grades/" target="_blank" rel="noopener">Guided Project — Calculate and Print Student Grades</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/guided-project-calculate-final-gpa/" target="_blank" rel="noopener">Guided Project — Calculate Final GPA</a></li>
+      </ol>
+      <div class="path-line">Full learning path (all modules above, one page): <a href="https://learn.microsoft.com/en-us/training/paths/get-started-c-sharp-part-1/" target="_blank" rel="noopener">learn.microsoft.com</a></div>
+
+      <div class="video-box">🎬 <strong>Optional video walkthrough:</strong> <a href="https://www.classcentral.com/course/microsoft-learn-write-your-first-code-using-c-get-started-with-c-part-1-62183" target="_blank" rel="noopener">Class Central — video overview</a> (not required)</div>
+    </div>
+  </details>
+
+  <!-- WEEK 2 -->
+  <details class="week" id="week-2">
+    <summary class="week-head">
+      <span class="badge">Week 2</span>
+      <span class="wk-title">Create and Run Simple C# Console Applications</span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="week-body">
+      <div class="subhead">Do this on freeCodeCamp (tracks your certificate progress)</div>
+      <div class="fcc-link"><a href="https://www.freecodecamp.org/learn/foundational-c-sharp-with-microsoft/#create-and-run-simple-c-console-applications" target="_blank" rel="noopener">freecodecamp.org → Create and Run Simple C# Console Applications</a></div>
+
+      <div class="subhead">Microsoft Learn modules (the actual content)</div>
+      <ol class="modules">
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/install-configure-visual-studio-code/" target="_blank" rel="noopener">Install and configure Visual Studio Code</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-call-methods/" target="_blank" rel="noopener">Call methods from the .NET Class Library using C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-if-elseif-else/" target="_blank" rel="noopener">Add decision logic using if, else, and else if statements in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-arrays/" target="_blank" rel="noopener">Store and iterate through sequences of data using Arrays and foreach in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-readable-code/" target="_blank" rel="noopener">Create readable code with conventions, whitespace, and comments in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/guided-project-arrays-iteration-selection/" target="_blank" rel="noopener">Guided Project — Develop foreach and if-elseif-else structures to process array data</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/challenge-project-arrays-iteration-selection/" target="_blank" rel="noopener">Challenge Project — Develop foreach and if-elseif-else structures to process array data</a></li>
+      </ol>
+      <div class="path-line">Full learning path (all modules above, one page): <a href="https://learn.microsoft.com/en-us/training/paths/get-started-c-sharp-part-2/" target="_blank" rel="noopener">learn.microsoft.com</a></div>
+
+      <div class="video-box">🎬 <strong>Optional video walkthrough:</strong> <a href="https://www.classcentral.com/course/microsoft-learn-create-and-run-simple-c-console-applications-get-started-with-c-part-2-262444" target="_blank" rel="noopener">Class Central — video overview</a> (not required)</div>
+    </div>
+  </details>
+
+  <!-- WEEK 3 -->
+  <details class="week" id="week-3">
+    <summary class="week-head">
+      <span class="badge">Week 3</span>
+      <span class="wk-title">Add Logic to C# Console Applications</span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="week-body">
+      <div class="subhead">Do this on freeCodeCamp (tracks your certificate progress)</div>
+      <div class="fcc-link"><a href="https://www.freecodecamp.org/learn/foundational-c-sharp-with-microsoft/#add-logic-to-c-console-applications" target="_blank" rel="noopener">freecodecamp.org → Add Logic to C# Console Applications</a></div>
+
+      <div class="subhead">Microsoft Learn modules (the actual content)</div>
+      <ol class="modules">
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-evaluate-boolean-expressions/" target="_blank" rel="noopener">Evaluate Boolean expressions to make decisions in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-code-blocks/" target="_blank" rel="noopener">Control variable scope and logic using code blocks in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-switch-case/" target="_blank" rel="noopener">Branch the flow of code using the switch-case construct in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-for/" target="_blank" rel="noopener">Iterate through a code block using the for statement in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-do-while/" target="_blank" rel="noopener">Add looping logic using the do-while and while statements in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/guided-project-develop-conditional-branching-looping/" target="_blank" rel="noopener">Guided Project — Develop Conditional Branching and Looping Structures in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/challenge-project-develop-branching-looping-structures-c-sharp/" target="_blank" rel="noopener">Challenge Project — Develop Branching and Looping Structures in C#</a></li>
+      </ol>
+      <div class="path-line">Full learning path (all modules above, one page): <a href="https://learn.microsoft.com/en-us/training/paths/get-started-c-sharp-part-3/" target="_blank" rel="noopener">learn.microsoft.com</a></div>
+
+      <div class="video-box">🎬 <strong>Optional video walkthrough:</strong> <a href="https://www.classcentral.com/course/microsoft-learn-add-logic-to-c-console-applications-get-started-with-c-part-3-62242" target="_blank" rel="noopener">Class Central — video overview</a> (not required)</div>
+    </div>
+  </details>
+
+  <!-- WEEK 4 -->
+  <details class="week" id="week-4">
+    <summary class="week-head">
+      <span class="badge">Week 4</span>
+      <span class="wk-title">Work with Variable Data in C# Console Applications</span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="week-body">
+      <div class="subhead">Do this on freeCodeCamp (tracks your certificate progress)</div>
+      <div class="fcc-link"><a href="https://www.freecodecamp.org/learn/foundational-c-sharp-with-microsoft/#work-with-variable-data-in-c-console-applications" target="_blank" rel="noopener">freecodecamp.org → Work with Variable Data in C# Console Applications</a></div>
+
+      <div class="subhead">Microsoft Learn modules (the actual content)</div>
+      <ol class="modules">
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-choose-data-type/" target="_blank" rel="noopener">Choose the correct data type in your C# code</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-convert-cast/" target="_blank" rel="noopener">Convert data types using casting and conversion techniques in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-arrays-operations/" target="_blank" rel="noopener">Perform operations on arrays using helper methods in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-format-strings/" target="_blank" rel="noopener">Format alphanumeric data for presentation in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/csharp-modify-content/" target="_blank" rel="noopener">Modify the content of strings using built-in string methods in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/guided-project-work-variable-data-c-sharp/" target="_blank" rel="noopener">Guided Project — Work with Variable Data in C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/challenge-project-work-variable-data-c-sharp/" target="_blank" rel="noopener">Challenge Project — Work with Variable Data in C#</a></li>
+      </ol>
+      <div class="path-line">Full learning path (all modules above, one page): <a href="https://learn.microsoft.com/en-us/training/paths/get-started-c-sharp-part-4/" target="_blank" rel="noopener">learn.microsoft.com</a></div>
+
+      <div class="video-box">🎬 <strong>Optional video walkthrough:</strong> <a href="https://www.classcentral.com/course/microsoft-learn-work-with-variable-data-in-c-console-applications-get-started-with-c-part-4-62280" target="_blank" rel="noopener">Class Central — video overview</a> (not required)</div>
+    </div>
+  </details>
+
+  <!-- WEEK 5 -->
+  <details class="week" id="week-5">
+    <summary class="week-head">
+      <span class="badge">Week 5</span>
+      <span class="wk-title">Create Methods in C# Console Applications</span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="week-body">
+      <div class="subhead">Do this on freeCodeCamp (tracks your certificate progress)</div>
+      <div class="fcc-link"><a href="https://www.freecodecamp.org/learn/foundational-c-sharp-with-microsoft/#create-methods-in-c-console-applications" target="_blank" rel="noopener">freecodecamp.org → Create Methods in C# Console Applications</a></div>
+
+      <div class="subhead">Microsoft Learn modules (the actual content)</div>
+      <ol class="modules">
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/write-first-c-sharp-method/" target="_blank" rel="noopener">Write your first C# method</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/create-c-sharp-methods-parameters/" target="_blank" rel="noopener">Create C# methods with parameters</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/create-c-sharp-methods-return-values/" target="_blank" rel="noopener">Create C# methods that return values</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/guided-project-visit-petting-zoo/" target="_blank" rel="noopener">Guided Project — Plan a Petting Zoo Visit</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/challenge-project-create-mini-game/" target="_blank" rel="noopener">Challenge Project — Create a Mini-Game</a></li>
+      </ol>
+      <div class="path-line">Full learning path (all modules above, one page): <a href="https://learn.microsoft.com/en-us/training/paths/get-started-c-sharp-part-5/" target="_blank" rel="noopener">learn.microsoft.com</a></div>
+
+      <div class="video-box">🎬 <strong>Optional video walkthrough:</strong> <a href="https://www.classcentral.com/course/microsoft-learn-create-methods-in-c-console-applications-get-started-with-c-part-5-262449" target="_blank" rel="noopener">Class Central — video overview</a> (not required)</div>
+    </div>
+  </details>
+
+  <!-- WEEK 6 -->
+  <details class="week" id="week-6">
+    <summary class="week-head">
+      <span class="badge">Week 6</span>
+      <span class="wk-title">Debug C# Console Applications</span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="week-body">
+      <div class="subhead">Do this on freeCodeCamp (tracks your certificate progress)</div>
+      <div class="fcc-link"><a href="https://www.freecodecamp.org/learn/foundational-c-sharp-with-microsoft/#debug-c-console-applications" target="_blank" rel="noopener">freecodecamp.org → Debug C# Console Applications</a></div>
+
+      <div class="subhead">Microsoft Learn modules (the actual content)</div>
+      <ol class="modules">
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/review-principles-code-debugging-exception-handling-c-sharp/" target="_blank" rel="noopener">Review the principles of code debugging and exception handling</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/implement-visual-studio-code-debugging-tools/" target="_blank" rel="noopener">Implement the Visual Studio Code debugging tools for C#</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/implement-exception-handling-c-sharp/" target="_blank" rel="noopener">Implement exception handling in C# console applications</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/create-throw-exceptions-c-sharp/" target="_blank" rel="noopener">Create and throw exceptions in C# console applications</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/guided-project-debug-handle-exceptions-c-sharp-console-application/" target="_blank" rel="noopener">Guided Project — Debug and Handle Exceptions in a C# Console Application Using VS Code</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/training/modules/challenge-project-debug-c-sharp-console-application/" target="_blank" rel="noopener">Challenge Project — Debug a C# Console Application Using VS Code</a></li>
+      </ol>
+      <div class="path-line">Full learning path (all modules above, one page): <a href="https://learn.microsoft.com/en-us/training/paths/get-started-c-sharp-part-6/" target="_blank" rel="noopener">learn.microsoft.com</a></div>
+    </div>
+  </details>
+
+  <!-- WEEK 7 / EXAM -->
+  <section class="block" id="week-7" style="margin-top:40px;">
+    <div class="exam-block">
+      <h2 class="section-title" style="margin-top:0;">Week 7: Certification Exam</h2>
+      <p>Once all 6 trophies show as complete on freeCodeCamp, you're ready to sit the <strong>Foundational C# with Microsoft</strong> certification exam.</p>
+      <p>80 multiple-choice questions, untimed — but once you start, you can't exit without losing progress, so make sure you have an uninterrupted block of time before you begin.</p>
+      <p><a href="https://www.freecodecamp.org/learn/foundational-c-sharp-with-microsoft/" target="_blank" rel="noopener">Go to the exam on freeCodeCamp →</a></p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  AS/A-level Computer Science (7516/7517) · C# (Option A) · Homework Hub
+</footer>
+
+</body>
+</html>

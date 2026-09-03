@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Island Map — Level 1: Simple Route</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sea: #5ba3c9;
+    --land: #5a9c4a;
+    --land-dark: #4a8a3a;
+    --sand: #c8b87a;
+    --water-body: #4a4ac0;
+    --red: #E24B4A;
+    --green: #1D9E75;
+    --blue: #185FA5;
+    --amber: #BA7517;
+    --bg: #f8f7f4;
+    --card: #ffffff;
+    --border: #e2e0d8;
+    --text: #1a1a1a;
+    --text-muted: #6b6860;
+    --text-hint: #9b9890;
+    --success-bg: #e8f7f0;
+    --success-text: #0d6e47;
+    --fail-bg: #fdeaea;
+    --fail-text: #922020;
+    --info-bg: #e6f1fb;
+    --info-text: #0c447c;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: 56px;
+  }
+
+  .level-pill {
+    background: #e8f7f0;
+    color: #0d6e47;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  header h1 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  .main-top { grid-column: 1 / -1; }
+  .type-row { display: flex; gap: 6px; margin-bottom: 1rem; }
+  .type-input { flex: 1; font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; background: #f8f7f4; color: var(--text); outline: none; }
+  .type-input:focus { border-color: var(--blue); background: #fff; }
+  .type-add-btn { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 14px; background: var(--blue); color: white; border: none; border-radius: 8px; cursor: pointer; }
+  .type-add-btn:hover { background: #0c447c; }
+
+  .instruction-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .instruction-card h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .instruction-card h2 .icon { font-size: 20px; }
+
+  .instruction-card p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 0.75rem;
+  }
+
+  .task-box {
+    background: #e6f1fb;
+    border: 1px solid #b5d4f4;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-top: 0.75rem;
+  }
+
+  .task-box .task-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #185FA5;
+    margin-bottom: 6px;
+  }
+
+  .task-box p {
+    font-size: 14px;
+    color: #0c447c;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .steps-list {
+    list-style: none;
+    counter-reset: steps;
+    margin-top: 0.75rem;
+  }
+
+  .steps-list li {
+    counter-increment: steps;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    line-height: 1.6;
+  }
+
+  .steps-list li::before {
+    content: counter(steps);
+    min-width: 22px;
+    height: 22px;
+    background: var(--text);
+    color: white;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .map-wrapper {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .map-wrapper svg {
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  .map-legend {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .controls-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+  }
+
+  .controls-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+
+  .cmd-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 1.25rem;
+  }
+
+  .cmd-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 7px 13px;
+    background: #f0efea;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text);
+    transition: background 0.1s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .cmd-btn:hover { background: #e4e2da; }
+  .cmd-btn:active { transform: scale(0.97); }
+
+  .cmd-btn .arrow { font-size: 15px; }
+
+  .program-area {
+    background: #f8f7f4;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    min-height: 100px;
+    margin-bottom: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .program-empty {
+    font-size: 13px;
+    color: var(--text-hint);
+    padding: 8px 0;
+  }
+
+  .prog-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 0;
+  }
+
+  .prog-num {
+    color: var(--text-hint);
+    font-size: 12px;
+    min-width: 18px;
+  }
+
+  .prog-text {
+    font-size: 13px;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .prog-del {
+    background: none;
+    border: none;
+    color: var(--text-hint);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0 4px;
+  }
+
+  .prog-del:hover { color: var(--fail-text); }
+
+  .btn-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .run-btn {
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .run-btn:hover { background: #0c447c; }
+  .run-btn:active { transform: scale(0.98); }
+
+  .clear-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .clear-btn:hover { background: #f0efea; }
+
+  .feedback {
+    margin-top: 1rem;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    display: none;
+  }
+
+  .feedback.success { background: var(--success-bg); color: var(--success-text); border: 1px solid #9fe1cb; }
+  .feedback.fail { background: var(--fail-bg); color: var(--fail-text); border: 1px solid #f7c1c1; }
+  .feedback.info { background: var(--info-bg); color: var(--info-text); border: 1px solid #b5d4f4; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(0,0,0,0.07);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+
+  .grid-label { font-size: 10px; fill: rgba(255,255,255,0.7); text-anchor: middle; dominant-baseline: middle; }
+
+  @media (max-width: 700px) {
+    .main { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="level-pill">Level 1</span>
+  <h1>Island Map — Simple Route</h1>
+</header>
+
+<div class="main">
+
+  <div class="main-top">
+    <div class="instruction-card">
+      <h2><span class="icon">🗺️</span> Your mission</h2>
+      <p>You are programming an explorer to navigate across the island. The map is divided into a grid — columns are labelled A–M and rows are labelled 1–10.</p>
+      <p>Your explorer starts at position <strong>F9</strong>. You need to write a sequence of instructions to guide them to <strong>J3</strong>, just below the lighthouse.</p>
+
+      <div class="task-box">
+        <div class="task-label">Task</div>
+        <p>Guide the explorer from <strong>F9</strong> to <strong>J3</strong> (one square below the lighthouse) using movement commands.</p>
+      </div>
+
+      <ul class="steps-list" style="margin-top: 1rem;">
+        <li>Click the command buttons to add instructions to your program.</li>
+        <li>Each command moves the explorer one cell in that direction. Use <code>move_north(3)</code> to move 3 cells at once.</li>
+        <li>When your program is ready, click <strong>Run program</strong> to watch your explorer move.</li>
+        <li>If they don't reach the lighthouse, read the feedback and try again!</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="map-wrapper">
+      <svg id="map" viewBox="0 0 390 310">
+        <rect width="390" height="310" fill="#5ba3c9"/>
+        <ellipse cx="200" cy="160" rx="148" ry="105" fill="#5a9c4a"/>
+        <ellipse cx="148" cy="148" rx="112" ry="93" fill="#5a9c4a"/>
+        <ellipse cx="252" cy="178" rx="112" ry="83" fill="#5a9c4a"/>
+        <ellipse cx="182" cy="225" rx="72" ry="28" fill="#c8b87a" opacity="0.7"/>
+        <circle cx="200" cy="145" r="28" fill="#4a4ac0" opacity="0.82"/>
+        <circle cx="98" cy="178" r="10" fill="#4a4ac0" opacity="0.75"/>
+        <ellipse cx="272" cy="147" rx="34" ry="24" fill="#2d6e2d"/>
+        <ellipse cx="280" cy="141" rx="20" ry="15" fill="#1e4e1e"/>
+
+        <g id="grid-lines">
+          <line x1="28" y1="0" x2="28" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="56" y1="0" x2="56" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="84" y1="0" x2="84" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="112" y1="0" x2="112" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="140" y1="0" x2="140" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="168" y1="0" x2="168" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="196" y1="0" x2="196" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="224" y1="0" x2="224" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="252" y1="0" x2="252" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="280" y1="0" x2="280" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="308" y1="0" x2="308" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="336" y1="0" x2="336" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="364" y1="0" x2="364" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="0" y1="28" x2="390" y2="28" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="0" y1="56" x2="390" y2="56" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="0" y1="84" x2="390" y2="84" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="0" y1="112" x2="390" y2="112" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="0" y1="140" x2="390" y2="140" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="0" y1="168" x2="390" y2="168" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="0" y1="196" x2="390" y2="196" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="0" y1="224" x2="390" y2="224" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="0" y1="252" x2="390" y2="252" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+          <line x1="0" y1="280" x2="390" y2="280" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        </g>
+
+        <text x="42" y="14" class="grid-label">A</text><text x="70" y="14" class="grid-label">B</text><text x="98" y="14" class="grid-label">C</text><text x="126" y="14" class="grid-label">D</text><text x="154" y="14" class="grid-label">E</text><text x="182" y="14" class="grid-label">F</text><text x="210" y="14" class="grid-label">G</text><text x="238" y="14" class="grid-label">H</text><text x="266" y="14" class="grid-label">I</text><text x="294" y="14" class="grid-label">J</text><text x="322" y="14" class="grid-label">K</text><text x="350" y="14" class="grid-label">L</text><text x="378" y="14" class="grid-label">M</text>
+        <text x="14" y="42" class="grid-label">1</text><text x="14" y="70" class="grid-label">2</text><text x="14" y="98" class="grid-label">3</text><text x="14" y="126" class="grid-label">4</text><text x="14" y="154" class="grid-label">5</text><text x="14" y="182" class="grid-label">6</text><text x="14" y="210" class="grid-label">7</text><text x="14" y="238" class="grid-label">8</text><text x="14" y="266" class="grid-label">9</text><text x="14" y="294" class="grid-label">10</text>
+
+        <!-- Lighthouse J2 -->
+        <rect x="283" y="44" width="20" height="28" fill="#e8e8e8" rx="2"/>
+        <rect x="287" y="30" width="5" height="16" fill="#888"/>
+        <rect x="281" y="47" width="5" height="18" fill="#d94f4f"/>
+        <rect x="286" y="47" width="5" height="18" fill="white"/>
+        <rect x="291" y="47" width="5" height="18" fill="#d94f4f"/>
+        <rect x="285" y="72" width="10" height="6" fill="#aaa"/>
+        <text x="293" y="86" text-anchor="middle" font-size="9" fill="white" font-family="Inter, sans-serif" font-weight="600">Lighthouse</text>
+
+        <circle id="goal-ring" cx="293" cy="84" r="12" fill="none" stroke="#1D9E75" stroke-width="2.5" stroke-dasharray="none"/>
+
+        <polyline id="trail" points="" fill="none" stroke="#E24B4A" stroke-width="2.5" stroke-dasharray="5 3" opacity="0.8"/>
+        <circle id="explorer" cx="182" cy="257" r="11" fill="#E24B4A" stroke="white" stroke-width="2.5"/>
+        <text id="exp-txt" x="182" y="261" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="white" font-weight="700">S</text>
+
+        <text x="182" y="271" text-anchor="middle" font-size="8" fill="white" font-family="Inter, sans-serif" font-weight="500" opacity="0.9">START</text>
+      </svg>
+
+      <div class="map-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#E24B4A;"></div> Explorer (S = Start)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1D9E75; border: 2px solid #1D9E75;"></div> Goal — J3 (below lighthouse)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#E24B4A; opacity:0.5;"></div> Trail</div>
+      </div>
+  </div>
+
+  <div>
+    <div class="controls-card">
+      <h3>Commands</h3>
+      <div class="cmd-grid">
+        <button class="cmd-btn" onclick="addCmd('move_north()')"><span class="arrow">↑</span> move_north()</button>
+        <button class="cmd-btn" onclick="addCmd('move_south()')"><span class="arrow">↓</span> move_south()</button>
+        <button class="cmd-btn" onclick="addCmd('move_east()')"><span class="arrow">→</span> move_east()</button>
+        <button class="cmd-btn" onclick="addCmd('move_west()')"><span class="arrow">←</span> move_west()</button>
+        <button class="cmd-btn" onclick="addCmd('move_north(2)')"><span class="arrow">↑↑</span> move_north(2)</button>
+        <button class="cmd-btn" onclick="addCmd('move_north(3)')"><span class="arrow">↑↑↑</span> move_north(3)</button>
+        <button class="cmd-btn" onclick="addCmd('move_east(2)')"><span class="arrow">→→</span> move_east(2)</button>
+        <button class="cmd-btn" onclick="addCmd('move_east(3)')"><span class="arrow">→→→</span> move_east(3)</button>
+        <button class="cmd-btn" onclick="addCmd('move_north(5)')"><span class="arrow">↑×5</span> move_north(5)</button>
+        <button class="cmd-btn" onclick="addCmd('move_east(4)')"><span class="arrow">→×4</span> move_east(4)</button>
+      </div>
+
+      <h3>Your program</h3>
+      <div class="type-row">
+        <input class="type-input" id="type-input" type="text" placeholder="Type a command e.g. move_north(3)" autocomplete="off" onkeydown="if(event.key==='Enter') addTyped()" />
+        <button class="type-add-btn" onclick="addTyped()">Add</button>
+      </div>
+      <div class="program-area" id="program-area">
+        <p class="program-empty" id="empty-msg">Click a command button or type one above...</p>
+      </div>
+
+      <div class="btn-row">
+        <button class="run-btn" onclick="runProgram()">▶ Run program</button>
+        <button class="clear-btn" onclick="clearAll()">Clear</button>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+
+      <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+        <p style="font-size:13px; font-weight:600; color:var(--text-muted); margin-bottom:6px;">How the number argument works</p>
+        <p style="font-size:13px; color:var(--text-muted); line-height:1.7;">
+          <code>move_north()</code> moves 1 cell.<br>
+          <code>move_north(3)</code> moves 3 cells at once.<br>
+          This is the same idea as calling a function with a parameter in Python!
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const COLS = ['A','B','C','D','E','F','G','H','I','J','K','L','M'];
+const CW = 28;
+const colX = c => 28 + c * CW + CW / 2;
+const rowY = r => 28 * r - CW / 2;
+
+const START_COL = 5, START_ROW = 9;
+const GOAL_COL = 9, GOAL_ROW = 3;
+
+let program = [];
+let animating = false;
+
+const explorer = document.getElementById('explorer');
+const expTxt = document.getElementById('exp-txt');
+const trail = document.getElementById('trail');
+const feedback = document.getElementById('feedback');
+
+function setPos(col, row) {
+  const x = colX(col), y = rowY(row);
+  explorer.setAttribute('cx', x);
+  explorer.setAttribute('cy', y);
+  expTxt.setAttribute('x', x);
+  expTxt.setAttribute('y', y);
+}
+
+function addToTrail(col, row) {
+  const pts = trail.getAttribute('points');
+  trail.setAttribute('points', pts + ` ${colX(col)},${rowY(row)}`);
+}
+
+function addCmd(cmd) {
+  program.push(cmd);
+  renderProgram();
+}
+
+function addTyped() {
+  const input = document.getElementById('type-input');
+  const cmd = input.value.trim();
+  if (!cmd) return;
+  const valid = /^move_(north|south|east|west)\(\s*\d*\s*\)$/.test(cmd);
+  if (!valid) {
+    showFeedback('fail', `❌ <strong>Unknown command:</strong> <code>${cmd}</code>. Try something like <code>move_north(3)</code> or <code>move_east()</code>.`);
+    return;
+  }
+  feedback.style.display = 'none';
+  program.push(cmd);
+  renderProgram();
+  input.value = '';
+  input.focus();
+}
+
+function removeCmd(i) {
+  program.splice(i, 1);
+  renderProgram();
+}
+
+function renderProgram() {
+  const area = document.getElementById('program-area');
+  if (program.length === 0) {
+    area.innerHTML = '<p class="program-empty" id="empty-msg">Click a command button to start your program...</p>';
+    return;
+  }
+  area.innerHTML = program.map((cmd, i) =>
+    `<div class="prog-line">
+      <span class="prog-num">${i+1}.</span>
+      <span class="prog-text">${cmd}</span>
+      <button class="prog-del" onclick="removeCmd(${i})" title="Remove this line">×</button>
+    </div>`
+  ).join('');
+}
+
+function clearAll() {
+  program = [];
+  renderProgram();
+  resetExplorer();
+  feedback.style.display = 'none';
+  trail.setAttribute('points', '');
+}
+
+function resetExplorer() {
+  setPos(START_COL, START_ROW);
+  trail.setAttribute('points', `${colX(START_COL)},${rowY(START_ROW)}`);
+  expTxt.textContent = 'S';
+}
+
+function showFeedback(type, msg) {
+  feedback.style.display = 'block';
+  feedback.className = 'feedback ' + type;
+  feedback.innerHTML = msg;
+}
+
+function parseSteps(cmds) {
+  const steps = [];
+  for (const cmd of cmds) {
+    const m = cmd.trim().match(/^move_(north|south|east|west)\(\s*(\d+)?\s*\)$/);
+    if (m) {
+      const dir = m[1], n = parseInt(m[2] || '1');
+      for (let i = 0; i < n; i++) steps.push(dir);
+    } else {
+      return { error: cmd };
+    }
+  }
+  return { steps };
+}
+
+async function runProgram() {
+  if (animating || program.length === 0) {
+    if (program.length === 0) showFeedback('info', 'Add some commands first!');
+    return;
+  }
+
+  const parsed = parseSteps(program);
+  if (parsed.error) {
+    showFeedback('fail', `I don't recognise: <code>${parsed.error}</code>. Check your spelling.`);
+    return;
+  }
+
+  animating = true;
+  feedback.style.display = 'none';
+
+  let col = START_COL, row = START_ROW;
+  trail.setAttribute('points', `${colX(col)},${rowY(row)}`);
+  setPos(col, row);
+  expTxt.textContent = 'S';
+
+  for (const dir of parsed.steps) {
+    await new Promise(r => setTimeout(r, 320));
+    if (dir === 'north') row--;
+    else if (dir === 'south') row++;
+    else if (dir === 'east') col++;
+    else col--;
+
+    if (col < 0 || col > 12 || row < 1 || row > 10) {
+      showFeedback('fail', '🚫 The explorer fell off the edge of the map! Check your directions and number of steps.');
+      animating = false;
+      return;
+    }
+    setPos(col, row);
+    addToTrail(col, row);
+  }
+
+  if (col === GOAL_COL && row === GOAL_ROW) {
+    expTxt.textContent = '★';
+    showFeedback('success', `🎉 <strong>You made it!</strong> The explorer reached J3 (below the lighthouse) in ${program.length} instruction${program.length !== 1 ? 's' : ''} (${parsed.steps.length} steps total). Excellent sequencing!`);
+  } else {
+    const colName = COLS[col];
+    showFeedback('fail', `❌ <strong>Not quite.</strong> The explorer ended at <strong>${colName}${row}</strong>, not J3. Think about which direction you need to travel and how many steps. Try adjusting your program.`);
+  }
+  animating = false;
+}
+
+resetExplorer();
+</script>
+</body>
+</html>

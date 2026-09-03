@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 5 — Turtle Beach: Inputs &amp; Subroutines</title>
+<style>
+:root {
+  --sand:      #E8D5A3;
+  --sand-dark: #C4A96B;
+  --sand-mid:  #D4BC7A;
+  --sea:       #4A90B8;
+  --sea-light: #7AB8D4;
+  --navy:      #1B2A4E;
+  --teal:      #1B7E8B;
+  --amber:     #D89A1F;
+  --white:     #FDFAF3;
+  --text:      #2a1f0a;
+  --muted:     #6b5a30;
+  --border:    #C4A96B;
+  --card:      #ffffff;
+  --pass:      #1D9E75;
+  --pass-bg:   #e8f7f0;
+  --pass-bd:   #9fe1cb;
+  --fail:      #c0392b;
+  --fail-bg:   #fdeaea;
+  --fail-bd:   #f7c1c1;
+  --code-bg:   #1e2538;
+  --code-fg:   #cdeaf5;
+  --mono: 'Consolas','SFMono-Regular','Menlo','Courier New',monospace;
+  --sans: -apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--white);color:var(--text);font-family:var(--sans);min-height:100vh;}
+
+/* ── Header ── */
+.hdr{background:var(--navy);color:#fff;padding:0 24px;height:56px;display:flex;align-items:center;gap:14px;}
+.hdr-badge{width:36px;height:36px;border-radius:8px;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.hdr h1{font-size:15px;font-weight:600;letter-spacing:.4px;}
+.hdr-sub{font-size:12px;color:rgba(255,255,255,.5);margin-left:auto;}
+
+/* ── Tabs ── */
+.tabs{background:var(--sand);border-bottom:2px solid var(--sand-dark);display:flex;padding:0 20px;gap:4px;}
+.tab{font-size:13px;font-weight:500;padding:12px 16px;cursor:pointer;border-bottom:3px solid transparent;color:var(--muted);transition:all .15s;margin-bottom:-2px;white-space:nowrap;}
+.tab:hover{color:var(--navy);}
+.tab.active{color:var(--teal);border-bottom-color:var(--teal);font-weight:600;background:var(--white);border-radius:8px 8px 0 0;}
+
+/* ── Panel ── */
+.panel{display:none;max-width:900px;margin:0 auto;padding:26px 20px 60px;}
+.panel.active{display:block;}
+
+/* ── Section headers ── */
+.sec-hdr{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;margin-top:28px;}
+.sec-hdr:first-child{margin-top:0;}
+.sec-icon{width:32px;height:32px;border-radius:8px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.sec-title{font-size:15px;font-weight:600;color:var(--navy);}
+.sec-desc{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;}
+
+/* ── Cards ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:14px;}
+.card p{font-size:13.5px;color:var(--text);line-height:1.65;margin-bottom:10px;}
+.card p:last-child{margin-bottom:0;}
+.card code{font-family:var(--mono);background:#f0ece0;padding:1px 5px;border-radius:3px;font-size:12.5px;color:#3d2b00;}
+
+/* ── Concept box ── */
+.concept-box{background:#EEF7FF;border:1px solid #B5D4F4;border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+.concept-box h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#0C447C;margin-bottom:8px;}
+.concept-box p{font-size:13.5px;color:#042C53;line-height:1.65;margin-bottom:6px;}
+.concept-box p:last-child{margin-bottom:0;}
+.concept-box code{font-family:var(--mono);background:rgba(0,0,0,.08);padding:1px 5px;border-radius:3px;font-size:12.5px;}
+
+/* ── Sand info box ── */
+.sand-box{background:#FDF6E3;border:1px solid var(--sand-dark);border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+.sand-box h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--amber);margin-bottom:8px;}
+.sand-box p{font-size:13.5px;color:var(--muted);line-height:1.65;margin-bottom:6px;}
+.sand-box p:last-child{margin-bottom:0;}
+.sand-box code{font-family:var(--mono);background:rgba(0,0,0,.07);padding:1px 5px;border-radius:3px;font-size:12.5px;}
+
+/* ── Code block ── */
+.code-block{background:var(--code-bg);border-radius:8px;padding:14px 16px;margin:10px 0;font-family:var(--mono);font-size:13px;line-height:1.8;color:var(--code-fg);counter-reset:lines;}
+.code-block .ln{display:block;counter-increment:lines;}
+.code-block .ln::before{content:counter(lines,'decimal-leading-zero');color:#4a5a7a;margin-right:14px;user-select:none;font-size:11px;}
+.kw{color:#C586C0;}.bi{color:#DCDCAA;}.st{color:#CE9178;}.nm{color:#B5CEA8;}.cm{color:#6A9955;font-style:italic;}.op{color:#FFD700;}.fn{color:#89b4fa;}
+
+/* ── Q card ── */
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;transition:border-color .2s;}
+.q-card.correct{border-color:var(--pass-bd);background:var(--pass-bg);}
+.q-card.wrong{border-color:var(--fail-bd);background:var(--fail-bg);}
+.q-num{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--teal);margin-bottom:8px;}
+.q-stem{font-size:13.5px;color:var(--text);line-height:1.65;margin-bottom:12px;}
+.q-stem code{font-family:var(--mono);background:#f0ece0;padding:1px 5px;border-radius:3px;font-size:12.5px;color:#3d2b00;}
+
+/* MCQ */
+.options{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.opt-btn{font-family:var(--mono);font-size:13px;padding:7px 16px;background:#fdf6e3;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;color:var(--text);transition:all .15s;}
+.opt-btn:hover:not(:disabled){background:#f0e8c8;border-color:var(--teal);}
+.opt-btn:disabled{cursor:default;}
+.opt-btn.selected-correct{background:var(--pass-bg);border-color:var(--pass);color:var(--pass);font-weight:600;}
+.opt-btn.selected-wrong{background:var(--fail-bg);border-color:var(--fail);color:var(--fail);font-weight:600;}
+.opt-btn.reveal-correct{background:var(--pass-bg);border-color:var(--pass);color:var(--pass);}
+
+/* Fill blank */
+.blank-input{font-family:var(--mono);font-size:13px;background:#fff;border:2px solid var(--border);border-radius:6px;padding:5px 10px;width:110px;text-align:center;color:var(--text);outline:none;}
+.blank-input:focus{border-color:var(--teal);}
+.blank-input.correct-input{border-color:var(--pass);background:var(--pass-bg);color:var(--pass);}
+.blank-input.wrong-input{border-color:var(--fail);background:var(--fail-bg);color:var(--fail);}
+.check-btn{font-size:13px;font-weight:600;padding:8px 16px;background:var(--teal);color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:8px;}
+.check-btn:hover{filter:brightness(1.1);}
+.check-btn:disabled{opacity:.4;cursor:default;}
+
+/* Feedback */
+.q-feedback{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:13px;line-height:1.6;display:none;}
+.q-feedback.show{display:block;}
+.q-feedback.ok{background:var(--pass-bg);color:#0d6e47;border:1px solid var(--pass-bd);}
+.q-feedback.bad{background:var(--fail-bg);color:#922020;border:1px solid var(--fail-bd);}
+.q-feedback code{font-family:var(--mono);background:rgba(0,0,0,.07);padding:1px 4px;border-radius:3px;}
+
+/* ── Vocab table ── */
+.vocab-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px;}
+.vocab-table th{background:var(--navy);color:#fff;padding:9px 13px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;}
+.vocab-table td{padding:9px 13px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55;}
+.vocab-table tr:last-child td{border-bottom:none;}
+.vocab-table td:first-child{font-family:var(--mono);font-size:12px;color:var(--teal);white-space:nowrap;font-weight:600;}
+.vocab-table td:nth-child(2){color:var(--text);}
+.vocab-table td:nth-child(3){color:var(--muted);font-style:italic;}
+.vocab-table tr:nth-child(even){background:#fdf6e3;}
+
+/* ── Annotated code ── */
+.annotated{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0;}
+@media(max-width:640px){.annotated{grid-template-columns:1fr;}}
+.annotated .ann-note{font-size:12.5px;color:var(--muted);line-height:1.6;padding:10px 14px;background:#fdf6e3;border-left:3px solid var(--amber);border-radius:0 6px 6px 0;}
+.annotated .ann-note strong{color:var(--navy);}
+.ann-arrow{display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--amber);}
+
+/* ── Tab 3: turtle canvas ── */
+.turtle-layout{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start;}
+@media(max-width:720px){.turtle-layout{grid-template-columns:1fr;}}
+.canvas-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.canvas-topbar{background:var(--navy);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;font-size:12px;}
+.canvas-title{font-size:12px;letter-spacing:.5px;font-weight:500;}
+.canvas-stats{display:flex;gap:10px;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.6);}
+.canvas-stats span b{color:#fff;}
+canvas#turtleCanvas{display:block;width:100%;image-rendering:crisp-edges;}
+.canvas-footer{padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--border);}
+
+/* ── Editor ── */
+.editor-panel-t3{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.editor-topbar-t3{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-bottom:1px solid var(--border);background:#f8f5ed;}
+.editor-topbar-left{display:flex;align-items:center;gap:6px;}
+.mac-dot{width:9px;height:9px;border-radius:50%;}
+.mac-r{background:#FF5F56;}.mac-y{background:#FFBD2E;}.mac-g{background:#27C93F;}
+.editor-file{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:4px;}
+.editor-wrap-t3{position:relative;background:var(--code-bg);}
+.editor-wrap-t3 textarea{width:100%;min-height:280px;resize:vertical;background:transparent;color:var(--code-fg);font-family:var(--mono);font-size:13px;line-height:1.7;padding:14px;border:none;outline:none;caret-color:var(--amber);}
+.editor-wrap-t3 pre{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;font-family:var(--mono);font-size:13px;line-height:1.7;padding:14px;color:var(--code-fg);margin:0;white-space:pre;overflow:hidden;}
+.t3-footer{padding:10px 13px;display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+.run-btn{font-size:13px;font-weight:700;padding:9px 18px;background:var(--teal);color:#fff;border:none;border-radius:8px;cursor:pointer;transition:filter .15s;}
+.run-btn:hover:not(:disabled){filter:brightness(1.1);}
+.run-btn:disabled{opacity:.4;cursor:not-allowed;}
+.clear-btn{font-size:12px;padding:9px 13px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:8px;cursor:pointer;}
+.engine-note{font-size:11px;color:var(--muted);font-family:var(--mono);margin-left:auto;}
+.spinner{width:12px;height:12px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--teal);animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:5px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.output-console{background:#0d1520;border-top:1px solid var(--border);padding:10px 13px;font-family:var(--mono);font-size:12px;color:#cdeaf5;min-height:40px;white-space:pre-wrap;word-break:break-word;max-height:100px;overflow-y:auto;}
+.output-console.has-error{color:#ff8080;}
+
+/* ── Snippet buttons ── */
+.snippets{display:flex;gap:6px;flex-wrap:wrap;padding:10px 13px;border-top:1px solid var(--border);background:#fdf9f0;}
+.snippet-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);align-self:center;margin-right:4px;}
+.snip-btn{font-family:var(--mono);font-size:11px;padding:4px 10px;background:#fff;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--navy);transition:background .12s;}
+.snip-btn:hover{background:#e8f0ff;}
+
+/* ── Challenge cards T3 ── */
+.challenge-strip{background:#fdf6e3;border:1px solid var(--sand-dark);border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:var(--muted);line-height:1.55;}
+.challenge-strip strong{color:var(--navy);}
+.challenge-strip code{font-family:var(--mono);background:rgba(0,0,0,.07);padding:1px 4px;border-radius:3px;font-size:12px;}
+
+/* Progress pill */
+.progress-pill{margin-left:auto;font-size:12px;font-weight:600;font-family:var(--mono);color:var(--teal);background:var(--pass-bg);border:1px solid var(--pass-bd);padding:3px 10px;border-radius:999px;}
+
+/* ── Summary box (screenshot-for-OneNote review) ── */
+.summary-box{background:var(--navy);border-radius:12px;padding:16px 18px 18px;margin-top:22px;}
+.summary-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.summary-title{font-size:13px;font-weight:700;color:#fff;letter-spacing:.3px;}
+.summary-hint{font-size:11px;color:rgba(255,255,255,.55);font-style:italic;}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px;margin-bottom:12px;}
+.sum-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;font-size:12.5px;background:rgba(255,255,255,.06);}
+.sum-row.sum-correct{background:rgba(29,158,117,.22);}
+.sum-row.sum-wrong{background:rgba(192,57,43,.22);}
+.sum-row.sum-pending{background:rgba(255,255,255,.05);color:rgba(255,255,255,.4);}
+.sum-icon{font-weight:700;width:16px;text-align:center;flex-shrink:0;}
+.sum-correct .sum-icon{color:#5FE0AE;}
+.sum-wrong .sum-icon{color:#F29B9B;}
+.sum-pending .sum-icon{color:rgba(255,255,255,.35);}
+.sum-q{color:#fff;font-weight:600;width:52px;flex-shrink:0;}
+.sum-pending .sum-q{color:rgba(255,255,255,.55);}
+.sum-status{color:rgba(255,255,255,.8);}
+.sum-pending .sum-status{color:rgba(255,255,255,.4);}
+.summary-total{font-family:var(--mono);font-size:13px;font-weight:700;color:#fff;background:rgba(255,255,255,.08);border-radius:7px;padding:8px 12px;text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-badge">🐢</div>
+  <h1>Lesson 5 — Turtle Beach: Inputs &amp; Subroutines</h1>
+  <div class="hdr-sub">inputs · type conversion · def · parameters · return</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" id="t1" onclick="switchTab(1)">🌊 Part 1 — Inputs</div>
+  <div class="tab"        id="t2" onclick="switchTab(2)">📐 Part 2 — Subroutines</div>
+  <div class="tab"        id="t3" onclick="switchTab(3)">🐢 Part 3 — Draw!</div>
+</div>
+
+<!-- ═══════════════════════ PART 1 — INPUTS ═══════════════════════ -->
+<div class="panel active" id="panel1">
+
+  <div class="sand-box">
+    <h3>🐢 The scenario</h3>
+    <p>A robot turtle is drawing patterns in the sand on a beach. To tell it what to draw, we need to take <strong>inputs</strong> from the user — things like how big a shape should be, or how many sides it should have. Before the turtle can use those inputs, Python needs to know what <em>type</em> of data they are.</p>
+  </div>
+
+  <div class="sec-hdr">
+    <div class="sec-icon">A</div>
+    <div>
+      <div class="sec-title">What is input() and why does type matter?</div>
+      <div class="sec-desc">Read the concept, then answer the questions below</div>
+    </div>
+  </div>
+
+  <div class="concept-box">
+    <h3>Key concept — input() and type conversion</h3>
+    <p><code>input()</code> always gives you a <strong>string</strong> — even if the user types a number. If you want to do maths with it, you must convert it first.</p>
+    <p><code>int(input())</code> — converts the input to a whole number (integer)<br>
+       <code>float(input())</code> — converts to a decimal number<br>
+       <code>str(input())</code> — keeps it as text (this is already the default)</p>
+    <p>Example: <code>size = int(input("How big? "))</code> — stores what the user types as a number, so you can use it in calculations.</p>
+  </div>
+
+  <!-- Q1 -->
+  <div class="q-card" id="qq1">
+    <div class="q-num">Question 1</div>
+    <div class="q-stem">Look at this code. What type of data will be stored in <code>name</code>?
+      <div class="code-block" style="margin-top:8px;">
+        <span class="ln"><span class="nm">name</span> <span class="op">=</span> <span class="bi">input</span>(<span class="st">"What is your name? "</span>)</span>
+      </div>
+    </div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('q1',this,'Integer')">Integer</button>
+      <button class="opt-btn" onclick="checkMCQ('q1',this,'Float')">Float</button>
+      <button class="opt-btn" onclick="checkMCQ('q1',this,'String')">String</button>
+      <button class="opt-btn" onclick="checkMCQ('q1',this,'Boolean')">Boolean</button>
+    </div>
+    <div class="q-feedback" id="fq1"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card" id="qq2">
+    <div class="q-num">Question 2</div>
+    <div class="q-stem">The turtle needs to know how many sides to draw. The user will type a number. Which line correctly stores that input so we can use it in maths?</div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('q2',this,'sides = input()')"><code>sides = input()</code></button>
+      <button class="opt-btn" onclick="checkMCQ('q2',this,'sides = int(input())')"><code>sides = int(input())</code></button>
+      <button class="opt-btn" onclick="checkMCQ('q2',this,'sides = str(input())')"><code>sides = str(input())</code></button>
+      <button class="opt-btn" onclick="checkMCQ('q2',this,'int = sides(input())')"><code>int = sides(input())</code></button>
+    </div>
+    <div class="q-feedback" id="fq2"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card" id="qq3">
+    <div class="q-num">Question 3</div>
+    <div class="q-stem">This code has a bug. What is wrong with it?
+      <div class="code-block" style="margin-top:8px;">
+        <span class="ln"><span class="nm">size</span> <span class="op">=</span> <span class="bi">input</span>(<span class="st">"How big? "</span>)</span>
+        <span class="ln"><span class="nm">double</span> <span class="op">=</span> <span class="nm">size</span> <span class="op">*</span> <span class="nm">2</span></span>
+        <span class="ln"><span class="bi">print</span>(<span class="nm">double</span>)</span>
+      </div>
+    </div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('q3',this,'You cannot multiply a variable by 2')">You cannot multiply a variable by 2</button>
+      <button class="opt-btn" onclick="checkMCQ('q3',this,'print() should come before input()')"><code>print()</code> should come before <code>input()</code></button>
+      <button class="opt-btn" onclick="checkMCQ('q3',this,'There is no bug')">There is no bug</button>
+      <button class="opt-btn" onclick="checkMCQ('q3',this,'size is a string — you need int(input()) to do maths with it')">size is a string — you need <code>int(input())</code></button>
+    </div>
+    <div class="q-feedback" id="fq3"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card" id="qq4">
+    <div class="q-num">Question 4</div>
+    <div class="q-stem">What will this program print if the user types <code>5</code>?
+      <div class="code-block" style="margin-top:8px;">
+        <span class="ln"><span class="nm">size</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>(<span class="st">"Size: "</span>))</span>
+        <span class="ln"><span class="nm">result</span> <span class="op">=</span> <span class="nm">size</span> <span class="op">*</span> <span class="nm">4</span></span>
+        <span class="ln"><span class="bi">print</span>(<span class="st">"Perimeter:"</span>, <span class="nm">result</span>)</span>
+      </div>
+    </div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('q4',this,'Perimeter: 5')">Perimeter: 5</button>
+      <button class="opt-btn" onclick="checkMCQ('q4',this,'Perimeter: 20')">Perimeter: 20</button>
+      <button class="opt-btn" onclick="checkMCQ('q4',this,'5555')">5555</button>
+      <button class="opt-btn" onclick="checkMCQ('q4',this,'Error')">Error</button>
+    </div>
+    <div class="q-feedback" id="fq4"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card" id="qq5">
+    <div class="q-num">Question 5</div>
+    <div class="q-stem">Fill in the blank — the turtle needs a size as a whole number. What goes in the gap?
+      <div class="code-block" style="margin-top:8px;">
+        <span class="ln"><span class="nm">size</span> <span class="op">=</span> <input class="blank-input" id="iq5" placeholder="?"> (<span class="bi">input</span>(<span class="st">"Enter size: "</span>))</span>
+      </div>
+    </div>
+    <button class="check-btn" onclick="checkBlank('q5','int')">Check</button>
+    <div class="q-feedback" id="fq5"></div>
+  </div>
+
+  <!-- Q6 prompt text -->
+  <div class="q-card" id="qq6">
+    <div class="q-num">Question 6</div>
+    <div class="q-stem">Fill in the blank — we want to show the user a message that includes their name (a string) and their score (a number). What keyword converts <code>score</code> to a string so it can be joined?
+      <div class="code-block" style="margin-top:8px;">
+        <span class="ln"><span class="nm">name</span> <span class="op">=</span> <span class="bi">input</span>(<span class="st">"Name: "</span>)</span>
+        <span class="ln"><span class="nm">score</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>(<span class="st">"Score: "</span>))</span>
+        <span class="ln"><span class="bi">print</span>(<span class="nm">name</span> <span class="op">+</span> <span class="st">" scored: "</span> <span class="op">+</span> <input class="blank-input" id="iq6" style="width:60px;" placeholder="?">(<span class="nm">score</span>))</span>
+      </div>
+    </div>
+    <button class="check-btn" onclick="checkBlank('q6','str')">Check</button>
+    <div class="q-feedback" id="fq6"></div>
+  </div>
+
+  <div class="summary-box">
+    <div class="summary-header">
+      <span class="summary-title">📋 Part 1 Summary</span>
+      <span class="summary-hint">Screenshot this for your OneNote evidence</span>
+    </div>
+    <div class="summary-grid" id="p1sum-grid"></div>
+    <div class="summary-total" id="p1sum-total">Score: 0 / 6</div>
+  </div>
+
+</div><!-- /panel1 -->
+
+<!-- ═══════════════════════ PART 2 — SUBROUTINES ═══════════════════════ -->
+<div class="panel" id="panel2">
+
+  <div class="sand-box">
+    <h3>📐 Why subroutines?</h3>
+    <p>Instead of writing the turtle commands for a square over and over, we can wrap them in a <strong>subroutine</strong> — a named block of code we can call whenever we need it. We can pass in a <strong>parameter</strong> to control the size, so one subroutine can draw any size square.</p>
+  </div>
+
+  <div class="sec-hdr">
+    <div class="sec-icon">A</div>
+    <div>
+      <div class="sec-title">Key vocabulary</div>
+      <div class="sec-desc">Learn these terms — they will come up in assessments</div>
+    </div>
+  </div>
+
+  <table class="vocab-table">
+    <thead><tr><th>Term</th><th>What it means</th><th>In the turtle example</th></tr></thead>
+    <tbody>
+      <tr><td>Subroutine</td><td>A named block of code you can call from anywhere in your program</td><td>The whole <code>draw_square</code> block</td></tr>
+      <tr><td>Procedure</td><td>A subroutine that does something but does NOT return a value</td><td><code>draw_square(50)</code> — it draws, but gives nothing back</td></tr>
+      <tr><td>Function</td><td>A subroutine that DOES return a value using <code>return</code></td><td><code>calculate_perimeter(50)</code> — gives back a number</td></tr>
+      <tr><td>Parameter</td><td>The variable name in the definition — a placeholder for the value that will be passed in</td><td><code>size</code> in <code>def draw_square(size):</code></td></tr>
+      <tr><td>Argument</td><td>The actual value you pass in when you call the subroutine</td><td><code>50</code> in <code>draw_square(50)</code></td></tr>
+      <tr><td>Call</td><td>The line that runs the subroutine</td><td><code>draw_square(50)</code> anywhere in the program</td></tr>
+      <tr><td>Definition</td><td>The block starting with <code>def</code> — where you write what the subroutine does</td><td><code>def draw_square(size):</code></td></tr>
+      <tr><td>return</td><td>Sends a value back to whoever called the function</td><td><code>return perimeter</code> inside a function</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sec-hdr">
+    <div class="sec-icon">B</div>
+    <div>
+      <div class="sec-title">Annotated example — procedure vs function</div>
+      <div class="sec-desc">Study the two examples carefully before answering the questions</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>This is a procedure</strong> — it does something (draws) but does not return a value:</p>
+    <div class="code-block">
+      <span class="ln"><span class="kw">def</span> <span class="fn">draw_square</span>(<span class="nm">size</span>)<span class="op">:</span>  <span class="cm">  # ← definition. "size" is the parameter</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> <span class="nm">i</span> <span class="kw">in</span> <span class="bi">range</span>(<span class="nm">4</span>)<span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">forward</span>(<span class="nm">size</span>)  <span class="cm">    # ← uses the parameter</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">right</span>(<span class="nm">90</span>)</span>
+      <span class="ln"></span>
+      <span class="ln"><span class="fn">draw_square</span>(<span class="nm">50</span>)  <span class="cm">        # ← call. 50 is the argument</span></span>
+      <span class="ln"><span class="fn">draw_square</span>(<span class="nm">100</span>)  <span class="cm">       # ← same procedure, different argument</span></span>
+    </div>
+    <p style="margin-top:8px;"><strong>This is a function</strong> — it returns a value:</p>
+    <div class="code-block">
+      <span class="ln"><span class="kw">def</span> <span class="fn">calculate_perimeter</span>(<span class="nm">size</span>)<span class="op">:</span>  <span class="cm"># ← definition</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="nm">perimeter</span> <span class="op">=</span> <span class="nm">size</span> <span class="op">*</span> <span class="nm">4</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="nm">perimeter</span>  <span class="cm">          # ← returns a value</span></span>
+      <span class="ln"></span>
+      <span class="ln"><span class="nm">p</span> <span class="op">=</span> <span class="fn">calculate_perimeter</span>(<span class="nm">50</span>)  <span class="cm"># ← stores the returned value</span></span>
+      <span class="ln"><span class="bi">print</span>(<span class="nm">p</span>)  <span class="cm">                    # ← prints 200</span></span>
+    </div>
+  </div>
+
+  <!-- Questions -->
+  <div class="sec-hdr" style="margin-top:20px;">
+    <div class="sec-icon">C</div>
+    <div>
+      <div class="sec-title">Questions</div>
+      <div class="sec-desc">Use the vocabulary table and examples above</div>
+    </div>
+    <div class="progress-pill" id="p2prog">0 / 8</div>
+  </div>
+
+  <!-- SQ1 -->
+  <div class="q-card" id="sq1">
+    <div class="q-num">Question 1</div>
+    <div class="q-stem">In <code>def draw_square(size):</code>, what is <code>size</code> called?</div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('sq1',this,'Argument')">Argument</button>
+      <button class="opt-btn" onclick="checkMCQ('sq1',this,'Variable')">Variable</button>
+      <button class="opt-btn" onclick="checkMCQ('sq1',this,'Parameter')">Parameter</button>
+      <button class="opt-btn" onclick="checkMCQ('sq1',this,'Return value')">Return value</button>
+    </div>
+    <div class="q-feedback" id="fsq1"></div>
+  </div>
+
+  <!-- SQ2 -->
+  <div class="q-card" id="sq2">
+    <div class="q-num">Question 2</div>
+    <div class="q-stem">In <code>draw_square(50)</code>, what is <code>50</code> called?</div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('sq2',this,'Parameter')">Parameter</button>
+      <button class="opt-btn" onclick="checkMCQ('sq2',this,'Definition')">Definition</button>
+      <button class="opt-btn" onclick="checkMCQ('sq2',this,'Return')">Return</button>
+      <button class="opt-btn" onclick="checkMCQ('sq2',this,'Argument')">Argument</button>
+    </div>
+    <div class="q-feedback" id="fsq2"></div>
+  </div>
+
+  <!-- SQ3 -->
+  <div class="q-card" id="sq3">
+    <div class="q-num">Question 3</div>
+    <div class="q-stem">Is <code>draw_square</code> a function or a procedure? How do you know?</div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('sq3',this,'Function — it uses def')">Function — it uses <code>def</code></button>
+      <button class="opt-btn" onclick="checkMCQ('sq3',this,'Procedure — it does not use return')">Procedure — it has no <code>return</code></button>
+      <button class="opt-btn" onclick="checkMCQ('sq3',this,'Function — it takes a parameter')">Function — it takes a parameter</button>
+      <button class="opt-btn" onclick="checkMCQ('sq3',this,'Procedure — it uses a for loop')">Procedure — it uses a <code>for</code> loop</button>
+    </div>
+    <div class="q-feedback" id="fsq3"></div>
+  </div>
+
+  <!-- SQ4 -->
+  <div class="q-card" id="sq4">
+    <div class="q-num">Question 4</div>
+    <div class="q-stem">Which line in this program is the <strong>call</strong>?
+      <div class="code-block" style="margin-top:8px;">
+        <span class="ln"><span class="kw">def</span> <span class="fn">draw_triangle</span>(<span class="nm">size</span>)<span class="op">:</span></span>
+        <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> <span class="nm">i</span> <span class="kw">in</span> <span class="bi">range</span>(<span class="nm">3</span>)<span class="op">:</span></span>
+        <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">forward</span>(<span class="nm">size</span>)</span>
+        <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">right</span>(<span class="nm">120</span>)</span>
+        <span class="ln"><span class="fn">draw_triangle</span>(<span class="nm">80</span>)</span>
+      </div>
+    </div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('sq4',this,'Line 1 — def draw_triangle(size):')">Line 1 — <code>def draw_triangle(size):</code></button>
+      <button class="opt-btn" onclick="checkMCQ('sq4',this,'Line 3 — forward(size)')">Line 3 — <code>forward(size)</code></button>
+      <button class="opt-btn" onclick="checkMCQ('sq4',this,'Line 5 — draw_triangle(80)')">Line 5 — <code>draw_triangle(80)</code></button>
+      <button class="opt-btn" onclick="checkMCQ('sq4',this,'Line 2 — for i in range(3):')">Line 2 — <code>for i in range(3):</code></button>
+    </div>
+    <div class="q-feedback" id="fsq4"></div>
+  </div>
+
+  <!-- SQ5 -->
+  <div class="q-card" id="sq5">
+    <div class="q-num">Question 5</div>
+    <div class="q-stem">What would the output be if this function was called with <code>calculate_perimeter(25)</code>?
+      <div class="code-block" style="margin-top:8px;">
+        <span class="ln"><span class="kw">def</span> <span class="fn">calculate_perimeter</span>(<span class="nm">size</span>)<span class="op">:</span></span>
+        <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="nm">perimeter</span> <span class="op">=</span> <span class="nm">size</span> <span class="op">*</span> <span class="nm">4</span></span>
+        <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="nm">perimeter</span></span>
+        <span class="ln"></span>
+        <span class="ln"><span class="nm">p</span> <span class="op">=</span> <span class="fn">calculate_perimeter</span>(<span class="nm">25</span>)</span>
+        <span class="ln"><span class="bi">print</span>(<span class="nm">p</span>)</span>
+      </div>
+    </div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('sq5',this,'25')">25</button>
+      <button class="opt-btn" onclick="checkMCQ('sq5',this,'50')">50</button>
+      <button class="opt-btn" onclick="checkMCQ('sq5',this,'Nothing — it only returns, not prints')">Nothing — it only returns</button>
+      <button class="opt-btn" onclick="checkMCQ('sq5',this,'100')">100</button>
+    </div>
+    <div class="q-feedback" id="fsq5"></div>
+  </div>
+
+  <!-- SQ6 fill blank -->
+  <div class="q-card" id="sq6">
+    <div class="q-num">Question 6</div>
+    <div class="q-stem">Fill in the blank — what keyword starts a subroutine definition?
+      <div class="code-block" style="margin-top:8px;">
+        <span class="ln"><input class="blank-input" id="isq6" placeholder="?"> <span class="fn">draw_circle</span>(<span class="nm">radius</span>)<span class="op">:</span></span>
+        <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># draw commands here</span></span>
+      </div>
+    </div>
+    <button class="check-btn" onclick="checkBlank('sq6','def')">Check</button>
+    <div class="q-feedback" id="fsq6"></div>
+  </div>
+
+  <!-- SQ7 -->
+  <div class="q-card" id="sq7">
+    <div class="q-num">Question 7</div>
+    <div class="q-stem">True or false? Once you define a subroutine, you can call it as many times as you like anywhere in your program.</div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('sq7',this,'False')">False</button>
+      <button class="opt-btn" onclick="checkMCQ('sq7',this,'True')">True</button>
+    </div>
+    <div class="q-feedback" id="fsq7"></div>
+  </div>
+
+  <!-- SQ8 -->
+  <div class="q-card" id="sq8">
+    <div class="q-num">Question 8</div>
+    <div class="q-stem">Fill in the blank — complete the function so it returns the area of a square:
+      <div class="code-block" style="margin-top:8px;">
+        <span class="ln"><span class="kw">def</span> <span class="fn">area</span>(<span class="nm">size</span>)<span class="op">:</span></span>
+        <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="nm">result</span> <span class="op">=</span> <span class="nm">size</span> <span class="op">**</span> <span class="nm">2</span></span>
+        <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<input class="blank-input" id="isq8" placeholder="?"> <span class="nm">result</span></span>
+      </div>
+    </div>
+    <button class="check-btn" onclick="checkBlank('sq8','return')">Check</button>
+    <div class="q-feedback" id="fsq8"></div>
+  </div>
+
+  <div class="summary-box">
+    <div class="summary-header">
+      <span class="summary-title">📋 Part 2 Summary</span>
+      <span class="summary-hint">Screenshot this for your OneNote evidence</span>
+    </div>
+    <div class="summary-grid" id="p2sum-grid"></div>
+    <div class="summary-total" id="p2sum-total">Score: 0 / 8</div>
+  </div>
+
+</div><!-- /panel2 -->
+
+<!-- ═══════════════════════ PART 3 — DRAW ═══════════════════════ -->
+<div class="panel" id="panel3">
+
+  <div class="sand-box">
+    <h3>🐢 How the turtle works</h3>
+    <p>The turtle starts in the middle of the sandy canvas, facing right. You control it with these commands — write them inside a <code>def</code> function, then call it:</p>
+    <p><code>forward(n)</code> — move n pixels forward &nbsp;·&nbsp; <code>backward(n)</code> — move back &nbsp;·&nbsp; <code>right(angle)</code> — turn right &nbsp;·&nbsp; <code>left(angle)</code> — turn left<br>
+       <code>penup()</code> — lift the pen (move without drawing) &nbsp;·&nbsp; <code>pendown()</code> — put the pen back down<br>
+       <code>color("red")</code> — change the drawing colour &nbsp;·&nbsp; <code>goto(x, y)</code> — jump to a position</p>
+  </div>
+
+  <div class="turtle-layout">
+    <!-- Left: editor -->
+    <div>
+      <div class="editor-panel-t3">
+        <div class="editor-topbar-t3">
+          <div class="editor-topbar-left">
+            <div class="mac-dot mac-r"></div><div class="mac-dot mac-y"></div><div class="mac-dot mac-g"></div>
+            <span class="editor-file">beach_art.py</span>
+          </div>
+          <span style="font-size:11px;color:var(--muted);font-family:var(--mono);" id="t3-engine">
+            <span class="spinner"></span>Loading…
+          </span>
+        </div>
+        <div class="editor-wrap-t3">
+          <textarea id="t3-editor" spellcheck="false" autocomplete="off">def draw_square(size):
+    for i in range(4):
+        forward(size)
+        right(90)
+
+def draw_triangle(size):
+    for i in range(3):
+        forward(size)
+        right(120)
+
+# Call your subroutines below:
+draw_square(80)
+penup()
+goto(100, 0)
+pendown()
+draw_triangle(60)
+</textarea>
+        </div>
+        <div class="snippets">
+          <span class="snippet-label">Insert:</span>
+          <button class="snip-btn" onclick="insertSnippet('forward(100)')">forward(100)</button>
+          <button class="snip-btn" onclick="insertSnippet('right(90)')">right(90)</button>
+          <button class="snip-btn" onclick="insertSnippet('penup()')">penup()</button>
+          <button class="snip-btn" onclick="insertSnippet('pendown()')">pendown()</button>
+          <button class="snip-btn" onclick="insertSnippet('goto(0, 0)')">goto(x,y)</button>
+          <button class="snip-btn" onclick="insertSnippet('color(\"blue\")')">color()</button>
+        </div>
+        <div class="t3-footer">
+          <button class="run-btn" id="t3-run" disabled onclick="runTurtle()">▶ Draw!</button>
+          <button class="clear-btn" onclick="clearCanvas()">Clear canvas</button>
+          <button class="clear-btn" onclick="resetCode()">↺ Reset code</button>
+        </div>
+        <div class="output-console" id="t3-console" style="display:none;"></div>
+      </div>
+
+      <!-- Challenges -->
+      <div style="margin-top:14px;">
+        <div class="sec-hdr" style="margin-top:0;">
+          <div class="sec-icon">🏖️</div>
+          <div>
+            <div class="sec-title">Beach drawing challenges</div>
+            <div class="sec-desc">Complete each one — screenshot your best work for OneNote</div>
+          </div>
+        </div>
+        <div class="challenge-strip"><strong>Challenge 1 — Run the starter code.</strong> What shapes appear? Change the sizes and positions. What happens when you call <code>draw_square(40)</code> then <code>draw_square(80)</code> then <code>draw_square(120)</code>?</div>
+        <div class="challenge-strip"><strong>Challenge 2 — Write <code>draw_circle(radius)</code>.</strong> A circle in turtle is a loop: <code>forward(2)</code> and <code>right(2)</code> repeated 180 times. Wrap this in a subroutine with a <code>radius</code> parameter that controls how far forward each step goes.</div>
+        <div class="challenge-strip"><strong>Challenge 3 — Take input from the user.</strong> Add <code>size = int(input("How big? "))</code> at the top. Then call <code>draw_square(size)</code> so the shape changes based on what the user types.</div>
+        <div class="challenge-strip"><strong>Challenge 4 — Write a function (not a procedure)</strong> called <code>get_perimeter(size)</code> that returns <code>size * 4</code>. Call it and <code>print()</code> the result — prove it works before you use it.</div>
+        <div class="challenge-strip"><strong>Challenge 5 — Draw a beach scene.</strong> Use <code>penup()</code> / <code>pendown()</code> and <code>goto(x, y)</code> to position shapes across the canvas. Use <code>color()</code> to make a sun (circle, yellow), a castle (squares, orange), and waves (triangles, blue).</div>
+      </div>
+    </div>
+
+    <!-- Right: canvas -->
+    <div>
+      <div class="canvas-panel">
+        <div class="canvas-topbar">
+          <span class="canvas-title">🐢 Sandy canvas</span>
+          <div class="canvas-stats">
+            <span>Lines: <b id="t3-lines">0</b></span>
+            <span>Steps: <b id="t3-steps">0</b></span>
+          </div>
+        </div>
+        <canvas id="turtleCanvas" width="320" height="320"></canvas>
+        <div class="canvas-footer">
+          <button class="clear-btn" onclick="clearCanvas()" style="font-size:11px;padding:6px 10px;">Clear</button>
+          <label style="font-size:11px;color:var(--muted);font-family:var(--mono);display:flex;align-items:center;gap:6px;margin-left:8px;">
+            Speed:
+            <input type="range" id="speedSlider" min="0" max="100" value="25" step="5"
+              style="width:80px;accent-color:var(--teal);"
+              oninput="document.getElementById('speedLabel').textContent=this.value+'%'">
+            <span id="speedLabel" style="min-width:32px;">25%</span>
+          </label>
+          <span style="font-size:11px;color:var(--muted);margin-left:auto;font-family:var(--mono);">Right-click → Save for OneNote</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /panel3 -->
+
+<!-- ═══════════════════════ SCRIPTS ═══════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+/* ── Tabs ── */
+window.switchTab=function(n){
+  [1,2,3].forEach(function(i){
+    document.getElementById('panel'+i).classList.toggle('active',i===n);
+    document.getElementById('t'+i).classList.toggle('active',i===n);
+  });
+};
+
+/* ── MCQ answers ── */
+var mcqData={
+  'q1' :{ans:'String',          ok:'<code>input()</code> always returns a string, even when the user types a number. You must convert it with <code>int()</code> or <code>float()</code> if you need to do maths.'},
+  'q2' :{ans:'sides = int(input())', ok:'Correct! <code>int(input())</code> takes whatever the user types and converts it to a whole number, ready for arithmetic.'},
+  'q3' :{ans:'size is a string — you need int(input()) to do maths with it', ok:'Correct! Without <code>int()</code>, <code>size</code> is a string. Multiplying a string by 2 in Python actually repeats it (<code>"5" * 2 = "55"</code>) which is almost certainly not what was intended.'},
+  'q4' :{ans:'Perimeter: 20',   ok:'Correct! <code>int(input())</code> converts "5" to the integer 5. Then <code>5 * 4 = 20</code>. <code>print("Perimeter:", result)</code> outputs the label and value separated by a space.'},
+  'sq1':{ans:'Parameter',       ok:'The variable in the <code>def</code> line is the <strong>parameter</strong> — it\'s a placeholder that takes the value when the subroutine is called.'},
+  'sq2':{ans:'Argument',        ok:'The actual value you pass in when calling the subroutine is the <strong>argument</strong>. Here 50 is passed in and stored in the parameter <code>size</code>.'},
+  'sq3':{ans:'Procedure — it does not use return', ok:'A procedure performs actions but does not send any value back. A function uses <code>return</code> to give a value back to the caller.'},
+  'sq4':{ans:'Line 5 — draw_triangle(80)', ok:'The <strong>call</strong> is the line that runs the subroutine. Line 1 is the <strong>definition</strong>. Line 5 (<code>draw_triangle(80)</code>) is where the code actually executes.'},
+  'sq5':{ans:'100',             ok:'<code>size = 25</code>, so <code>perimeter = 25 * 4 = 100</code>. The function <code>return</code>s 100, which gets stored in <code>p</code>, and then <code>print(p)</code> outputs it.'},
+  'sq7':{ans:'True',            ok:'True! That\'s one of the main benefits of subroutines — define once, call many times. This avoids repeating the same code.'},
+};
+
+var mcqFeedback={};
+
+window.checkMCQ=function(id,btn,chosen){
+  var data=mcqData[id];
+  if(!data)return;
+  var card=document.getElementById(id)||document.getElementById('q'+id.replace('q',''))||document.getElementById('s'+id);
+  // find card by searching for the element containing this button
+  var parentCard=btn.closest('.q-card');
+  if(!parentCard)return;
+  var correct=data.ans;
+  var isOk=(chosen===correct);
+  parentCard.querySelectorAll('.opt-btn').forEach(function(b){
+    b.disabled=true;
+    if(b.textContent.trim()===correct||b.innerHTML.includes(correct))b.className='opt-btn reveal-correct';
+  });
+  btn.className='opt-btn '+(isOk?'selected-correct':'selected-wrong');
+  parentCard.className='q-card '+(isOk?'correct':'wrong');
+  var fbId='f'+id;
+  var fb=document.getElementById(fbId);
+  if(fb){
+    fb.className='q-feedback show '+(isOk?'ok':'bad');
+    fb.innerHTML=isOk?('✓ Correct! '+data.ok):('✗ Not quite — the answer is: <strong>'+correct+'</strong>. '+data.ok);
+  }
+  updateP2Progress();
+  renderAllSummaries();
+};
+
+var blankData={
+  'q5' :{ans:'int',    ok:'Correct! <code>int(input())</code> converts the typed text to a whole number so the turtle can use it for sizes.'},
+  'q6' :{ans:'str',    ok:'Correct! <code>str(score)</code> converts the integer into a string so it can be joined with the other strings using <code>+</code>.'},
+  'sq6':{ans:'def',    ok:'Correct! All subroutine definitions start with <code>def</code> followed by the name and parameters in brackets.'},
+  'sq8':{ans:'return', ok:'Correct! <code>return result</code> sends the value back to wherever the function was called. Without <code>return</code> it would be a procedure.'},
+};
+
+window.checkBlank=function(id){
+  var data=blankData[id];
+  if(!data)return;
+  var inp=document.getElementById('i'+id);
+  var fb=document.getElementById('f'+id);
+  var parentCard=inp?inp.closest('.q-card'):null;
+  if(!inp||!fb)return;
+  var val=inp.value.trim();
+  var isOk=(val===data.ans);
+  inp.className='blank-input '+(isOk?'correct-input':'wrong-input');
+  if(fb){
+    fb.className='q-feedback show '+(isOk?'ok':'bad');
+    fb.innerHTML=isOk?('✓ '+data.ok):('✗ Not quite — the answer is <code>'+data.ans+'</code>. '+data.ok);
+  }
+  if(parentCard)parentCard.className='q-card '+(isOk?'correct':'wrong');
+  inp.disabled=true;
+  if(parentCard){parentCard.querySelectorAll('.check-btn').forEach(function(b){b.disabled=true;});}
+  updateP2Progress();
+  renderAllSummaries();
+};
+
+var p2count=0;
+function updateP2Progress(){
+  var answered=document.querySelectorAll('#panel2 .q-card.correct, #panel2 .q-card.wrong').length;
+  document.getElementById('p2prog').textContent=answered+' / 8';
+}
+
+/* ── Summary boxes (screenshot-for-OneNote review) ── */
+var P1_QUESTIONS=[
+  {card:'qq1',label:'Q1'},{card:'qq2',label:'Q2'},{card:'qq3',label:'Q3'},
+  {card:'qq4',label:'Q4'},{card:'qq5',label:'Q5'},{card:'qq6',label:'Q6'}
+];
+var P2_QUESTIONS=[
+  {card:'sq1',label:'Q1'},{card:'sq2',label:'Q2'},{card:'sq3',label:'Q3'},{card:'sq4',label:'Q4'},
+  {card:'sq5',label:'Q5'},{card:'sq6',label:'Q6'},{card:'sq7',label:'Q7'},{card:'sq8',label:'Q8'}
+];
+
+function renderSummary(gridId,totalId,questions){
+  var grid=document.getElementById(gridId),total=document.getElementById(totalId);
+  if(!grid||!total)return;
+  var correct=0,answered=0,html='';
+  questions.forEach(function(q){
+    var card=document.getElementById(q.card);
+    var cls='sum-pending',icon='—',status='Not answered yet';
+    if(card&&card.classList.contains('correct')){cls='sum-correct';icon='✓';status='Correct';correct++;answered++;}
+    else if(card&&card.classList.contains('wrong')){cls='sum-wrong';icon='✗';status='Incorrect';answered++;}
+    html+='<div class="sum-row '+cls+'"><span class="sum-icon">'+icon+'</span><span class="sum-q">'+q.label+'</span><span class="sum-status">'+status+'</span></div>';
+  });
+  grid.innerHTML=html;
+  total.textContent='Score: '+correct+' / '+questions.length+' correct  ('+answered+' / '+questions.length+' answered)';
+}
+
+function renderAllSummaries(){
+  renderSummary('p1sum-grid','p1sum-total',P1_QUESTIONS);
+  renderSummary('p2sum-grid','p2sum-total',P2_QUESTIONS);
+}
+
+/* ══════════════════════════════════════════════════════
+   TURTLE ENGINE
+══════════════════════════════════════════════════════ */
+var canvas=document.getElementById('turtleCanvas');
+var ctx=canvas.getContext('2d');
+var CW=canvas.width, CH=canvas.height;
+
+// Draw sandy background
+function drawBackground(){
+  ctx.fillStyle='#E8D5A3';
+  ctx.fillRect(0,0,CW,CH);
+  // Sand texture dots
+  ctx.fillStyle='rgba(180,150,80,0.18)';
+  for(var i=0;i<200;i++){
+    var x=(i*173+7)%CW, y=(i*97+13)%CH;
+    ctx.beginPath();ctx.arc(x,y,1.2,0,Math.PI*2);ctx.fill();
+  }
+  // Sea at top
+  ctx.fillStyle='#4A90B8';
+  ctx.fillRect(0,0,CW,28);
+  ctx.fillStyle='#7AB8D4';
+  ctx.fillRect(0,18,CW,12);
+  // Horizon label
+  ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.font='10px sans-serif';ctx.fillText('~ sea ~',CW/2-16,14);
+}
+
+drawBackground();
+
+// Turtle state
+var tx, ty, tangle, penDown, penColor, lineCount, stepCount;
+var commands=[];
+
+function resetTurtle(){
+  tx=CW/4; ty=CH/3;
+  tangle=0; penDown=true; penColor='#8B4513';
+  lineCount=0; stepCount=0;
+  commands=[];
+  document.getElementById('t3-lines').textContent='0';
+  document.getElementById('t3-steps').textContent='0';
+}
+resetTurtle();
+
+function drawTurtleCursor(x,y,angle){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(angle*Math.PI/180);
+  ctx.fillStyle='#2d6a2d';
+  ctx.beginPath();
+  // shell
+  ctx.ellipse(0,0,9,7,0,0,Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle='#1a4a1a';
+  ctx.beginPath();ctx.ellipse(0,0,6,5,0,0,Math.PI*2);ctx.stroke();
+  // head
+  ctx.fillStyle='#3a7a3a';
+  ctx.beginPath();ctx.arc(10,0,4,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+
+function animateDraw(cmds, done){
+  var i=0;
+  var curX=tx,curY=ty,curAngle=tangle,curPen=penDown,curColor=penColor;
+  function step(){
+    if(i>=cmds.length){
+      tx=curX;ty=curY;tangle=curAngle;penDown=curPen;penColor=curColor;
+      drawBackground();
+      // redraw all lines
+      replayLines(cmds);
+      drawTurtleCursor(tx,ty,tangle);
+      if(done)done();
+      return;
+    }
+    var cmd=cmds[i++];
+    if(cmd.type==='forward'||cmd.type==='backward'){
+      var dist=cmd.type==='backward'?-cmd.n:cmd.n;
+      var rad=curAngle*Math.PI/180;
+      var nx=curX+Math.cos(rad)*dist;
+      var ny=curY+Math.sin(rad)*dist;
+      if(curPen){
+        ctx.strokeStyle=curColor;ctx.lineWidth=2.5;ctx.lineCap='round';
+        ctx.beginPath();ctx.moveTo(curX,curY);ctx.lineTo(nx,ny);ctx.stroke();
+        lineCount++;document.getElementById('t3-lines').textContent=lineCount;
+      }
+      curX=nx;curY=ny;stepCount++;
+      document.getElementById('t3-steps').textContent=stepCount;
+    }else if(cmd.type==='right'){curAngle=(curAngle+cmd.n)%360;}
+    else if(cmd.type==='left'){curAngle=((curAngle-cmd.n)%360+360)%360;}
+    else if(cmd.type==='penup'){curPen=false;}
+    else if(cmd.type==='pendown'){curPen=true;}
+    else if(cmd.type==='color'){curColor=cmd.c;}
+    else if(cmd.type==='goto'){
+      if(curPen){
+        ctx.strokeStyle=curColor;ctx.lineWidth=2.5;ctx.lineCap='round';
+        ctx.beginPath();ctx.moveTo(curX,curY);ctx.lineTo(cmd.x+CW/2,cmd.y+CH/2+20);ctx.stroke();
+        lineCount++;document.getElementById('t3-lines').textContent=lineCount;
+      }
+      curX=cmd.x+CW/2;curY=cmd.y+CH/2+20;
+    }
+    // Draw cursor
+    drawBackground();
+    replayLines(cmds.slice(0,i));
+    drawTurtleCursor(curX,curY,curAngle);
+    var spd=parseInt(document.getElementById('speedSlider').value); setTimeout(step,Math.round(120-spd*1.2));
+  }
+  step();
+}
+
+var allLines=[];
+function replayLines(cmds){
+  // replay all move commands to draw lines
+  var rx=CW/4,ry=CH/3,ra=0,rp=true,rc='#8B4513';
+  cmds.forEach(function(cmd){
+    if(cmd.type==='forward'||cmd.type==='backward'){
+      var dist=cmd.type==='backward'?-cmd.n:cmd.n;
+      var rad=ra*Math.PI/180;
+      var nx=rx+Math.cos(rad)*dist;
+      var ny=ry+Math.sin(rad)*dist;
+      if(rp){ctx.strokeStyle=rc;ctx.lineWidth=2.5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(rx,ry);ctx.lineTo(nx,ny);ctx.stroke();}
+      rx=nx;ry=ny;
+    }else if(cmd.type==='right'){ra=(ra+cmd.n)%360;}
+    else if(cmd.type==='left'){ra=((ra-cmd.n)%360+360)%360;}
+    else if(cmd.type==='penup'){rp=false;}
+    else if(cmd.type==='pendown'){rp=true;}
+    else if(cmd.type==='color'){rc=cmd.c;}
+    else if(cmd.type==='goto'){
+      if(rp){ctx.strokeStyle=rc;ctx.lineWidth=2.5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(rx,ry);ctx.lineTo(cmd.x+CW/2,cmd.y+CH/2+20);ctx.stroke();}
+      rx=cmd.x+CW/2;ry=cmd.y+CH/2+20;
+    }
+  });
+}
+
+window.clearCanvas=function(){
+  resetTurtle();
+  drawBackground();
+};
+
+/* ── Pyodide worker ── */
+var WORKER_SRC=[
+'self.pyodideReady=false;',
+'importScripts("https://cdn.jsdelivr.net/pyodide/v0.26.3/full/pyodide.js");',
+'async function init(){try{self.pyodide=await loadPyodide({indexURL:"https://cdn.jsdelivr.net/pyodide/v0.26.3/full/"});',
+'self.pyodideReady=true;self.postMessage({type:"ready"});}catch(e){self.postMessage({type:"err",msg:String(e)});}}',
+'init();',
+'self.onmessage=function(e){',
+'  if(!self.pyodideReady){self.postMessage({id:e.data.id,ok:false,cmds:[],out:"Engine loading."});return;}',
+'  try{',
+'    self.pyodide.runPython("import sys,io;sys.stdout=io.StringIO()");',
+'    var setup=[',
+'      "_cmds=[]",',
+'      "def forward(n): _cmds.append({\'type\':\'forward\',\'n\':float(n)})",',
+'      "def backward(n): _cmds.append({\'type\':\'backward\',\'n\':float(n)})",',
+'      "def right(n): _cmds.append({\'type\':\'right\',\'n\':float(n)})",',
+'      "def left(n): _cmds.append({\'type\':\'left\',\'n\':float(n)})",',
+'      "def penup(): _cmds.append({\'type\':\'penup\'})",',
+'      "def pendown(): _cmds.append({\'type\':\'pendown\'})",',
+'      "def color(c): _cmds.append({\'type\':\'color\',\'c\':str(c)})",',
+'      "def goto(x,y): _cmds.append({\'type\':\'goto\',\'x\':float(x),\'y\':float(y)})",',
+'      "import builtins",',
+'      "_inputs=iter([\\"100\\"])",',
+'      "builtins.input=lambda p=\'\': next(_inputs, \\"100\\")"',
+'    ].join("\\n");',
+'    self.pyodide.runPython(setup);',
+'    self.pyodide.runPython(e.data.code);',
+'    var cmdsJson=self.pyodide.runPython("import json; json.dumps(_cmds)");',
+'    var out=self.pyodide.runPython("sys.stdout.getvalue()");',
+'    self.postMessage({id:e.data.id,ok:true,cmds:JSON.parse(cmdsJson),out:out});',
+'  }catch(err){self.postMessage({id:e.data.id,ok:false,cmds:[],out:String(err)});}',
+'};'
+].join('\n');
+
+var workerBlob=URL.createObjectURL(new Blob([WORKER_SRC],{type:'application/javascript'}));
+var worker=new Worker(workerBlob);
+var pyReady=false, pending=null, pendingTimer=null;
+
+worker.onmessage=function(e){
+  if(e.data.type==='ready'){
+    pyReady=true;
+    document.getElementById('t3-engine').innerHTML='<span style="color:var(--pass);font-weight:600;">✓ Python ready</span>';
+    document.getElementById('t3-run').disabled=false;
+    return;
+  }
+  if(e.data.type==='err'){document.getElementById('t3-engine').textContent='⚠ Engine error';return;}
+  if(pending){clearTimeout(pendingTimer);var r=pending;pending=null;pendingTimer=null;r(e.data);}
+};
+
+function callWorker(code){
+  return new Promise(function(res){
+    pending=res;
+    pendingTimer=setTimeout(function(){pending=null;res({ok:false,cmds:[],out:'Timed out.'});},8000);
+    worker.postMessage({id:Date.now(),code:code});
+  });
+}
+
+window.runTurtle=function(){
+  if(!pyReady)return;
+  var code=document.getElementById('t3-editor').value;
+  var cons=document.getElementById('t3-console');
+  var btn=document.getElementById('t3-run');
+  btn.disabled=true;
+  cons.style.display='none';
+  clearCanvas();
+  callWorker(code).then(function(res){
+    btn.disabled=false;
+    if(!res.ok){
+      cons.style.display='block';
+      cons.className='output-console has-error';
+      cons.textContent=res.out||'Error';
+      return;
+    }
+    if(res.out&&res.out.trim()){
+      cons.style.display='block';
+      cons.className='output-console';
+      cons.textContent=res.out;
+    }
+    if(res.cmds&&res.cmds.length){
+      animateDraw(res.cmds,null);
+    }
+  });
+};
+
+window.clearCanvas=function(){
+  resetTurtle();
+  drawBackground();
+};
+
+var STARTER=`def draw_square(size):
+    for i in range(4):
+        forward(size)
+        right(90)
+
+def draw_triangle(size):
+    for i in range(3):
+        forward(size)
+        right(120)
+
+# Call your subroutines below:
+draw_square(80)
+penup()
+goto(100, 0)
+pendown()
+draw_triangle(60)
+`;
+
+window.resetCode=function(){
+  document.getElementById('t3-editor').value=STARTER;
+  clearCanvas();
+  document.getElementById('t3-console').style.display='none';
+};
+
+window.insertSnippet=function(text){
+  var ta=document.getElementById('t3-editor');
+  var s=ta.selectionStart;
+  ta.value=ta.value.slice(0,s)+text+ta.value.slice(ta.selectionEnd);
+  ta.selectionStart=ta.selectionEnd=s+text.length;
+  ta.focus();
+};
+
+renderAllSummaries();
+
+/* Tab key in editor */
+document.getElementById('t3-editor').addEventListener('keydown',function(e){
+  if(e.key==='Tab'){
+    e.preventDefault();
+    var s=this.selectionStart,end=this.selectionEnd;
+    this.value=this.value.slice(0,s)+'    '+this.value.slice(end);
+    this.selectionStart=this.selectionEnd=s+4;
+  }
+});
+
+})();
+</script>
+</body>
+</html>

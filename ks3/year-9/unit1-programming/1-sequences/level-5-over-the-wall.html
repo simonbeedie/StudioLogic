@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crane Control — Level 2: Over the Wall</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #fff9f0;
+    --card: #ffffff;
+    --border: #edd8b0;
+    --text: #1a1a00;
+    --muted: #6b5a30;
+    --hint: #b09060;
+    --amber: #BA7517;
+    --amber-bg: #faeeda;
+    --amber-text: #633806;
+    --amber-border: #FAC775;
+    --green: #1D9E75;
+    --green-bg: #e8f7f0;
+    --green-text: #0d6e47;
+    --green-border: #9fe1cb;
+    --red-bg: #fdeaea;
+    --red-text: #922020;
+    --red-border: #f7c1c1;
+    --warn-bg: #faeeda;
+    --warn-text: #633806;
+    --warn-border: #FAC775;
+    --info-bg: #e6f1fb;
+    --info-text: #0c447c;
+    --info-border: #b5d4f4;
+  }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  header { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; gap: 1rem; height: 56px; }
+  .level-pill { background: var(--amber-bg); color: var(--amber-text); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; }
+  header h1 { font-size: 16px; font-weight: 600; }
+  .main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+  .main-top { grid-column: 1 / -1; }
+  .type-row { display: flex; gap: 6px; margin-bottom: 1rem; }
+  .type-input { flex: 1; font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; background: #fffaf2; color: var(--text); outline: none; }
+  .type-input:focus { border-color: var(--amber); background: #fff; }
+  .type-add-btn { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 14px; background: var(--amber); color: white; border: none; border-radius: 8px; cursor: pointer; }
+  .type-add-btn:hover { background: #633806; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem; }
+  .card h2 { font-size: 18px; font-weight: 600; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px; }
+  .card p { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 0.75rem; }
+  .card p:last-child { margin-bottom: 0; }
+  .task-box { background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: 10px; padding: 1rem 1.25rem; margin-top: 0.75rem; }
+  .task-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--amber); margin-bottom: 6px; }
+  .task-box p { color: var(--amber-text); margin: 0; font-size: 14px; }
+  .constraint-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 0.75rem; }
+  .constraint-chip { background: #fff3e0; border: 1px solid var(--amber-border); border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 500; color: var(--amber-text); }
+  .steps-list { list-style: none; counter-reset: steps; margin-top: 0.75rem; }
+  .steps-list li { counter-increment: steps; display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--muted); margin-bottom: 8px; line-height: 1.6; }
+  .steps-list li::before { content: counter(steps); min-width: 22px; height: 22px; background: var(--amber); color: white; border-radius: 50%; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .scene-wrapper { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; margin-bottom: 1rem; }
+  .scene-wrapper canvas { display: block; width: 100%; border-radius: 8px; border: 1px solid var(--border); }
+  .controls-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; }
+  .controls-card h3 { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .cmd-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.25rem; }
+  .cmd-btn { font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 7px 12px; background: #fff8ee; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; color: var(--text); display: flex; align-items: center; gap: 5px; }
+  .cmd-btn:hover { background: #fdeecf; }
+  .cmd-btn:active { transform: scale(0.97); }
+  .program-area { background: #fffaf2; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; min-height: 100px; margin-bottom: 1rem; font-family: 'JetBrains Mono', monospace; }
+  .prog-empty { font-size: 13px; color: var(--hint); padding: 8px 0; }
+  .prog-line { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+  .prog-num { color: var(--hint); font-size: 12px; min-width: 18px; }
+  .prog-text { font-size: 13px; color: var(--text); flex: 1; }
+  .prog-del { background: none; border: none; color: var(--hint); cursor: pointer; font-size: 16px; line-height: 1; padding: 0 4px; }
+  .prog-del:hover { color: #922020; }
+  .btn-row { display: flex; gap: 8px; }
+  .run-btn { background: var(--amber); color: white; border: none; border-radius: 10px; padding: 10px 24px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .run-btn:hover { background: #633806; }
+  .run-btn:active { transform: scale(0.98); }
+  .clear-btn { background: none; border: 1px solid var(--border); border-radius: 10px; padding: 10px 18px; font-size: 14px; cursor: pointer; color: var(--muted); font-family: 'Inter', sans-serif; }
+  .clear-btn:hover { background: #fff8ee; }
+  .feedback { margin-top: 1rem; border-radius: 10px; padding: 12px 16px; font-size: 14px; line-height: 1.6; display: none; }
+  .feedback.success { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
+  .feedback.fail { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border); }
+  .feedback.warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
+  .feedback.info { background: var(--info-bg); color: var(--info-text); border: 1px solid var(--info-border); }
+  code { font-family: 'JetBrains Mono', monospace; background: rgba(0,0,0,0.07); padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+  .tip-box { background: #fff8ee; border-left: 3px solid var(--amber); border-radius: 0 8px 8px 0; padding: 0.75rem 1rem; margin-top: 1rem; }
+  .tip-box p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.6; }
+  @media (max-width: 700px) { .main { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <span class="level-pill">Level 2</span>
+  <h1>Crane Control — Over the Wall</h1>
+</header>
+<div class="main">
+  <div class="main-top">
+    <div class="card">
+      <h2>🧱 Your mission</h2>
+      <p>There is now a <strong>wall</strong> between the ball and the basket. If your cable or ball hits the wall while moving, the task fails.</p>
+      <p>You must raise the ball <strong>high enough</strong> to clear the wall before moving the crane across. This means the order of operations matters — you can't just move sideways with a dangling ball.</p>
+      <div class="task-box">
+        <div class="task-label">Task — clear the obstacle</div>
+        <p>Grab the ball at column 2 → raise it above the wall (height 3) → move to column 8 → lower into basket.</p>
+      </div>
+      <div class="constraint-chips">
+        <span class="constraint-chip">⚠ Wall at columns 4–5, height 3</span>
+        <span class="constraint-chip">Ball at column 2, row 5</span>
+        <span class="constraint-chip">Basket at column 8</span>
+      </div>
+      <ul class="steps-list" style="margin-top:1rem;">
+        <li>Pick up the ball the same way as Level 1 — move over it, lower hook, grab.</li>
+        <li>Raise the hook enough that the ball clears the wall. The wall reaches to row 2, so your hook + ball must be at row 1 or above.</li>
+        <li>Move the crane to the right — the program checks if the ball would clip the wall as you pass over it.</li>
+        <li>Once past the wall, lower the ball and drop it into the basket.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="scene-wrapper">
+      <canvas id="scene" width="500" height="320"></canvas>
+      <p style="font-size:12px; color:var(--hint); margin-top:8px; text-align:center;">The red wall blocks low-flying cargo. Raise the ball to row 1 or higher before passing columns 4–5.</p>
+  </div>
+  <div>
+    <div class="controls-card">
+      <h3>Commands</h3>
+      <div class="cmd-grid">
+        <button class="cmd-btn" onclick="addCmd('move_right(1)')">→ move_right(1)</button>
+        <button class="cmd-btn" onclick="addCmd('move_right(2)')">→→ move_right(2)</button>
+        <button class="cmd-btn" onclick="addCmd('move_right(3)')">→×3 move_right(3)</button>
+        <button class="cmd-btn" onclick="addCmd('move_right(4)')">→×4 move_right(4)</button>
+        <button class="cmd-btn" onclick="addCmd('move_right(5)')">→×5 move_right(5)</button>
+        <button class="cmd-btn" onclick="addCmd('move_left(1)')">← move_left(1)</button>
+        <button class="cmd-btn" onclick="addCmd('lower_hook(1)')">↧ lower_hook(1)</button>
+        <button class="cmd-btn" onclick="addCmd('lower_hook(2)')">↧↧ lower_hook(2)</button>
+        <button class="cmd-btn" onclick="addCmd('lower_hook(3)')">↧×3 lower_hook(3)</button>
+        <button class="cmd-btn" onclick="addCmd('lower_hook(4)')">↧×4 lower_hook(4)</button>
+        <button class="cmd-btn" onclick="addCmd('raise_hook(1)')">↥ raise_hook(1)</button>
+        <button class="cmd-btn" onclick="addCmd('raise_hook(2)')">↥↥ raise_hook(2)</button>
+        <button class="cmd-btn" onclick="addCmd('raise_hook(3)')">↥×3 raise_hook(3)</button>
+        <button class="cmd-btn" onclick="addCmd('raise_hook(4)')">↥×4 raise_hook(4)</button>
+        <button class="cmd-btn" onclick="addCmd('grab()')">✊ grab()</button>
+        <button class="cmd-btn" onclick="addCmd('drop()')">✋ drop()</button>
+      </div>
+      <h3>Your program</h3>
+      <div class="type-row">
+        <input class="type-input" id="type-input" type="text" placeholder="Type a command e.g. raise_hook(4)" autocomplete="off" onkeydown="if(event.key==='Enter') addTyped()" />
+        <button class="type-add-btn" onclick="addTyped()">Add</button>
+      </div>
+      <div class="program-area" id="program-area">
+        <p class="prog-empty">Click a command or type one above...</p>
+      </div>
+      <div class="btn-row">
+        <button class="run-btn" onclick="runProgram()">▶ Run program</button>
+        <button class="clear-btn" onclick="clearAll()">Clear</button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+      <div class="tip-box">
+        <p><strong>Planning tip:</strong> Think of this like an <code>if</code> condition in Python — <em>if the ball is at or above row 1, it can cross; otherwise it hits the wall.</em> You must satisfy the condition before moving!</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const canvas = document.getElementById('scene');
+const ctx = canvas.getContext('2d');
+const COLS = 10, ROWS = 6;
+const CW = canvas.width / COLS;
+const CH = (canvas.height - 40) / ROWS;
+const TRACK_Y = 30;
+const BALL_COL = 2, BALL_ROW = 5;
+const BASKET_COL = 8;
+const WALL_COLS = [4, 5], WALL_HEIGHT = 3;
+
+let state = { craneX: 0, hookRows: 0, hasBall: false, ballDropped: false, ballInBasket: false };
+let program = [], animating = false;
+
+function colToX(c) { return c * CW + CW / 2; }
+function rowToY(r) { return TRACK_Y + r * CH + CH / 2; }
+function groundY() { return TRACK_Y + ROWS * CH; }
+
+function drawScene(st) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#ddeeff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const gy = groundY();
+  ctx.fillStyle = '#8bad6b'; ctx.fillRect(0, gy, canvas.width, canvas.height - gy);
+
+  for (let c = 0; c <= COLS; c++) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(c * CW, TRACK_Y); ctx.lineTo(c * CW, gy); ctx.stroke();
+  }
+  for (let r = 0; r <= ROWS; r++) {
+    ctx.beginPath(); ctx.moveTo(0, TRACK_Y + r * CH); ctx.lineTo(canvas.width, TRACK_Y + r * CH); ctx.stroke();
+  }
+  for (let c = 0; c < COLS; c++) {
+    ctx.fillStyle = '#7a90a0'; ctx.font = '10px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(c, c * CW + CW / 2, TRACK_Y - 8);
+  }
+
+  WALL_COLS.forEach(wc => {
+    const wx = wc * CW, wy = gy - WALL_HEIGHT * CH;
+    ctx.fillStyle = '#c44';
+    ctx.fillRect(wx + 4, wy, CW - 8, WALL_HEIGHT * CH);
+    ctx.fillStyle = '#a22';
+    for (let row = 0; row < WALL_HEIGHT; row++) {
+      for (let brick = 0; brick < 2; brick++) {
+        const bx = wx + 4 + brick * (CW / 2 - 4) + (row % 2 === 0 ? 0 : CW / 4 - 2);
+        const by = wy + row * CH + 3;
+        ctx.strokeStyle = '#a22'; ctx.lineWidth = 1;
+        ctx.strokeRect(bx, by, CW / 2 - 6, CH - 6);
+      }
+    }
+    ctx.fillStyle = 'rgba(255,200,200,0.4)';
+    ctx.font = 'bold 9px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('WALL', wc * CW + CW / 2, gy - WALL_HEIGHT * CH - 5);
+  });
+
+  ctx.fillStyle = '#1a4a7a'; ctx.fillRect(0, 18, canvas.width, 12);
+  ctx.fillStyle = '#2a6aaa'; ctx.fillRect(0, 26, canvas.width, 4);
+
+  const cx = colToX(st.craneX);
+  ctx.fillStyle = '#BA7517'; ctx.fillRect(cx - 28, 10, 56, 22);
+  ctx.fillStyle = '#633806'; ctx.fillRect(cx - 6, 8, 12, 26);
+
+  const hookBottomY = TRACK_Y + (st.hookRows + 1) * CH;
+  ctx.strokeStyle = '#555'; ctx.lineWidth = 2; ctx.setLineDash([4, 3]);
+  ctx.beginPath(); ctx.moveTo(cx, TRACK_Y + 2); ctx.lineTo(cx, hookBottomY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#333';
+  ctx.beginPath(); ctx.arc(cx, hookBottomY, 7, Math.PI, 2 * Math.PI); ctx.fill();
+  ctx.fillRect(cx - 4, hookBottomY, 8, 5);
+
+  if (st.hasBall) {
+    ctx.fillStyle = '#e05c2a';
+    ctx.beginPath(); ctx.arc(cx, hookBottomY + 16, 13, 0, 2 * Math.PI); ctx.fill();
+    ctx.strokeStyle = '#a03a10'; ctx.lineWidth = 2; ctx.stroke();
+  }
+
+  if (!st.hasBall && !st.ballDropped && !st.ballInBasket) {
+    const bx = colToX(BALL_COL), by = rowToY(BALL_ROW);
+    ctx.fillStyle = '#e05c2a';
+    ctx.beginPath(); ctx.arc(bx, by, 13, 0, 2 * Math.PI); ctx.fill();
+    ctx.strokeStyle = '#a03a10'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.beginPath(); ctx.arc(bx - 4, by - 4, 5, 0, 2 * Math.PI); ctx.fill();
+    ctx.fillStyle = '#e05c2a'; ctx.font = 'bold 11px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('BALL', bx, by + 28);
+  }
+
+  const bkx = colToX(BASKET_COL);
+  ctx.lineWidth = 3; ctx.strokeStyle = '#2d9e5f';
+  ctx.beginPath();
+  ctx.moveTo(bkx - 22, gy - 30); ctx.lineTo(bkx - 18, gy);
+  ctx.lineTo(bkx + 18, gy); ctx.lineTo(bkx + 22, gy - 30);
+  ctx.stroke(); ctx.lineWidth = 1;
+  if (st.ballInBasket) {
+    ctx.fillStyle = '#e05c2a';
+    ctx.beginPath(); ctx.arc(bkx, gy - 15, 13, 0, 2 * Math.PI); ctx.fill();
+    ctx.strokeStyle = '#a03a10'; ctx.lineWidth = 2; ctx.stroke();
+  }
+  ctx.fillStyle = '#2d9e5f'; ctx.font = 'bold 11px Inter,sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('BASKET', bkx, gy + 14);
+  ctx.fillStyle = '#BA7517'; ctx.font = 'bold 10px Inter,sans-serif';
+  ctx.fillText('CRANE', cx, 16);
+}
+
+function addCmd(cmd) { program.push(cmd); renderProgram(); }
+function removeCmd(i) { program.splice(i, 1); renderProgram(); }
+
+function addTyped() {
+  const input = document.getElementById('type-input');
+  const cmd = input.value.trim();
+  if (!cmd) return;
+  const valid = /^move_right\(\d+\)$/.test(cmd) || /^move_left\(\d+\)$/.test(cmd) ||
+                /^lower_hook\(\d+\)$/.test(cmd) || /^raise_hook\(\d+\)$/.test(cmd) ||
+                cmd === 'grab()' || cmd === 'drop()';
+  if (!valid) {
+    showFeedback('fail', `❌ <strong>Unknown command:</strong> <code>${cmd}</code>. Try something like <code>raise_hook(4)</code> or <code>grab()</code>.`);
+    return;
+  }
+  document.getElementById('feedback').style.display = 'none';
+  program.push(cmd);
+  renderProgram();
+  input.value = '';
+  input.focus();
+}
+function renderProgram() {
+  const area = document.getElementById('program-area');
+  if (!program.length) { area.innerHTML = '<p class="prog-empty">Click a command to start your program...</p>'; return; }
+  area.innerHTML = program.map((c, i) =>
+    `<div class="prog-line"><span class="prog-num">${i+1}.</span><span class="prog-text">${c}</span><button class="prog-del" onclick="removeCmd(${i})">×</button></div>`
+  ).join('');
+}
+function clearAll() {
+  program = []; renderProgram();
+  state = { craneX: 0, hookRows: 0, hasBall: false, ballDropped: false, ballInBasket: false };
+  drawScene(state); document.getElementById('feedback').style.display = 'none';
+}
+function showFeedback(type, msg) {
+  const f = document.getElementById('feedback'); f.style.display = 'block';
+  f.className = 'feedback ' + type; f.innerHTML = msg;
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function runProgram() {
+  if (animating || !program.length) { if (!program.length) showFeedback('info', 'Add some commands first!'); return; }
+  animating = true; document.getElementById('feedback').style.display = 'none';
+  let st = { craneX: 0, hookRows: 0, hasBall: false, ballDropped: false, ballInBasket: false };
+  let grabbed = false, success = false, error = null;
+
+  for (const cmd of program) {
+    const mr = cmd.match(/^move_right\((\d+)\)$/);
+    const ml = cmd.match(/^move_left\((\d+)\)$/);
+    const lh = cmd.match(/^lower_hook\((\d+)\)$/);
+    const rh = cmd.match(/^raise_hook\((\d+)\)$/);
+    const grab = cmd === 'grab()'; const drop = cmd === 'drop()';
+    if (!mr && !ml && !lh && !rh && !grab && !drop) { error = `Unknown command: <code>${cmd}</code>`; break; }
+
+    if (mr) {
+      const n = parseInt(mr[1]);
+      for (let i = 0; i < n; i++) {
+        st = { ...st, craneX: Math.min(COLS - 1, st.craneX + 1) };
+        if (st.hasBall && WALL_COLS.includes(st.craneX)) {
+          const ballRow = st.hookRows + 1;
+          if (ballRow > ROWS - WALL_HEIGHT) {
+            error = `💥 The ball hit the wall at column ${st.craneX}! The wall reaches to row ${ROWS - WALL_HEIGHT}. Raise the hook higher before moving across.`;
+            drawScene(st); await sleep(200); break;
+          }
+        }
+        drawScene(st); await sleep(180);
+        if (error) break;
+      }
+    } else if (ml) {
+      const n = parseInt(ml[1]);
+      for (let i = 0; i < n; i++) { st = { ...st, craneX: Math.max(0, st.craneX - 1) }; drawScene(st); await sleep(180); }
+    } else if (lh) {
+      const n = parseInt(lh[1]);
+      for (let i = 0; i < n; i++) { st = { ...st, hookRows: Math.min(ROWS - 1, st.hookRows + 1) }; drawScene(st); await sleep(200); }
+    } else if (rh) {
+      const n = parseInt(rh[1]);
+      for (let i = 0; i < n; i++) { st = { ...st, hookRows: Math.max(0, st.hookRows - 1) }; drawScene(st); await sleep(200); }
+    } else if (grab) {
+      if (st.craneX === BALL_COL && st.hookRows === BALL_ROW - 1 && !st.hasBall && !st.ballDropped) {
+        st = { ...st, hasBall: true }; grabbed = true;
+      } else if (!st.hasBall) {
+        error = `grab() failed — hook at col ${st.craneX} row ${st.hookRows + 1}, but ball is at col ${BALL_COL} row ${BALL_ROW}.`; break;
+      }
+      drawScene(st); await sleep(300);
+    } else if (drop) {
+      if (!st.hasBall) { error = `drop() called but no ball is held.`; break; }
+      st = { ...st, hasBall: false, ballDropped: true };
+      if (st.craneX === BASKET_COL) { st = { ...st, ballInBasket: true }; success = true; }
+      drawScene(st); await sleep(300);
+    }
+    if (error) break;
+  }
+
+  drawScene(st);
+  if (error) showFeedback('fail', `❌ <strong>Error:</strong> ${error}`);
+  else if (success) showFeedback('success', `🎉 <strong>Brilliant!</strong> The crane cleared the wall and landed the ball in the basket. You've handled a constraint — this is exactly what conditional logic is about in programming!`);
+  else if (st.ballDropped && !st.ballInBasket) showFeedback('fail', `❌ <strong>Missed!</strong> Ball dropped at column ${st.craneX} — basket is at column ${BASKET_COL}.`);
+  else if (!grabbed) showFeedback('warn', `⚠️ Ball not grabbed. Move to column ${BALL_COL}, lower hook to row ${BALL_ROW}, then grab().`);
+  else showFeedback('warn', `⚠️ You grabbed the ball but didn't drop it into the basket. Move to column ${BASKET_COL} and use drop().`);
+  animating = false;
+}
+
+drawScene(state);
+</script>
+</body>
+</html>

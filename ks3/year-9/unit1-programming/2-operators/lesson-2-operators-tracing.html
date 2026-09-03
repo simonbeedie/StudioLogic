@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 2 — Operators &amp; Tracing</title>
+<style>
+:root {
+  --navy:   #1B2A4E;
+  --teal:   #1B7E8B;
+  --amber:  #D89A1F;
+  --white:  #F4F8FC;
+  --text:   #1a2233;
+  --muted:  #5a6a80;
+  --border: #ccd8e8;
+  --card:   #ffffff;
+  --pass:   #1D9E75;
+  --pass-bg:#e8f7f0;
+  --pass-bd:#9fe1cb;
+  --fail:   #c0392b;
+  --fail-bg:#fdeaea;
+  --fail-bd:#f7c1c1;
+  --warn-bg:#fef9ec;
+  --warn-bd:#f0d080;
+  --code-bg:#1e2538;
+  --code-fg:#cdeaf5;
+  --mono: 'Consolas','SFMono-Regular','Menlo','Courier New',monospace;
+  --sans: -apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--white);color:var(--text);font-family:var(--sans);min-height:100vh;}
+
+/* ── Header ── */
+.hdr{background:var(--navy);color:#fff;padding:0 24px;height:56px;display:flex;align-items:center;gap:14px;}
+.hdr-badge{width:36px;height:36px;border-radius:8px;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.hdr h1{font-size:15px;font-weight:600;letter-spacing:.5px;}
+.hdr-sub{font-size:12px;color:rgba(255,255,255,.55);margin-left:auto;}
+
+/* ── Tabs ── */
+.tabs{background:var(--card);border-bottom:2px solid var(--border);display:flex;padding:0 24px;gap:4px;}
+.tab{font-size:13px;font-weight:500;padding:13px 18px;cursor:pointer;border-bottom:3px solid transparent;color:var(--muted);transition:all .15s;margin-bottom:-2px;white-space:nowrap;}
+.tab:hover{color:var(--navy);}
+.tab.active{color:var(--teal);border-bottom-color:var(--teal);font-weight:600;}
+.tab .badge{display:inline-block;background:var(--border);color:var(--muted);font-size:10px;padding:1px 7px;border-radius:999px;margin-left:6px;font-weight:600;}
+.tab.active .badge{background:var(--teal);color:#fff;}
+
+/* ── Panel ── */
+.panel{display:none;max-width:860px;margin:0 auto;padding:28px 20px 60px;}
+.panel.active{display:block;}
+
+/* ── Section header ── */
+.sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:18px;margin-top:32px;}
+.sec-hdr:first-child{margin-top:0;}
+.sec-icon{width:32px;height:32px;border-radius:8px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.sec-title{font-size:16px;font-weight:600;color:var(--navy);}
+.sec-desc{font-size:13px;color:var(--muted);margin-top:2px;}
+.progress-pill{margin-left:auto;font-size:12px;font-weight:600;font-family:var(--mono);color:var(--teal);background:var(--pass-bg);border:1px solid var(--pass-bd);padding:3px 10px;border-radius:999px;}
+
+/* ── Question card ── */
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:14px;transition:border-color .2s;}
+.q-card.correct{border-color:var(--pass-bd);background:var(--pass-bg);}
+.q-card.wrong{border-color:var(--fail-bd);background:var(--fail-bg);}
+.q-num{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--teal);margin-bottom:8px;}
+.q-stem{font-size:14px;color:var(--text);line-height:1.65;margin-bottom:12px;}
+.q-stem code{font-family:var(--mono);background:var(--code-bg);color:var(--code-fg);padding:1px 6px;border-radius:4px;font-size:13px;}
+
+/* Code block */
+.code-block{background:var(--code-bg);border-radius:8px;padding:14px 16px;margin-bottom:14px;font-family:var(--mono);font-size:13px;line-height:1.8;color:var(--code-fg);counter-reset:lines;}
+.code-block .ln{display:block;counter-increment:lines;}
+.code-block .ln::before{content:counter(lines,'decimal-leading-zero');color:#4a5a7a;margin-right:14px;user-select:none;font-size:11px;}
+.kw{color:#C586C0;}.bi{color:#DCDCAA;}.st{color:#CE9178;}.nm{color:#B5CEA8;}.cm{color:#6A9955;font-style:italic;}.op{color:#FFD700;}
+
+/* Fill blank input */
+.blank-input{font-family:var(--mono);font-size:13px;background:#fff;border:2px solid var(--border);border-radius:6px;padding:5px 10px;width:90px;text-align:center;color:var(--text);outline:none;transition:border-color .2s;}
+.blank-input:focus{border-color:var(--teal);}
+.blank-input.correct-input{border-color:var(--pass);background:var(--pass-bg);color:var(--pass);}
+.blank-input.wrong-input{border-color:var(--fail);background:var(--fail-bg);color:var(--fail);}
+
+/* MCQ options */
+.options{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.opt-btn{font-family:var(--mono);font-size:13px;padding:7px 16px;background:#f4f8fc;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;color:var(--text);transition:all .15s;}
+.opt-btn:hover:not(:disabled){background:#e6f0fb;border-color:var(--teal);color:var(--navy);}
+.opt-btn:disabled{cursor:default;}
+.opt-btn.selected-correct{background:var(--pass-bg);border-color:var(--pass);color:var(--pass);font-weight:600;}
+.opt-btn.selected-wrong{background:var(--fail-bg);border-color:var(--fail);color:var(--fail);font-weight:600;}
+.opt-btn.reveal-correct{background:var(--pass-bg);border-color:var(--pass);color:var(--pass);}
+
+/* Check button */
+.check-btn{font-size:13px;font-weight:600;padding:8px 18px;background:var(--teal);color:#fff;border:none;border-radius:8px;cursor:pointer;transition:filter .15s;}
+.check-btn:hover{filter:brightness(1.1);}
+.check-btn:disabled{opacity:.4;cursor:default;}
+
+/* Feedback */
+.q-feedback{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:13px;line-height:1.6;display:none;}
+.q-feedback.show{display:block;}
+.q-feedback.ok{background:var(--pass-bg);color:#0d6e47;border:1px solid var(--pass-bd);}
+.q-feedback.bad{background:var(--fail-bg);color:#922020;border:1px solid var(--fail-bd);}
+.q-feedback code{font-family:var(--mono);background:rgba(0,0,0,.07);padding:1px 5px;border-radius:3px;}
+
+/* Section score */
+.sec-score{text-align:center;background:var(--warn-bg);border:1px solid var(--warn-bd);border-radius:10px;padding:14px 20px;margin-top:6px;margin-bottom:28px;font-size:14px;color:var(--text);display:none;}
+.sec-score.show{display:block;}
+.sec-score strong{color:var(--navy);font-size:18px;}
+
+/* ── Tab 3 coding challenges ── */
+.challenge-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:18px;}
+.challenge-hdr{background:var(--navy);color:#fff;padding:12px 18px;display:flex;align-items:center;gap:10px;}
+.challenge-hdr .c-num{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.15);padding:2px 8px;border-radius:4px;}
+.challenge-hdr .c-title{font-size:14px;font-weight:600;}
+.challenge-body{padding:18px 20px;}
+.challenge-body p{font-size:13.5px;color:var(--muted);line-height:1.65;margin-bottom:12px;}
+.challenge-body p strong{color:var(--text);}
+.task-box{background:#eef4ff;border:1px solid #b5d4f4;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#0c447c;line-height:1.6;}
+.task-box strong{color:#042C53;}
+.editor-wrap{position:relative;background:var(--code-bg);border-radius:8px;overflow:hidden;margin-bottom:10px;}
+.editor-wrap textarea{width:100%;min-height:140px;resize:vertical;background:transparent;color:var(--code-fg);font-family:var(--mono);font-size:13px;line-height:1.7;padding:14px 16px;border:none;outline:none;caret-color:var(--amber);}
+.editor-wrap .hl{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;font-family:var(--mono);font-size:13px;line-height:1.7;padding:14px 16px;color:var(--code-fg);white-space:pre;overflow:hidden;}
+.c-footer{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.run-btn{font-size:13px;font-weight:700;padding:9px 20px;background:var(--teal);color:#fff;border:none;border-radius:8px;cursor:pointer;transition:filter .15s;}
+.run-btn:hover{filter:brightness(1.1);}
+.run-btn:disabled{opacity:.4;cursor:not-allowed;}
+.reset-btn{font-size:12px;padding:9px 14px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:8px;cursor:pointer;}
+.output-box{margin-top:10px;background:#0d1520;border-radius:8px;padding:12px 14px;font-family:var(--mono);font-size:13px;color:#cdeaf5;min-height:44px;white-space:pre-wrap;word-break:break-word;display:none;}
+.output-box.show{display:block;}
+.output-box.has-error{color:#ff8080;}
+.output-box.has-pass{border:1px solid var(--pass-bd);}
+.engine-note{font-size:11px;color:var(--muted);font-family:var(--mono);margin-left:auto;}
+
+/* Spinner */
+.spinner{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--teal);animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Submit all */
+.submit-section{text-align:center;padding:20px 0 10px;}
+.submit-btn{font-size:14px;font-weight:700;padding:12px 30px;background:var(--navy);color:#fff;border:none;border-radius:10px;cursor:pointer;transition:filter .15s;}
+.submit-btn:hover{filter:brightness(1.3);}
+.total-score{margin-top:14px;font-size:16px;color:var(--navy);display:none;}
+.total-score.show{display:block;}
+.total-score span{font-size:26px;font-weight:700;color:var(--teal);}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-badge">🔢</div>
+  <h1>Lesson 2 — Operators &amp; Code Tracing</h1>
+  <div class="hdr-sub">Complete each tab before moving on</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" id="t1" onclick="switchTab(1)">Foundation <span class="badge" id="b1">10</span></div>
+  <div class="tab"        id="t2" onclick="switchTab(2)">Developing <span class="badge" id="b2">10</span></div>
+  <div class="tab"        id="t3" onclick="switchTab(3)">Coding Challenges <span class="badge" id="b3">10</span></div>
+</div>
+
+<!-- ════════════════════════════ TAB 1 ════════════════════════════ -->
+<div class="panel active" id="panel1">
+
+  <!-- Section A -->
+  <div class="sec-hdr">
+    <div class="sec-icon">A</div>
+    <div>
+      <div class="sec-title">Section A — Fill in the Blank</div>
+      <div class="sec-desc">Type the correct operator or symbol in each gap</div>
+    </div>
+    <div class="progress-pill" id="p1a">0 / 5</div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="q-card" id="q1a1">
+    <div class="q-num">Question 1</div>
+    <div class="q-stem">In Python, the symbol used for <strong>multiplication</strong> is: &nbsp;<input class="blank-input" id="i1a1" placeholder="?"></div>
+    <button class="check-btn" onclick="checkBlank('1a1')">Check</button>
+    <div class="q-feedback" id="f1a1"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card" id="q1a2">
+    <div class="q-num">Question 2</div>
+    <div class="q-stem">In Python, the symbol used for <strong>division</strong> is: &nbsp;<input class="blank-input" id="i1a2" placeholder="?"></div>
+    <button class="check-btn" onclick="checkBlank('1a2')">Check</button>
+    <div class="q-feedback" id="f1a2"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card" id="q1a3">
+    <div class="q-num">Question 3</div>
+    <div class="q-stem">Fill in the blank — what symbol goes in the gap?
+      <div class="code-block" style="margin-top:10px;">
+        <span class="ln"><span class="nm">a</span> <span class="op">=</span> <span class="nm">10</span></span>
+        <span class="ln"><span class="nm">b</span> <span class="op">=</span> <span class="nm">3</span></span>
+        <span class="ln"><span class="nm">result</span> <span class="op">=</span> <span class="nm">a</span> <input class="blank-input" id="i1a3" style="width:50px;" placeholder="?"> <span class="nm">b</span></span>
+        <span class="ln"><span class="bi">print</span>(<span class="nm">result</span>)  <span class="cm"># outputs 30</span></span>
+      </div>
+    </div>
+    <button class="check-btn" onclick="checkBlank('1a3')">Check</button>
+    <div class="q-feedback" id="f1a3"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card" id="q1a4">
+    <div class="q-num">Question 4</div>
+    <div class="q-stem">Fill in the comparison symbol — what goes in the gap so the condition is "greater than or equal to"?
+      <div class="code-block" style="margin-top:10px;">
+        <span class="ln"><span class="nm">score</span> <span class="op">=</span> <span class="nm">75</span></span>
+        <span class="ln"><span class="kw">if</span> <span class="nm">score</span> <input class="blank-input" id="i1a4" style="width:60px;" placeholder="?"> <span class="nm">70</span><span class="op">:</span></span>
+        <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"Pass"</span>)</span>
+      </div>
+    </div>
+    <button class="check-btn" onclick="checkBlank('1a4')">Check</button>
+    <div class="q-feedback" id="f1a4"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card" id="q1a5">
+    <div class="q-num">Question 5</div>
+    <div class="q-stem">Fill in the blank — what symbol is needed so this prints <code>True</code> when two values are the <strong>same</strong>?
+      <div class="code-block" style="margin-top:10px;">
+        <span class="ln"><span class="nm">a</span> <span class="op">=</span> <span class="nm">5</span></span>
+        <span class="ln"><span class="nm">b</span> <span class="op">=</span> <span class="nm">5</span></span>
+        <span class="ln"><span class="kw">if</span> <span class="nm">a</span> <input class="blank-input" id="i1a5" style="width:60px;" placeholder="?"> <span class="nm">b</span><span class="op">:</span></span>
+        <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"True"</span>)</span>
+      </div>
+    </div>
+    <button class="check-btn" onclick="checkBlank('1a5')">Check</button>
+    <div class="q-feedback" id="f1a5"></div>
+  </div>
+
+  <div class="sec-score" id="s1a"></div>
+
+  <!-- Section B -->
+  <div class="sec-hdr">
+    <div class="sec-icon">B</div>
+    <div>
+      <div class="sec-title">Section B — What's the Output?</div>
+      <div class="sec-desc">Read the code carefully, then select the correct output</div>
+    </div>
+    <div class="progress-pill" id="p1b">0 / 5</div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card" id="q1b1">
+    <div class="q-num">Question 6</div>
+    <div class="q-stem">What will this program output?</div>
+    <div class="code-block">
+      <span class="ln"><span class="nm">a</span> <span class="op">=</span> <span class="nm">4</span></span>
+      <span class="ln"><span class="nm">b</span> <span class="op">=</span> <span class="nm">8</span></span>
+      <span class="ln"><span class="kw">if</span> <span class="nm">a</span> <span class="op">></span> <span class="nm">b</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"True"</span>)</span>
+      <span class="ln"><span class="kw">else</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"False"</span>)</span>
+    </div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('1b1',this,'False')">False</button>
+      <button class="opt-btn" onclick="checkMCQ('1b1',this,'True')">True</button>
+      <button class="opt-btn" onclick="checkMCQ('1b1',this,'Error')">Error</button>
+      <button class="opt-btn" onclick="checkMCQ('1b1',this,'Nothing')">Nothing</button>
+    </div>
+    <div class="q-feedback" id="f1b1"></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card" id="q1b2">
+    <div class="q-num">Question 7</div>
+    <div class="q-stem">What will this program output?</div>
+    <div class="code-block">
+      <span class="ln"><span class="nm">a</span> <span class="op">=</span> <span class="nm">6</span></span>
+      <span class="ln"><span class="nm">b</span> <span class="op">=</span> <span class="nm">4</span></span>
+      <span class="ln"><span class="kw">if</span> <span class="nm">a</span> <span class="op">></span> <span class="nm">b</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"True"</span>)</span>
+      <span class="ln"><span class="kw">else</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"False"</span>)</span>
+    </div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('1b2',this,'True')">True</button>
+      <button class="opt-btn" onclick="checkMCQ('1b2',this,'False')">False</button>
+      <button class="opt-btn" onclick="checkMCQ('1b2',this,'6')">6</button>
+      <button class="opt-btn" onclick="checkMCQ('1b2',this,'4')">4</button>
+    </div>
+    <div class="q-feedback" id="f1b2"></div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card" id="q1b3">
+    <div class="q-num">Question 8</div>
+    <div class="q-stem">What will this program output?</div>
+    <div class="code-block">
+      <span class="ln"><span class="nm">a</span> <span class="op">=</span> <span class="nm">14</span></span>
+      <span class="ln"><span class="nm">b</span> <span class="op">=</span> <span class="nm">18</span></span>
+      <span class="ln"><span class="kw">if</span> <span class="nm">a</span> <span class="op">&lt;</span> <span class="nm">b</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"True"</span>)</span>
+      <span class="ln"><span class="kw">else</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"False"</span>)</span>
+    </div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('1b3',this,'True')">True</button>
+      <button class="opt-btn" onclick="checkMCQ('1b3',this,'False')">False</button>
+      <button class="opt-btn" onclick="checkMCQ('1b3',this,'14')">14</button>
+      <button class="opt-btn" onclick="checkMCQ('1b3',this,'18')">18</button>
+    </div>
+    <div class="q-feedback" id="f1b3"></div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card" id="q1b4">
+    <div class="q-num">Question 9</div>
+    <div class="q-stem">What will this program output if the user types <code>9</code> then <code>3</code>?</div>
+    <div class="code-block">
+      <span class="ln"><span class="nm">a</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>())</span>
+      <span class="ln"><span class="nm">b</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>())</span>
+      <span class="ln"><span class="nm">c</span> <span class="op">=</span> <span class="nm">a</span> <span class="op">+</span> <span class="nm">b</span></span>
+      <span class="ln"><span class="nm">c</span> <span class="op">=</span> <span class="nm">c</span> <span class="op">*</span> <span class="nm">2</span></span>
+      <span class="ln"><span class="bi">print</span>(<span class="nm">c</span>)</span>
+    </div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('1b4',this,'24')">24</button>
+      <button class="opt-btn" onclick="checkMCQ('1b4',this,'12')">12</button>
+      <button class="opt-btn" onclick="checkMCQ('1b4',this,'6')">6</button>
+      <button class="opt-btn" onclick="checkMCQ('1b4',this,'18')">18</button>
+    </div>
+    <div class="q-feedback" id="f1b4"></div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card" id="q1b5">
+    <div class="q-num">Question 10</div>
+    <div class="q-stem">What will this program output if the user types <code>2</code> then <code>8</code>?</div>
+    <div class="code-block">
+      <span class="ln"><span class="nm">a</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>())</span>
+      <span class="ln"><span class="nm">b</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>())</span>
+      <span class="ln"><span class="nm">c</span> <span class="op">=</span> <span class="nm">a</span> <span class="op">+</span> <span class="nm">b</span></span>
+      <span class="ln"><span class="nm">c</span> <span class="op">=</span> <span class="nm">c</span> <span class="op">*</span> <span class="nm">2</span></span>
+      <span class="ln"><span class="bi">print</span>(<span class="nm">c</span>)</span>
+    </div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('1b5',this,'20')">20</button>
+      <button class="opt-btn" onclick="checkMCQ('1b5',this,'10')">10</button>
+      <button class="opt-btn" onclick="checkMCQ('1b5',this,'16')">16</button>
+      <button class="opt-btn" onclick="checkMCQ('1b5',this,'32')">32</button>
+    </div>
+    <div class="q-feedback" id="f1b5"></div>
+  </div>
+
+  <div class="sec-score" id="s1b"></div>
+  <div class="submit-section">
+    <button class="submit-btn" onclick="submitTab(1)">Submit Tab 1 →</button>
+    <div class="total-score" id="ts1"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ TAB 2 ════════════════════════════ -->
+<div class="panel" id="panel2">
+
+  <div class="sec-hdr">
+    <div class="sec-icon">A</div>
+    <div>
+      <div class="sec-title">Section A — Fill in the Blank</div>
+      <div class="sec-desc">More complex expressions — think carefully</div>
+    </div>
+    <div class="progress-pill" id="p2a">0 / 5</div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="q-card" id="q2a1">
+    <div class="q-num">Question 1</div>
+    <div class="q-stem">What symbol is used to <strong>assign</strong> a value to a variable (not compare)?
+      <div class="code-block" style="margin-top:10px;">
+        <span class="ln"><span class="nm">score</span> <input class="blank-input" id="i2a1" style="width:50px;" placeholder="?"> <span class="nm">100</span></span>
+      </div>
+    </div>
+    <button class="check-btn" onclick="checkBlank('2a1')">Check</button>
+    <div class="q-feedback" id="f2a1"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card" id="q2a2">
+    <div class="q-num">Question 2</div>
+    <div class="q-stem">Fill in the symbol that means <strong>not equal to</strong>:
+      <div class="code-block" style="margin-top:10px;">
+        <span class="ln"><span class="kw">if</span> <span class="nm">a</span> <input class="blank-input" id="i2a2" style="width:60px;" placeholder="?"> <span class="nm">b</span><span class="op">:</span></span>
+        <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"Different"</span>)</span>
+      </div>
+    </div>
+    <button class="check-btn" onclick="checkBlank('2a2')">Check</button>
+    <div class="q-feedback" id="f2a2"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card" id="q2a3">
+    <div class="q-num">Question 3</div>
+    <div class="q-stem">Fill in the blank so the output is <code>4</code>:
+      <div class="code-block" style="margin-top:10px;">
+        <span class="ln"><span class="nm">a</span> <span class="op">=</span> <span class="nm">20</span></span>
+        <span class="ln"><span class="nm">b</span> <span class="op">=</span> <span class="nm">a</span> <input class="blank-input" id="i2a3" style="width:50px;" placeholder="?"> <span class="nm">5</span></span>
+        <span class="ln"><span class="bi">print</span>(<span class="nm">b</span>)  <span class="cm"># outputs 4</span></span>
+      </div>
+    </div>
+    <button class="check-btn" onclick="checkBlank('2a3')">Check</button>
+    <div class="q-feedback" id="f2a3"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card" id="q2a4">
+    <div class="q-num">Question 4</div>
+    <div class="q-stem">Fill in the blank so the output is <code>8</code>:
+      <div class="code-block" style="margin-top:10px;">
+        <span class="ln"><span class="nm">a</span> <span class="op">=</span> <span class="nm">2</span></span>
+        <span class="ln"><span class="nm">b</span> <span class="op">=</span> <span class="nm">a</span> <input class="blank-input" id="i2a4" style="width:50px;" placeholder="?"> <span class="nm">3</span></span>
+        <span class="ln"><span class="bi">print</span>(<span class="nm">b</span>)  <span class="cm"># outputs 8</span></span>
+      </div>
+    </div>
+    <button class="check-btn" onclick="checkBlank('2a4')">Check</button>
+    <div class="q-feedback" id="f2a4"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card" id="q2a5">
+    <div class="q-num">Question 5</div>
+    <div class="q-stem">Fill in the blank — what symbol gives the <strong>remainder</strong> after division? (This is called MOD in pseudocode, <code>%</code> in Python.)
+      <div class="code-block" style="margin-top:10px;">
+        <span class="ln"><span class="nm">a</span> <span class="op">=</span> <span class="nm">17</span></span>
+        <span class="ln"><span class="nm">b</span> <span class="op">=</span> <span class="nm">a</span> <input class="blank-input" id="i2a5" style="width:50px;" placeholder="?"> <span class="nm">5</span></span>
+        <span class="ln"><span class="bi">print</span>(<span class="nm">b</span>)  <span class="cm"># outputs 2</span></span>
+      </div>
+    </div>
+    <button class="check-btn" onclick="checkBlank('2a5')">Check</button>
+    <div class="q-feedback" id="f2a5"></div>
+  </div>
+
+  <div class="sec-score" id="s2a"></div>
+
+  <div class="sec-hdr">
+    <div class="sec-icon">B</div>
+    <div>
+      <div class="sec-title">Section B — What's the Output?</div>
+      <div class="sec-desc">Harder programs — trace through each line carefully</div>
+    </div>
+    <div class="progress-pill" id="p2b">0 / 5</div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card" id="q2b1">
+    <div class="q-num">Question 6</div>
+    <div class="q-stem">What will this output if the user enters <code>9</code> then <code>11</code>?</div>
+    <div class="code-block">
+      <span class="ln"><span class="nm">a</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>())</span>
+      <span class="ln"><span class="nm">b</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>())</span>
+      <span class="ln"><span class="nm">c</span> <span class="op">=</span> <span class="nm">10</span></span>
+      <span class="ln"><span class="kw">if</span> <span class="nm">a</span> <span class="op">></span> <span class="nm">c</span> <span class="kw">and</span> <span class="nm">b</span> <span class="op">></span> <span class="nm">c</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"Both large"</span>)</span>
+      <span class="ln"><span class="kw">elif</span> <span class="nm">a</span> <span class="op">></span> <span class="nm">c</span> <span class="kw">or</span> <span class="nm">b</span> <span class="op">></span> <span class="nm">c</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"One large"</span>)</span>
+      <span class="ln"><span class="kw">else</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"Both small"</span>)</span>
+    </div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('2b1',this,'One large')">One large</button>
+      <button class="opt-btn" onclick="checkMCQ('2b1',this,'Both large')">Both large</button>
+      <button class="opt-btn" onclick="checkMCQ('2b1',this,'Both small')">Both small</button>
+      <button class="opt-btn" onclick="checkMCQ('2b1',this,'Error')">Error</button>
+    </div>
+    <div class="q-feedback" id="f2b1"></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card" id="q2b2">
+    <div class="q-num">Question 7</div>
+    <div class="q-stem">What will this output if the user enters <code>12</code> then <code>14</code>?</div>
+    <div class="code-block">
+      <span class="ln"><span class="nm">a</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>())</span>
+      <span class="ln"><span class="nm">b</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>())</span>
+      <span class="ln"><span class="nm">c</span> <span class="op">=</span> <span class="nm">10</span></span>
+      <span class="ln"><span class="kw">if</span> <span class="nm">a</span> <span class="op">></span> <span class="nm">c</span> <span class="kw">and</span> <span class="nm">b</span> <span class="op">></span> <span class="nm">c</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"Both large"</span>)</span>
+      <span class="ln"><span class="kw">elif</span> <span class="nm">a</span> <span class="op">></span> <span class="nm">c</span> <span class="kw">or</span> <span class="nm">b</span> <span class="op">></span> <span class="nm">c</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"One large"</span>)</span>
+      <span class="ln"><span class="kw">else</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"Both small"</span>)</span>
+    </div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('2b2',this,'Both large')">Both large</button>
+      <button class="opt-btn" onclick="checkMCQ('2b2',this,'One large')">One large</button>
+      <button class="opt-btn" onclick="checkMCQ('2b2',this,'Both small')">Both small</button>
+      <button class="opt-btn" onclick="checkMCQ('2b2',this,'12')">12</button>
+    </div>
+    <div class="q-feedback" id="f2b2"></div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card" id="q2b3">
+    <div class="q-num">Question 8</div>
+    <div class="q-stem">What will this output if the user enters <code>14</code>, <code>26</code>, <code>23</code>?</div>
+    <div class="code-block">
+      <span class="ln"><span class="nm">a</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>())</span>
+      <span class="ln"><span class="nm">b</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>())</span>
+      <span class="ln"><span class="nm">c</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>())</span>
+      <span class="ln"><span class="kw">if</span> <span class="nm">a</span> <span class="op">></span> <span class="nm">b</span> <span class="kw">and</span> <span class="nm">a</span> <span class="op">></span> <span class="nm">c</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="nm">a</span>)</span>
+      <span class="ln"><span class="kw">elif</span> <span class="nm">b</span> <span class="op">></span> <span class="nm">a</span> <span class="kw">and</span> <span class="nm">b</span> <span class="op">></span> <span class="nm">c</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="nm">b</span>)</span>
+      <span class="ln"><span class="kw">else</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="nm">c</span>)</span>
+    </div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('2b3',this,'26')">26</button>
+      <button class="opt-btn" onclick="checkMCQ('2b3',this,'14')">14</button>
+      <button class="opt-btn" onclick="checkMCQ('2b3',this,'23')">23</button>
+      <button class="opt-btn" onclick="checkMCQ('2b3',this,'63')">63</button>
+    </div>
+    <div class="q-feedback" id="f2b3"></div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card" id="q2b4">
+    <div class="q-num">Question 9</div>
+    <div class="q-stem">What will this output? (Tip: work out <code>a + b</code> and <code>b + c</code> first, then compare them)</div>
+    <div class="code-block">
+      <span class="ln"><span class="nm">a</span> <span class="op">=</span> <span class="nm">6</span></span>
+      <span class="ln"><span class="nm">b</span> <span class="op">=</span> <span class="nm">2</span></span>
+      <span class="ln"><span class="nm">c</span> <span class="op">=</span> <span class="nm">4</span></span>
+      <span class="ln"><span class="kw">if</span> <span class="nm">a</span> <span class="op">+</span> <span class="nm">b</span> <span class="op">></span> <span class="nm">b</span> <span class="op">+</span> <span class="nm">c</span> <span class="kw">or</span> <span class="nm">a</span> <span class="op">+</span> <span class="nm">c</span> <span class="op">></span> <span class="nm">b</span> <span class="op">+</span> <span class="nm">c</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"True"</span>)</span>
+      <span class="ln"><span class="kw">else</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="st">"False"</span>)</span>
+    </div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('2b4',this,'True')">True</button>
+      <button class="opt-btn" onclick="checkMCQ('2b4',this,'False')">False</button>
+      <button class="opt-btn" onclick="checkMCQ('2b4',this,'8')">8</button>
+      <button class="opt-btn" onclick="checkMCQ('2b4',this,'6')">6</button>
+    </div>
+    <div class="q-feedback" id="f2b4"></div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card" id="q2b5">
+    <div class="q-num">Question 10</div>
+    <div class="q-stem">What will this output if the user enters <code>10</code>, <code>6</code>, <code>4</code>?</div>
+    <div class="code-block">
+      <span class="ln"><span class="nm">a</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>())</span>
+      <span class="ln"><span class="nm">b</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>())</span>
+      <span class="ln"><span class="nm">c</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>())</span>
+      <span class="ln"><span class="kw">if</span> <span class="nm">a</span> <span class="op">>=</span> <span class="nm">c</span> <span class="kw">or</span> <span class="nm">b</span> <span class="op">>=</span> <span class="nm">c</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> <span class="nm">b</span> <span class="op">!=</span> <span class="nm">c</span> <span class="kw">or</span> <span class="nm">a</span> <span class="op">==</span> <span class="nm">b</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="nm">a</span> <span class="op">+</span> <span class="nm">b</span>)</span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="nm">a</span> <span class="op">+</span> <span class="nm">c</span>)</span>
+      <span class="ln"><span class="kw">else</span><span class="op">:</span></span>
+      <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span>(<span class="nm">b</span> <span class="op">+</span> <span class="nm">c</span>)</span>
+    </div>
+    <div class="options">
+      <button class="opt-btn" onclick="checkMCQ('2b5',this,'16')">16</button>
+      <button class="opt-btn" onclick="checkMCQ('2b5',this,'14')">14</button>
+      <button class="opt-btn" onclick="checkMCQ('2b5',this,'10')">10</button>
+      <button class="opt-btn" onclick="checkMCQ('2b5',this,'6')">6</button>
+    </div>
+    <div class="q-feedback" id="f2b5"></div>
+  </div>
+
+  <div class="sec-score" id="s2b"></div>
+  <div class="submit-section">
+    <button class="submit-btn" onclick="submitTab(2)">Submit Tab 2 →</button>
+    <div class="total-score" id="ts2"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ TAB 3 ════════════════════════════ -->
+<div class="panel" id="panel3">
+
+  <div class="sec-hdr">
+    <div class="sec-icon">💻</div>
+    <div>
+      <div class="sec-title">Coding Challenges</div>
+      <div class="sec-desc">Write and run real Python — press Run to test your code</div>
+    </div>
+    <div class="engine-note" id="eng-note"><span class="spinner"></span>Loading Python engine…</div>
+  </div>
+
+  <!-- C1 -->
+  <div class="challenge-card">
+    <div class="challenge-hdr">
+      <span class="c-num">Challenge 1</span>
+      <span class="c-title">Arithmetic Operators</span>
+    </div>
+    <div class="challenge-body">
+      <p>Use the four main arithmetic operators to calculate and print four results. The starter code shows you the first one.</p>
+      <div class="task-box">
+        <strong>Your task:</strong> Given <code>a = 12</code> and <code>b = 4</code>, print:<br>
+        the result of <code>a + b</code>, then <code>a - b</code>, then <code>a * b</code>, then <code>a / b</code>
+      </div>
+      <div class="editor-wrap">
+        <textarea id="c1-editor" spellcheck="false">a = 12
+b = 4
+print(a + b)
+# Add three more print lines below:
+</textarea>
+      </div>
+      <div class="c-footer">
+        <button class="run-btn" id="c1-run" disabled onclick="runChallenge(1)">▶ Run</button>
+        <button class="reset-btn" onclick="resetChallenge(1,'a = 12\nb = 4\nprint(a + b)\n# Add three more print lines below:\n')">↺ Reset</button>
+      </div>
+      <div class="output-box" id="c1-out"></div>
+    </div>
+  </div>
+
+  <!-- C2 -->
+  <div class="challenge-card">
+    <div class="challenge-hdr">
+      <span class="c-num">Challenge 2</span>
+      <span class="c-title">Powers and Remainders</span>
+    </div>
+    <div class="challenge-body">
+      <p>Practise using <code>**</code> (power) and <code>%</code> (modulo / remainder).</p>
+      <div class="task-box">
+        <strong>Your task:</strong><br>
+        • Print <code>2 ** 4</code> (2 to the power of 4)<br>
+        • Print <code>17 % 5</code> (the remainder when 17 is divided by 5)<br>
+        • Print <code>3 ** 3</code> (3 cubed)
+      </div>
+      <div class="editor-wrap">
+        <textarea id="c2-editor" spellcheck="false"># Use ** for power and % for remainder
+print(2 ** 4)
+# Add your other two lines:
+</textarea>
+      </div>
+      <div class="c-footer">
+        <button class="run-btn" id="c2-run" disabled onclick="runChallenge(2)">▶ Run</button>
+        <button class="reset-btn" onclick="resetChallenge(2,'# Use ** for power and % for remainder\nprint(2 ** 4)\n# Add your other two lines:\n')">↺ Reset</button>
+      </div>
+      <div class="output-box" id="c2-out"></div>
+    </div>
+  </div>
+
+  <!-- C3 -->
+  <div class="challenge-card">
+    <div class="challenge-hdr">
+      <span class="c-num">Challenge 3</span>
+      <span class="c-title">Simple if / else</span>
+    </div>
+    <div class="challenge-body">
+      <p>Write a program that checks whether a number is greater than 10. The structure is started for you — complete it.</p>
+      <div class="task-box">
+        <strong>Your task:</strong> Set <code>number = 15</code>. If it is greater than 10, print <code>"Big number"</code>. Otherwise print <code>"Small number"</code>.
+        Try changing the value to test both branches.
+      </div>
+      <div class="editor-wrap">
+        <textarea id="c3-editor" spellcheck="false">number = 15
+if number > 10:
+    print("Big number")
+# Add the else branch:
+</textarea>
+      </div>
+      <div class="c-footer">
+        <button class="run-btn" id="c3-run" disabled onclick="runChallenge(3)">▶ Run</button>
+        <button class="reset-btn" onclick="resetChallenge(3,'number = 15\nif number > 10:\n    print(\"Big number\")\n# Add the else branch:\n')">↺ Reset</button>
+      </div>
+      <div class="output-box" id="c3-out"></div>
+    </div>
+  </div>
+
+  <!-- C4 -->
+  <div class="challenge-card">
+    <div class="challenge-hdr">
+      <span class="c-num">Challenge 4</span>
+      <span class="c-title">Grade Calculator</span>
+    </div>
+    <div class="challenge-body">
+      <p>Use <code>if</code>, <code>elif</code>, and <code>else</code> to build a grade boundary checker. You need three conditions.</p>
+      <div class="task-box">
+        <strong>Your task:</strong><br>
+        Set <code>mark</code> to any number. Then:<br>
+        • If mark is <code>>=</code> 70, print <code>"Distinction"</code><br>
+        • Else if mark is <code>>=</code> 50, print <code>"Pass"</code><br>
+        • Otherwise print <code>"Not yet"</code>
+      </div>
+      <div class="editor-wrap">
+        <textarea id="c4-editor" spellcheck="false">mark = 65
+if mark >= 70:
+    print("Distinction")
+# Add elif and else:
+</textarea>
+      </div>
+      <div class="c-footer">
+        <button class="run-btn" id="c4-run" disabled onclick="runChallenge(4)">▶ Run</button>
+        <button class="reset-btn" onclick="resetChallenge(4,'mark = 65\nif mark >= 70:\n    print(\"Distinction\")\n# Add elif and else:\n')">↺ Reset</button>
+      </div>
+      <div class="output-box" id="c4-out"></div>
+    </div>
+  </div>
+
+  <!-- C5 -->
+  <div class="challenge-card">
+    <div class="challenge-hdr">
+      <span class="c-num">Challenge 5</span>
+      <span class="c-title">Extension — Biggest Number</span>
+    </div>
+    <div class="challenge-body">
+      <p>This is the toughest challenge. You need to compare three variables and print the largest one. Think carefully about which conditions you need.</p>
+      <div class="task-box">
+        <strong>Your task:</strong> Given <code>a = 14</code>, <code>b = 26</code>, <code>c = 23</code> — write an <code>if / elif / else</code> program that prints whichever is the biggest value. Try changing the numbers to test all three branches.
+      </div>
+      <div class="editor-wrap">
+        <textarea id="c5-editor" spellcheck="false">a = 14
+b = 26
+c = 23
+# Write your if / elif / else below:
+</textarea>
+      </div>
+      <div class="c-footer">
+        <button class="run-btn" id="c5-run" disabled onclick="runChallenge(5)">▶ Run</button>
+        <button class="reset-btn" onclick="resetChallenge(5,'a = 14\nb = 26\nc = 23\n# Write your if / elif / else below:\n')">↺ Reset</button>
+      </div>
+      <div class="output-box" id="c5-out"></div>
+    </div>
+  </div>
+
+  <!-- C6 -->
+  <div class="challenge-card">
+    <div class="challenge-hdr">
+      <span class="c-num">Challenge 6</span>
+      <span class="c-title">Even or Odd</span>
+    </div>
+    <div class="challenge-body">
+      <p>Use the <code>%</code> operator to check if a number is even or odd. A number is even if the remainder when divided by 2 is 0.</p>
+      <div class="task-box">
+        <strong>Starting variables — write the rest yourself:</strong><br>
+        <code>number = 17</code><br><br>
+        If the remainder of <code>number % 2</code> equals 0, print <code>"Even"</code>. Otherwise print <code>"Odd"</code>.
+        Try changing number to test both outputs.
+      </div>
+      <div class="editor-wrap">
+        <textarea id="c6-editor" spellcheck="false">number = 17
+</textarea>
+      </div>
+      <div class="c-footer">
+        <button class="run-btn" id="c6-run" disabled onclick="runChallenge(6)">&#9654; Run</button>
+        <button class="reset-btn" onclick="resetChallenge(6,'number = 17\n')">&#8635; Reset</button>
+      </div>
+      <div class="output-box" id="c6-out"></div>
+    </div>
+  </div>
+
+  <!-- C7 -->
+  <div class="challenge-card">
+    <div class="challenge-hdr">
+      <span class="c-num">Challenge 7</span>
+      <span class="c-title">Temperature Check</span>
+    </div>
+    <div class="challenge-body">
+      <p>Temperatures fall into three categories — hot, warm, or cold. Your program should read a temperature and decide which category it belongs to.</p>
+      <div class="task-box">
+        <strong>Starting variable — write the rest yourself:</strong><br>
+        <code>temp = 22</code><br><br>
+        When you run it with 35 it should print <code>"Hot"</code>, with 22 it should print <code>"Warm"</code>, and with 8 it should print <code>"Cold"</code>. Think about where the boundaries between categories should be.
+      </div>
+      <div class="editor-wrap">
+        <textarea id="c7-editor" spellcheck="false">temp = 22
+</textarea>
+      </div>
+      <div class="c-footer">
+        <button class="run-btn" id="c7-run" disabled onclick="runChallenge(7)">&#9654; Run</button>
+        <button class="reset-btn" onclick="resetChallenge(7,'temp = 22\n')">&#8635; Reset</button>
+      </div>
+      <div class="output-box" id="c7-out"></div>
+    </div>
+  </div>
+
+  <!-- C8 -->
+  <div class="challenge-card">
+    <div class="challenge-hdr">
+      <span class="c-num">Challenge 8</span>
+      <span class="c-title">Ticket Price Calculator</span>
+    </div>
+    <div class="challenge-body">
+      <p>A cinema charges different prices depending on the customer's age. Children pay less, adults pay full price, and there's a rate in between for teenagers.</p>
+      <div class="task-box">
+        <strong>Starting variable — write the rest yourself:</strong><br>
+        <code>age = 14</code><br><br>
+        Your program should print <code>"Ticket costs £"</code> followed by the correct price. When you test with age 8 it should cost £4, age 14 should cost £6, and age 30 should cost £9.
+      </div>
+      <div class="editor-wrap">
+        <textarea id="c8-editor" spellcheck="false">age = 14
+</textarea>
+      </div>
+      <div class="c-footer">
+        <button class="run-btn" id="c8-run" disabled onclick="runChallenge(8)">&#9654; Run</button>
+        <button class="reset-btn" onclick="resetChallenge(8,'age = 14\n')">&#8635; Reset</button>
+      </div>
+      <div class="output-box" id="c8-out"></div>
+    </div>
+  </div>
+
+  <!-- C9 -->
+  <div class="challenge-card">
+    <div class="challenge-hdr">
+      <span class="c-num">Challenge 9</span>
+      <span class="c-title">Score Multiplier</span>
+    </div>
+    <div class="challenge-body">
+      <p>A game multiplies a base score to calculate a final total, then rates that total as high, medium, or low. You will need to use a multiplication operator before writing your selection.</p>
+      <div class="task-box">
+        <strong>Starting variables — write the rest yourself:</strong><br>
+        <code>base_score = 45</code><br>
+        <code>multiplier = 3</code><br><br>
+        Your program should print the total score and then a rating. Try different values of <code>base_score</code> and <code>multiplier</code> to make sure all three ratings can be reached.
+      </div>
+      <div class="editor-wrap">
+        <textarea id="c9-editor" spellcheck="false">base_score = 45
+multiplier = 3
+</textarea>
+      </div>
+      <div class="c-footer">
+        <button class="run-btn" id="c9-run" disabled onclick="runChallenge(9)">&#9654; Run</button>
+        <button class="reset-btn" onclick="resetChallenge(9,'base_score = 45\nmultiplier = 3\n')">&#8635; Reset</button>
+      </div>
+      <div class="output-box" id="c9-out"></div>
+    </div>
+  </div>
+
+  <!-- C10 -->
+  <div class="challenge-card">
+    <div class="challenge-hdr">
+      <span class="c-num">Challenge 10</span>
+      <span class="c-title">Extension — Power Check</span>
+    </div>
+    <div class="challenge-body">
+      <p>The <code>**</code> operator raises a number to a power. Your program should calculate a result and check whether it hits a specific target value — then investigate whether that target is even reachable.</p>
+      <div class="task-box">
+        <strong>Starting variables — write the rest yourself:</strong><br>
+        <code>base = 3</code><br>
+        <code>exponent = 4</code><br><br>
+        Raise <code>base</code> to the power of <code>exponent</code> and print the result along with a message saying whether it equals 100 or not. Then experiment with different values — can you find whole number values of base and exponent that give exactly 100?
+      </div>
+      <div class="editor-wrap">
+        <textarea id="c10-editor" spellcheck="false">base = 3
+exponent = 4
+</textarea>
+      </div>
+      <div class="c-footer">
+        <button class="run-btn" id="c10-run" disabled onclick="runChallenge(10)">&#9654; Run</button>
+        <button class="reset-btn" onclick="resetChallenge(10,'base = 3\nexponent = 4\n')">&#8635; Reset</button>
+      </div>
+      <div class="output-box" id="c10-out"></div>
+    </div>
+  </div>
+
+
+</div>
+
+<!-- ════════════════════════════ SCRIPTS ════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+/* ── Tab switching ── */
+window.switchTab=function(n){
+  [1,2,3].forEach(function(i){
+    document.getElementById('panel'+i).classList.toggle('active',i===n);
+    document.getElementById('t'+i).classList.toggle('active',i===n);
+  });
+};
+
+/* ── Score tracking ── */
+var scores={};
+
+/* ── Fill-in-blank ── */
+var blankData={
+  '1a1':{ans:'*',   ok:'Correct! <code>*</code> is multiplication in Python. Example: <code>3 * 4</code> gives <code>12</code>.'},
+  '1a2':{ans:'/',   ok:'Correct! <code>/</code> is division. Example: <code>10 / 2</code> gives <code>5.0</code>.'},
+  '1a3':{ans:'*',   ok:'Correct! <code>10 * 3 = 30</code>. The <code>*</code> operator multiplies two values.'},
+  '1a4':{ans:'>=',  ok:'Correct! <code>>=</code> means greater than or equal to. So <code>75 >= 70</code> is True and "Pass" is printed.'},
+  '1a5':{ans:'==',  ok:'Correct! <code>==</code> compares two values. Remember: <code>=</code> assigns a value, <code>==</code> checks if they are equal.'},
+  '2a1':{ans:'=',   ok:'Correct! A single <code>=</code> assigns a value. <code>score = 100</code> stores 100. <code>==</code> would compare, not assign.'},
+  '2a2':{ans:'!=',  ok:'Correct! <code>!=</code> means not equal to. The <code>!</code> means NOT in many programming languages.'},
+  '2a3':{ans:'/',   ok:'Correct! <code>20 / 5 = 4</code>. In Python 3 division returns a float, so the output is <code>4.0</code> — but 4 is accepted here.'},
+  '2a4':{ans:'**',  ok:'Correct! <code>**</code> is the power operator. <code>2 ** 3</code> = 2 × 2 × 2 = 8.'},
+  '2a5':{ans:'%',   ok:'Correct! <code>%</code> is modulo (remainder). <code>17 % 5 = 2</code> because 17 ÷ 5 = 3 remainder 2. Pseudocode writes this as <code>17 MOD 5</code>.'}
+};
+
+window.checkBlank=function(id){
+  var data=blankData[id];
+  if(!data)return;
+  var correct=data.ans, okMsg=data.ok;
+  var inp=document.getElementById('i'+id);
+  var fb=document.getElementById('f'+id);
+  var card=document.getElementById('q'+id);
+  var val=inp.value.trim();
+  var isOk=(val===correct);
+  inp.className='blank-input '+(isOk?'correct-input':'wrong-input');
+  fb.className='q-feedback show '+(isOk?'ok':'bad');
+  card.className='q-card '+(isOk?'correct':'wrong');
+  fb.innerHTML=isOk?('✓ '+okMsg):('✗ Not quite. The correct answer is <code>'+correct+'</code>. '+okMsg);
+  inp.disabled=true;
+  var btns=card.querySelectorAll('.check-btn');
+  btns.forEach(function(b){b.disabled=true;});
+  scores[id]=isOk?1:0;
+  updateSectionProgress(id);
+};
+
+/* ── MCQ ── */
+var mcqAnswers={
+  '1b1':'False','1b2':'True','1b3':'True','1b4':'24','1b5':'20',
+  '2b1':'One large','2b2':'Both large','2b3':'26','2b4':'True','2b5':'16'
+};
+var mcqFeedback={
+  '1b1':'<code>a = 4</code>, <code>b = 8</code>. Is 4 > 8? No — so the <code>else</code> branch runs and prints <code>False</code>.',
+  '1b2':'<code>a = 6</code>, <code>b = 4</code>. Is 6 > 4? Yes — so the <code>if</code> branch runs and prints <code>True</code>.',
+  '1b3':'<code>a = 14</code>, <code>b = 18</code>. Is 14 < 18? Yes — so prints <code>True</code>.',
+  '1b4':'<code>a = 9</code>, <code>b = 3</code>. <code>c = 9 + 3 = 12</code>. Then <code>c = 12 * 2 = 24</code>. So prints <code>24</code>.',
+  '1b5':'<code>a = 2</code>, <code>b = 8</code>. <code>c = 2 + 8 = 10</code>. Then <code>c = 10 * 2 = 20</code>. So prints <code>20</code>.',
+  '2b1':'<code>a = 9</code>, <code>b = 11</code>, <code>c = 10</code>. Is 9 > 10? No. Is 11 > 10? Yes. So the <code>elif</code> (OR) condition is True → prints <code>One large</code>.',
+  '2b2':'<code>a = 12</code>, <code>b = 14</code>, <code>c = 10</code>. Is 12 > 10? Yes. Is 14 > 10? Yes. Both conditions are true → prints <code>Both large</code>.',
+  '2b3':'<code>a = 14</code>, <code>b = 26</code>, <code>c = 23</code>. Is 14 > 26 and 14 > 23? No. Is 26 > 14 and 26 > 23? Yes → prints <code>b</code> which is <code>26</code>.',
+  '2b4':'<code>a+b = 8</code>, <code>b+c = 6</code>, <code>a+c = 10</code>. Is 8 > 6? Yes (first OR condition is True) → prints <code>True</code>.',
+  '2b5':'<code>a=10, b=6, c=4</code>. Outer: is 10>=4 or 6>=4? Yes. Inner: is 6!=4 or 10==6? 6!=4 is True → prints <code>a+b = 16</code>.'
+};
+
+window.checkMCQ=function(id,btn,chosen){
+  var card=document.getElementById('q'+id);
+  var fb=document.getElementById('f'+id);
+  var correct=mcqAnswers[id];
+  var isOk=(chosen===correct);
+  // Disable all buttons in this card
+  card.querySelectorAll('.opt-btn').forEach(function(b){
+    b.disabled=true;
+    if(b.textContent.trim()===correct)b.className='opt-btn reveal-correct';
+  });
+  btn.className='opt-btn '+(isOk?'selected-correct':'selected-wrong');
+  card.className='q-card '+(isOk?'correct':'wrong');
+  fb.className='q-feedback show '+(isOk?'ok':'bad');
+  fb.innerHTML=(isOk?'✓ Correct! ':'✗ Not quite — the answer is <code>'+correct+'</code>. ')+mcqFeedback[id];
+  scores[id]=isOk?1:0;
+  updateSectionProgress(id);
+};
+
+function updateSectionProgress(id){
+  // id format: 1a1, 1b3, 2a2 etc.
+  var tab=id[0];
+  var sec=id[1];
+  var key=tab+sec;
+  // count answered in this section
+  var prefix=tab+sec;
+  var total=0,done=0,correct=0;
+  for(var k in scores){
+    if(k.startsWith(prefix)){total++;done++;if(scores[k])correct++;}
+  }
+  // section has 5 questions
+  var pill=document.getElementById('p'+key);
+  if(pill)pill.textContent=correct+' / 5';
+}
+
+window.submitTab=function(n){
+  // Tally all questions in this tab
+  var total=0,correct=0;
+  for(var k in scores){if(k[0]==n){total++;if(scores[k])correct++;}}
+  var el=document.getElementById('ts'+n);
+  el.className='total-score show';
+  var msg=correct>=8?'🎉 Excellent!':correct>=6?'👍 Good work!':correct>=4?'⚡ Keep going!':'📚 Review and retry';
+  el.innerHTML=msg+' You scored <span>'+correct+' / '+total+'</span> on Tab '+n;
+  if(n<3){
+    setTimeout(function(){switchTab(n+1);},800);
+  }
+};
+
+/* ── PYODIDE ── */
+var WORKER_SRC=[
+'self.pyodideReady=false;',
+'importScripts("https://cdn.jsdelivr.net/pyodide/v0.26.3/full/pyodide.js");',
+'async function init(){try{self.pyodide=await loadPyodide({indexURL:"https://cdn.jsdelivr.net/pyodide/v0.26.3/full/"});',
+'self.pyodideReady=true;self.postMessage({type:"ready"});}catch(e){self.postMessage({type:"err",msg:String(e)});}}',
+'init();',
+'self.onmessage=function(e){',
+'  if(!self.pyodideReady){self.postMessage({id:e.data.id,ok:false,out:"Engine still loading."});return;}',
+'  try{',
+'    self.pyodide.runPython("import sys,io;sys.stdout=io.StringIO()");',
+'    self.pyodide.runPython(e.data.code);',
+'    var out=self.pyodide.runPython("sys.stdout.getvalue()");',
+'    self.postMessage({id:e.data.id,ok:true,out:out});',
+'  }catch(err){self.postMessage({id:e.data.id,ok:false,out:String(err)});}',
+'};'
+].join('\n');
+
+var workerBlob=URL.createObjectURL(new Blob([WORKER_SRC],{type:'application/javascript'}));
+var worker=new Worker(workerBlob);
+var pyReady=false,pending=null,pendingTimer=null;
+
+worker.onmessage=function(e){
+  if(e.data.type==='ready'){
+    pyReady=true;
+    document.getElementById('eng-note').innerHTML='<span style="color:var(--pass);font-weight:600;">✓ Python ready</span>';
+    [1,2,3,4,5,6,7,8,9,10].forEach(function(i){var b=document.getElementById('c'+i+'-run');if(b)b.disabled=false;});
+    return;
+  }
+  if(e.data.type==='err'){document.getElementById('eng-note').textContent='⚠ Engine error';return;}
+  if(pending){clearTimeout(pendingTimer);var r=pending;pending=null;pendingTimer=null;r(e.data);}
+};
+
+function callWorker(code){
+  return new Promise(function(res){
+    pending=res;
+    pendingTimer=setTimeout(function(){pending=null;res({ok:false,out:'Timed out — check for infinite loops.'});},6000);
+    worker.postMessage({id:Date.now(),code:code});
+  });
+}
+
+window.runChallenge=function(n){
+  var code=document.getElementById('c'+n+'-editor').value;
+  var outEl=document.getElementById('c'+n+'-out');
+  var btn=document.getElementById('c'+n+'-run');
+  outEl.className='output-box show';outEl.textContent='Running…';btn.disabled=true;
+  callWorker(code).then(function(res){
+    btn.disabled=false;
+    outEl.textContent=res.out||'(no output)';
+    outEl.className='output-box show'+(res.ok?'':' has-error');
+  });
+};
+
+window.resetChallenge=function(n,starter){
+  document.getElementById('c'+n+'-editor').value=starter;
+  var outEl=document.getElementById('c'+n+'-out');
+  outEl.className='output-box';outEl.textContent='';
+};
+
+})();
+</script>
+</body>
+</html>

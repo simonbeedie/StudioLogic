@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crane Control — Level 3: Two Deliveries</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f0ff;
+    --card: #ffffff;
+    --border: #d8cef0;
+    --text: #1a0a2e;
+    --muted: #5a4a7a;
+    --hint: #9a8aba;
+    --purple: #534AB7;
+    --purple-dark: #3C3489;
+    --purple-bg: #EEEDFE;
+    --purple-text: #26215C;
+    --purple-border: #CECBF6;
+    --green: #1D9E75;
+    --green-bg: #e8f7f0;
+    --green-text: #0d6e47;
+    --green-border: #9fe1cb;
+    --red-bg: #fdeaea;
+    --red-text: #922020;
+    --red-border: #f7c1c1;
+    --warn-bg: #faeeda;
+    --warn-text: #633806;
+    --warn-border: #FAC775;
+    --info-bg: #e6f1fb;
+    --info-text: #0c447c;
+    --info-border: #b5d4f4;
+  }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  header { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; gap: 1rem; height: 56px; }
+  .level-pill { background: var(--purple-bg); color: var(--purple-text); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; }
+  header h1 { font-size: 16px; font-weight: 600; }
+  .main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+  .main-top { grid-column: 1 / -1; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem; }
+  .card h2 { font-size: 18px; font-weight: 600; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px; }
+  .card p { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 0.75rem; }
+  .card p:last-child { margin-bottom: 0; }
+  .task-box { background: var(--purple-bg); border: 1px solid var(--purple-border); border-radius: 10px; padding: 1rem 1.25rem; margin-top: 0.75rem; }
+  .task-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--purple); margin-bottom: 6px; }
+  .task-box p { color: var(--purple-text); margin: 0; font-size: 14px; }
+  .delivery-status { display: flex; gap: 10px; margin-top: 0.75rem; flex-wrap: wrap; }
+  .del-chip { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; border: 1px solid var(--border); background: #f0eeff; color: var(--muted); transition: all 0.3s; }
+  .del-chip.done { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
+  .del-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hint); transition: background 0.3s; flex-shrink: 0; }
+  .del-chip.done .dot { background: var(--green); }
+  .steps-list { list-style: none; counter-reset: steps; margin-top: 0.75rem; }
+  .steps-list li { counter-increment: steps; display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--muted); margin-bottom: 8px; line-height: 1.6; }
+  .steps-list li::before { content: counter(steps); min-width: 22px; height: 22px; background: var(--purple); color: white; border-radius: 50%; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .syntax-box { background: #1e1e2e; border-radius: 10px; padding: 1rem 1.25rem; margin-top: 0.75rem; }
+  .syntax-box .syntax-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #7f77dd; margin-bottom: 8px; }
+  .syn { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 2; color: #cdd6f4; display: block; }
+  .sk { color: #cba6f7; } .sf { color: #89b4fa; } .sn { color: #fab387; } .sc { color: #6c7086; }
+  .scene-wrapper { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1rem; margin-bottom: 1rem; }
+  .scene-wrapper canvas { display: block; width: 100%; border-radius: 8px; border: 1px solid var(--border); }
+  .controls-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; }
+  .controls-card h3 { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .type-input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+  .line-num { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--hint); min-width: 18px; text-align: right; }
+  .code-input { font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; background: #f8f5ff; color: var(--text); width: 100%; outline: none; }
+  .code-input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(83,74,183,0.12); }
+  .del-btn { background: none; border: none; color: var(--hint); cursor: pointer; font-size: 16px; line-height: 1; padding: 0 4px; flex-shrink: 0; }
+  .del-btn:hover { color: #922020; }
+  .add-line-btn { font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 6px 12px; background: none; border: 1px dashed var(--purple-border); border-radius: 8px; cursor: pointer; color: var(--purple); margin-top: 5px; width: 100%; text-align: left; }
+  .add-line-btn:hover { background: var(--purple-bg); }
+  .program-display { background: #f8f5ff; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; min-height: 60px; margin: 1rem 0; font-family: 'JetBrains Mono', monospace; }
+  .prog-line { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+  .prog-num { color: var(--hint); font-size: 12px; min-width: 18px; }
+  .prog-text { font-size: 13px; color: var(--text); flex: 1; }
+  .prog-empty { font-size: 13px; color: var(--hint); padding: 8px 0; }
+  .btn-row { display: flex; gap: 8px; }
+  .run-btn { background: var(--purple); color: white; border: none; border-radius: 10px; padding: 10px 24px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .run-btn:hover { background: var(--purple-dark); }
+  .run-btn:active { transform: scale(0.98); }
+  .clear-btn { background: none; border: 1px solid var(--border); border-radius: 10px; padding: 10px 18px; font-size: 14px; cursor: pointer; color: var(--muted); font-family: 'Inter', sans-serif; }
+  .clear-btn:hover { background: #f0eeff; }
+  .feedback { margin-top: 1rem; border-radius: 10px; padding: 12px 16px; font-size: 14px; line-height: 1.6; display: none; }
+  .feedback.success { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
+  .feedback.fail { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border); }
+  .feedback.warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
+  .feedback.info { background: var(--info-bg); color: var(--info-text); border: 1px solid var(--info-border); }
+  code { font-family: 'JetBrains Mono', monospace; background: rgba(0,0,0,0.07); padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+  @media (max-width: 700px) { .main { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <span class="level-pill">Level 3</span>
+  <h1>Crane Control — Two Deliveries</h1>
+</header>
+<div class="main">
+  <div class="main-top">
+    <div class="card">
+      <h2>🏆 Your mission</h2>
+      <p>The hardest challenge yet. There are <strong>two balls</strong> and <strong>two baskets</strong>. You must deliver each ball to its matching basket — the red ball to the red basket, the blue ball to the blue basket.</p>
+      <p>There are no command buttons this time. You must <strong>type all your instructions</strong>, including the new <code>repeat()</code> command. Think carefully about reusing patterns in your code.</p>
+      <div class="task-box">
+        <div class="task-label">Task — two deliveries</div>
+        <p>Red ball (col 1, row 5) → Red basket (col 4) &nbsp;|&nbsp; Blue ball (col 7, row 4) → Blue basket (col 9)</p>
+      </div>
+      <div class="delivery-status">
+        <div class="del-chip" id="del-red"><div class="dot"></div> Red ball → basket</div>
+        <div class="del-chip" id="del-blue"><div class="dot"></div> Blue ball → basket</div>
+      </div>
+      <div class="syntax-box" style="margin-top:1rem;">
+        <div class="syntax-label">Command reference</div>
+        <span class="syn"><span class="sf">move_right</span>(<span class="sn">3</span>) <span class="sc"># slide crane right 3 units</span></span>
+        <span class="syn"><span class="sf">move_left</span>(<span class="sn">2</span>) <span class="sc"># slide crane left 2 units</span></span>
+        <span class="syn"><span class="sf">lower_hook</span>(<span class="sn">4</span>) <span class="sc"># lower cable 4 rows</span></span>
+        <span class="syn"><span class="sf">raise_hook</span>(<span class="sn">4</span>) <span class="sc"># raise cable 4 rows</span></span>
+        <span class="syn"><span class="sf">grab</span>() <span class="sc"># pick up ball at hook position</span></span>
+        <span class="syn"><span class="sf">drop</span>() <span class="sc"># release ball</span></span>
+        <span class="syn"><span class="sk">repeat</span>(<span class="sn">5</span>, <span class="sf">move_right</span>) <span class="sc"># same as move_right(5)</span></span>
+      </div>
+      <ul class="steps-list" style="margin-top:1rem;">
+        <li>Plan both deliveries on paper. Each ball has a different column and row.</li>
+        <li>After completing the first delivery, return the crane and hook to a good starting position for the second pick-up.</li>
+        <li>Use <code>repeat(n, move_right)</code> to practise loop syntax — no quotes needed around the function name this time.</li>
+        <li>The two ball colours are tracked separately — the program checks you deliver each one to the correct basket.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="scene-wrapper">
+      <canvas id="scene" width="500" height="320"></canvas>
+      <p style="font-size:12px; color:var(--hint); margin-top:8px; text-align:center;">Red ball col 1 row 5 → red basket col 4 &nbsp;|&nbsp; Blue ball col 7 row 4 → blue basket col 9</p>
+  </div>
+  <div>
+    <div class="controls-card">
+      <h3>Type your program</h3>
+      <p style="font-size:13px; color:var(--muted); margin-bottom:10px; line-height:1.6;">Type each instruction on its own line. Press <strong>Enter</strong> or click Add line for more.</p>
+      <div id="type-inputs"></div>
+      <button class="add-line-btn" onclick="addLine()">+ Add line</button>
+      <h3 style="margin-top:1.25rem;">Parsed program</h3>
+      <div class="program-display" id="program-display">
+        <p class="prog-empty">Your instructions will appear here when you run...</p>
+      </div>
+      <div class="btn-row">
+        <button class="run-btn" onclick="runProgram()">▶ Run program</button>
+        <button class="clear-btn" onclick="clearAll()">Clear</button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+  </div>
+</div>
+<script>
+const canvas = document.getElementById('scene');
+const ctx = canvas.getContext('2d');
+const COLS = 10, ROWS = 6;
+const CW = canvas.width / COLS;
+const CH = (canvas.height - 40) / ROWS;
+const TRACK_Y = 30;
+
+const RED_BALL = { col: 1, row: 5, color: '#e05c2a', stroke: '#a03a10', name: 'red' };
+const BLUE_BALL = { col: 7, row: 4, color: '#3a82e0', stroke: '#1a4ab0', name: 'blue' };
+const RED_BASKET = { col: 4, color: '#d94f4f' };
+const BLUE_BASKET = { col: 9, color: '#3a82e0' };
+
+let lines = ['', '', '', ''];
+let animating = false;
+
+function colToX(c) { return c * CW + CW / 2; }
+function rowToY(r) { return TRACK_Y + r * CH + CH / 2; }
+function groundY() { return TRACK_Y + ROWS * CH; }
+
+function drawScene(st) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#ddeeff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const gy = groundY();
+  ctx.fillStyle = '#8bad6b'; ctx.fillRect(0, gy, canvas.width, canvas.height - gy);
+
+  for (let c = 0; c <= COLS; c++) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(c * CW, TRACK_Y); ctx.lineTo(c * CW, gy); ctx.stroke();
+  }
+  for (let r = 0; r <= ROWS; r++) {
+    ctx.beginPath(); ctx.moveTo(0, TRACK_Y + r * CH); ctx.lineTo(canvas.width, TRACK_Y + r * CH); ctx.stroke();
+  }
+  for (let c = 0; c < COLS; c++) {
+    ctx.fillStyle = '#7a90a0'; ctx.font = '10px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(c, c * CW + CW / 2, TRACK_Y - 8);
+  }
+
+  function drawBasket(col, color, hasball) {
+    const bkx = colToX(col);
+    ctx.lineWidth = 3; ctx.strokeStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(bkx - 22, gy - 30); ctx.lineTo(bkx - 18, gy);
+    ctx.lineTo(bkx + 18, gy); ctx.lineTo(bkx + 22, gy - 30);
+    ctx.stroke(); ctx.lineWidth = 1;
+    if (hasball) {
+      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(bkx, gy - 15, 12, 0, 2 * Math.PI); ctx.fill();
+    }
+  }
+
+  drawBasket(RED_BASKET.col, RED_BASKET.color, st.redInBasket);
+  drawBasket(BLUE_BASKET.col, BLUE_BASKET.color, st.blueInBasket);
+
+  ctx.fillStyle = RED_BASKET.color; ctx.font = 'bold 10px Inter,sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('RED', colToX(RED_BASKET.col), gy + 14);
+  ctx.fillStyle = BLUE_BASKET.color;
+  ctx.fillText('BLUE', colToX(BLUE_BASKET.col), gy + 14);
+
+  function drawBall(ball, visible) {
+    if (!visible) return;
+    const bx = colToX(ball.col), by = rowToY(ball.row);
+    ctx.fillStyle = ball.color; ctx.beginPath(); ctx.arc(bx, by, 12, 0, 2 * Math.PI); ctx.fill();
+    ctx.strokeStyle = ball.stroke; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.beginPath(); ctx.arc(bx - 3, by - 3, 4, 0, 2 * Math.PI); ctx.fill();
+  }
+
+  drawBall(RED_BALL, !st.holdingRed && !st.redDropped && !st.redInBasket);
+  drawBall(BLUE_BALL, !st.holdingBlue && !st.blueDropped && !st.blueInBasket);
+
+  ctx.fillStyle = '#1a4a7a'; ctx.fillRect(0, 18, canvas.width, 12);
+  ctx.fillStyle = '#2a6aaa'; ctx.fillRect(0, 26, canvas.width, 4);
+
+  const cx = colToX(st.craneX);
+  ctx.fillStyle = '#534AB7'; ctx.fillRect(cx - 28, 10, 56, 22);
+  ctx.fillStyle = '#26215C'; ctx.fillRect(cx - 6, 8, 12, 26);
+
+  const hookBottomY = TRACK_Y + (st.hookRows + 1) * CH;
+  ctx.strokeStyle = '#555'; ctx.lineWidth = 2; ctx.setLineDash([4, 3]);
+  ctx.beginPath(); ctx.moveTo(cx, TRACK_Y + 2); ctx.lineTo(cx, hookBottomY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#333'; ctx.beginPath(); ctx.arc(cx, hookBottomY, 7, Math.PI, 2 * Math.PI); ctx.fill();
+  ctx.fillRect(cx - 4, hookBottomY, 8, 5);
+
+  if (st.holdingRed || st.holdingBlue) {
+    const bc = st.holdingRed ? RED_BALL.color : BLUE_BALL.color;
+    const bs = st.holdingRed ? RED_BALL.stroke : BLUE_BALL.stroke;
+    ctx.fillStyle = bc; ctx.beginPath(); ctx.arc(cx, hookBottomY + 16, 12, 0, 2 * Math.PI); ctx.fill();
+    ctx.strokeStyle = bs; ctx.lineWidth = 2; ctx.stroke();
+  }
+
+  ctx.fillStyle = '#534AB7'; ctx.font = 'bold 10px Inter,sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('CRANE', cx, 16);
+}
+
+function addLine() {
+  lines.push('');
+  renderInputs();
+  setTimeout(() => { const ins = document.querySelectorAll('.code-input'); if (ins.length) ins[ins.length-1].focus(); }, 50);
+}
+function removeLine(i) { if (lines.length <= 1) { lines[0]=''; renderInputs(); return; } lines.splice(i,1); renderInputs(); }
+function renderInputs() {
+  document.getElementById('type-inputs').innerHTML = lines.map((v,i) =>
+    `<div class="type-input-row">
+      <span class="line-num">${i+1}</span>
+      <input class="code-input" value="${v.replace(/"/g,'&quot;')}" placeholder="e.g. move_right(3) or repeat(4, lower_hook)"
+        oninput="lines[${i}]=this.value" onkeydown="handleKey(event,${i})" />
+      ${lines.length>1?`<button class="del-btn" onclick="removeLine(${i})">×</button>`:''}
+    </div>`
+  ).join('');
+}
+function handleKey(e, i) {
+  if (e.key === 'Enter') {
+    lines.splice(i+1,0,''); renderInputs();
+    setTimeout(()=>{ const ins=document.querySelectorAll('.code-input'); if(ins[i+1]) ins[i+1].focus(); },30);
+  }
+}
+function setDelivery(id, done) {
+  const chip = document.getElementById(id);
+  if (done) chip.classList.add('done'); else chip.classList.remove('done');
+}
+function clearAll() {
+  lines=['','','','']; renderInputs();
+  setDelivery('del-red',false); setDelivery('del-blue',false);
+  document.getElementById('program-display').innerHTML='<p class="prog-empty">Your instructions will appear here when you run...</p>';
+  document.getElementById('feedback').style.display='none';
+  drawScene({ craneX:0, hookRows:0, holdingRed:false, holdingBlue:false, redDropped:false, blueDropped:false, redInBasket:false, blueInBasket:false });
+}
+function showFeedback(type, msg) {
+  const f=document.getElementById('feedback'); f.style.display='block'; f.className='feedback '+type; f.innerHTML=msg;
+}
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+
+function parseCmd(cmd) {
+  const mr = cmd.match(/^move_right\((\d+)\)$/);
+  const ml = cmd.match(/^move_left\((\d+)\)$/);
+  const lh = cmd.match(/^lower_hook\((\d+)\)$/);
+  const rh = cmd.match(/^raise_hook\((\d+)\)$/);
+  const rep = cmd.match(/^repeat\((\d+),\s*(move_right|move_left|lower_hook|raise_hook)\)$/);
+  if (mr) return { type: 'move_right', n: parseInt(mr[1]) };
+  if (ml) return { type: 'move_left', n: parseInt(ml[1]) };
+  if (lh) return { type: 'lower_hook', n: parseInt(lh[1]) };
+  if (rh) return { type: 'raise_hook', n: parseInt(rh[1]) };
+  if (cmd === 'grab()') return { type: 'grab' };
+  if (cmd === 'drop()') return { type: 'drop' };
+  if (rep) return { type: rep[2], n: parseInt(rep[1]) };
+  return null;
+}
+
+async function runProgram() {
+  if (animating) return;
+  const cmds = lines.map(l=>l.trim()).filter(Boolean);
+  if (!cmds.length) { showFeedback('info','Type some instructions first!'); return; }
+
+  for (const cmd of cmds) {
+    if (!parseCmd(cmd)) {
+      showFeedback('fail', `❌ Unknown command: <code>${cmd}</code><br>Check spelling. Remember: <code>repeat(n, move_right)</code> — no quotes around the function name.`);
+      return;
+    }
+  }
+
+  document.getElementById('program-display').innerHTML = cmds.map((c,i) =>
+    `<div class="prog-line"><span class="prog-num">${i+1}.</span><span class="prog-text">${c}</span></div>`
+  ).join('');
+
+  animating = true;
+  setDelivery('del-red',false); setDelivery('del-blue',false);
+  document.getElementById('feedback').style.display='none';
+
+  let st = { craneX:0, hookRows:0, holdingRed:false, holdingBlue:false, redDropped:false, blueDropped:false, redInBasket:false, blueInBasket:false };
+  let error = null;
+  drawScene(st);
+
+  for (const cmd of cmds) {
+    const parsed = parseCmd(cmd);
+    if (!parsed) { error=`Unknown: <code>${cmd}</code>`; break; }
+
+    const steps = parsed.n || 1;
+    for (let i=0; i<steps; i++) {
+      await sleep(170);
+      if (parsed.type==='move_right') st={...st, craneX:Math.min(COLS-1,st.craneX+1)};
+      else if (parsed.type==='move_left') st={...st, craneX:Math.max(0,st.craneX-1)};
+      else if (parsed.type==='lower_hook') st={...st, hookRows:Math.min(ROWS-1,st.hookRows+1)};
+      else if (parsed.type==='raise_hook') st={...st, hookRows:Math.max(0,st.hookRows-1)};
+      drawScene(st);
+    }
+
+    if (parsed.type==='grab') {
+      await sleep(250);
+      const hr = st.hookRows + 1;
+      const atRed = st.craneX===RED_BALL.col && hr===RED_BALL.row && !st.holdingRed && !st.holdingBlue && !st.redDropped && !st.redInBasket;
+      const atBlue = st.craneX===BLUE_BALL.col && hr===BLUE_BALL.row && !st.holdingRed && !st.holdingBlue && !st.blueDropped && !st.blueInBasket;
+      if (atRed) { st={...st, holdingRed:true}; }
+      else if (atBlue) { st={...st, holdingBlue:true}; }
+      else if (!st.holdingRed && !st.holdingBlue) {
+        error=`grab() failed. Hook is at col ${st.craneX} depth ${hr}. Red ball: col ${RED_BALL.col} row ${RED_BALL.row}. Blue ball: col ${BLUE_BALL.col} row ${BLUE_BALL.row}.`;
+      }
+      drawScene(st);
+    }
+
+    if (parsed.type==='drop') {
+      await sleep(250);
+      if (!st.holdingRed && !st.holdingBlue) { error='drop() called but crane is not holding anything.'; break; }
+      if (st.holdingRed) {
+        st={...st, holdingRed:false, redDropped:true};
+        if (st.craneX===RED_BASKET.col) { st={...st, redInBasket:true}; setDelivery('del-red',true); }
+      } else if (st.holdingBlue) {
+        st={...st, holdingBlue:false, blueDropped:true};
+        if (st.craneX===BLUE_BASKET.col) { st={...st, blueInBasket:true}; setDelivery('del-blue',true); }
+      }
+      drawScene(st);
+    }
+
+    if (error) break;
+  }
+
+  drawScene(st);
+  if (error) {
+    showFeedback('fail',`❌ <strong>Error:</strong> ${error}`);
+  } else if (st.redInBasket && st.blueInBasket) {
+    showFeedback('success',`🏆 <strong>Outstanding!</strong> Both deliveries complete! You wrote a full multi-step algorithm — grab, transport, drop, return, repeat. That's the core pattern behind robotic automation in the real world.`);
+  } else {
+    const missing=[];
+    if (!st.redInBasket) missing.push('red ball → red basket (col '+RED_BASKET.col+')');
+    if (!st.blueInBasket) missing.push('blue ball → blue basket (col '+BLUE_BASKET.col+')');
+    showFeedback('warn',`⚠️ <strong>Incomplete.</strong> Still to do: ${missing.join('; ')}. Check your program handles both deliveries in sequence.`);
+  }
+  animating=false;
+}
+
+renderInputs();
+drawScene({ craneX:0, hookRows:0, holdingRed:false, holdingBlue:false, redDropped:false, blueDropped:false, redInBasket:false, blueInBasket:false });
+</script>
+</body>
+</html>

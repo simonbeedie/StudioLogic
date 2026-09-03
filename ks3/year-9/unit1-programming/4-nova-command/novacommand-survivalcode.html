@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Nova Command — Survival Programming Assessment</title>
+<style>
+:root {
+  --space:     #02060F;
+  --space-mid: #060D1C;
+  --panel:     #08142A;
+  --line:      #0D2548;
+  --green:     #39FF14;
+  --green-dim: #081A03;
+  --white:     #E8F4FF;
+  --muted:     #4A6A8A;
+  --amber:     #FFB800;
+  --fail:      #FF3333;
+  --pass:      #39FF14;
+  --alien2:    #FF6FCF;
+  --alien3:    #FFB800;
+  --bullet:    #FF3333;
+  --ship:      #4488CC;
+  --mono: 'Consolas','SFMono-Regular','Menlo','Courier New',monospace;
+  --sans: -apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--space);color:var(--white);font-family:var(--sans);min-height:100vh;padding:24px 14px 60px;}
+.wrap{max-width:1020px;margin:0 auto;}
+
+/* Header */
+.hdr{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:20px;}
+.hdr-badge{width:46px;height:46px;border-radius:10px;flex-shrink:0;background:linear-gradient(150deg,var(--green-dim),var(--panel));border:1px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 14px rgba(57,255,20,0.15);}
+.hdr-text h1{font-family:var(--mono);font-size:16px;letter-spacing:2px;color:var(--green);text-shadow:0 0 8px rgba(57,255,20,0.35);}
+.hdr-text p{font-size:12px;color:var(--muted);margin-top:3px;}
+.hdr-meta{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.pill{font-family:var(--mono);font-size:11px;padding:4px 11px;border-radius:999px;border:1px solid var(--line);background:var(--space-mid);color:var(--green);}
+
+/* Engine banner */
+.engine-banner{display:flex;align-items:center;gap:10px;background:var(--space-mid);border:1px solid var(--line);border-radius:8px;padding:10px 15px;margin-bottom:18px;font-size:12.5px;color:var(--muted);}
+.engine-banner.ready{border-color:var(--pass);color:var(--pass);}
+.engine-banner.error{border-color:var(--fail);color:var(--fail);}
+.spinner{width:12px;height:12px;border-radius:50%;flex-shrink:0;border:2px solid var(--line);border-top-color:var(--green);animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Level tabs */
+.level-tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--line);}
+.level-tab{font-family:var(--mono);font-size:12.5px;padding:10px 18px;border-radius:8px 8px 0 0;cursor:pointer;border:1px solid var(--line);border-bottom:none;background:var(--space-mid);color:var(--muted);transition:all .15s;position:relative;bottom:-1px;}
+.level-tab:hover{color:var(--white);}
+.level-tab.active{background:var(--panel);color:var(--green);border-color:var(--green);border-bottom:1px solid var(--panel);}
+.level-tab .bdg{display:inline-block;width:18px;height:18px;border-radius:50%;background:var(--line);font-size:10px;line-height:18px;text-align:center;margin-left:6px;color:var(--muted);}
+.level-tab.active .bdg{background:var(--green);color:#020a00;}
+.level-tab.completed .bdg{background:var(--amber);color:#1a0a00;}
+
+/* Level panels */
+.level-panel{display:none;}.level-panel.active{display:block;}
+
+/* Brief */
+.brief-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:18px;}
+.brief-card h2{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:10px;}
+.brief-card p{font-size:13.5px;color:var(--white);line-height:1.65;margin-bottom:8px;}
+.brief-card p:last-child{margin-bottom:0;}
+.brief-card code{font-family:var(--mono);background:#020810;padding:1px 5px;border-radius:3px;color:var(--amber);}
+
+/* API box */
+.api-box{background:#020810;border:1px solid var(--line);border-radius:7px;padding:12px 14px;margin-top:12px;}
+.api-box-title{font-family:var(--mono);font-size:10px;color:var(--green);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.api-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px;flex-wrap:wrap;}
+.api-row:last-child{margin-bottom:0;}
+.api-call{font-family:var(--mono);font-size:12px;color:var(--amber);white-space:nowrap;min-width:210px;}
+.api-desc{font-size:12.5px;color:var(--muted);line-height:1.5;}
+.api-desc b{color:var(--white);}
+.api-sep{border-top:1px solid var(--line);margin:8px 0;}
+
+/* Layout */
+.main-grid{display:grid;grid-template-columns:1fr 420px;gap:18px;align-items:start;}
+@media(max-width:860px){.main-grid{grid-template-columns:1fr;}}
+.triple-editors{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+@media(max-width:860px){.triple-editors{grid-template-columns:1fr;}}
+/* L2/L3 side-by-side: editors left, game right */
+.side-grid{display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start;}
+@media(max-width:860px){.side-grid{grid-template-columns:1fr;}}
+.side-grid .game-panel canvas{width:100%;}
+
+/* Editor */
+.editor-panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.editor-topbar{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-bottom:1px solid var(--line);background:var(--space-mid);}
+.editor-topbar-left{display:flex;align-items:center;gap:6px;}
+.mac-dot{width:9px;height:9px;border-radius:50%;}
+.mac-r{background:#FF5F56;}.mac-y{background:#FFBD2E;}.mac-g{background:#27C93F;}
+.file-label{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-left:4px;}
+.fn-label{font-family:var(--mono);font-size:10.5px;color:var(--green);}
+
+/* Highlighted editor */
+.editor-wrap{position:relative;background:#020810;border-bottom:1px solid var(--line);}
+.editor-wrap textarea,.editor-wrap .editor-highlight{font-family:var(--mono);font-size:13px;line-height:1.65;padding:12px;tab-size:4;white-space:pre;overflow-wrap:normal;overflow-x:auto;min-height:160px;width:100%;}
+.editor-wrap textarea{position:absolute;top:0;left:0;height:100%;background:transparent;color:transparent;caret-color:#39FF14;border:none;outline:none;resize:none;z-index:2;-webkit-text-fill-color:transparent;}
+.editor-wrap .editor-highlight{position:relative;z-index:1;pointer-events:none;color:#cdeaf5;margin:0;overflow:hidden;}
+
+/* Syntax tokens */
+.tok-kw     {color:#C586C0;}
+.tok-builtin{color:#DCDCAA;}
+.tok-num    {color:#B5CEA8;}
+.tok-str    {color:#CE9178;}
+.tok-comment{color:#6A9955;font-style:italic;}
+.tok-obj    {color:#39FF14;}
+.tok-obj2   {color:#FF6FCF;}
+.tok-obj3   {color:#FFB800;}
+.tok-method {color:#DCDCAA;}
+.tok-paren  {color:#FFD700;}
+.tok-bracket{color:#DA70D6;}
+
+.editor-footer{padding:9px 13px;display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+button.btn-run{font-family:var(--mono);background:var(--green);color:#020a00;border:none;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;transition:filter .15s;}
+button.btn-run:hover:not(:disabled){filter:brightness(1.15);}
+button.btn-run:disabled{opacity:.4;cursor:not-allowed;}
+button.btn-run.a2{background:var(--alien2);color:#200010;}
+button.btn-run.a3{background:var(--alien3);color:#1a0800;}
+button.btn-reset{font-family:var(--mono);background:transparent;color:var(--muted);border:1px solid var(--line);padding:8px 13px;border-radius:6px;font-size:11px;cursor:pointer;}
+button.btn-reset:hover{color:var(--white);border-color:var(--white);}
+button.btn-hint{font-family:var(--mono);background:transparent;color:var(--amber);border:1px solid var(--amber);padding:8px 12px;border-radius:6px;font-size:11px;cursor:pointer;margin-left:auto;}
+
+/* Hint */
+.hint-box{margin-top:12px;display:none;background:rgba(255,184,0,0.05);border:1px solid var(--amber);border-radius:8px;padding:14px;}
+.hint-box.show{display:block;}
+.hint-box h3{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--amber);margin-bottom:10px;}
+.hint-box p{font-size:13px;color:var(--white);line-height:1.65;margin-bottom:7px;}
+.hint-box p:last-child{margin-bottom:0;}
+.hint-box code{font-family:var(--mono);background:#020810;padding:1px 4px;border-radius:3px;color:var(--amber);}
+
+/* Feedback */
+.feedback-panel{margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.feedback-header{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:8px 13px;border-bottom:1px solid var(--line);background:var(--space-mid);}
+.feedback-body{padding:11px 13px;font-size:12.5px;line-height:1.6;font-family:var(--mono);color:var(--white);min-height:44px;white-space:pre-wrap;word-break:break-word;}
+
+/* Marking */
+details.mark-panel{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+details.mark-panel summary{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:10px 14px;cursor:pointer;background:var(--space-mid);border-bottom:1px solid var(--line);list-style:none;display:flex;justify-content:space-between;align-items:center;}
+details.mark-panel summary::after{content:'▾';color:var(--green);}
+details.mark-panel[open] summary::after{content:'▴';}
+.mark-table{width:100%;border-collapse:collapse;font-size:12px;}
+.mark-table th{font-family:var(--mono);font-size:10px;color:var(--green);text-transform:uppercase;padding:8px 13px;border-bottom:1px solid var(--line);text-align:left;}
+.mark-table td{padding:8px 13px;border-bottom:1px solid var(--line);color:var(--white);vertical-align:top;}
+.mark-table tr:last-child td{border-bottom:none;}
+.mark-table .marks{font-family:var(--mono);color:var(--amber);}
+.mark-table .lvl{font-family:var(--mono);font-size:10px;color:var(--green);}
+
+/* Game panel */
+.game-panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.game-topbar{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-bottom:1px solid var(--line);background:var(--space-mid);}
+.game-topbar-title{font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:1px;text-transform:uppercase;}
+.game-stats{display:flex;gap:10px;font-family:var(--mono);font-size:11px;color:var(--muted);}
+.game-stats span b{color:var(--white);}
+canvas.game-canvas{display:block;width:100%;background:#000;}
+
+/* Stat bars (L3 survival) */
+.survival-bars{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 13px;border-top:1px solid var(--line);}
+.surv-bar{background:var(--space-mid);border:1px solid var(--line);border-radius:6px;padding:8px 10px;}
+.surv-bar-name{font-family:var(--mono);font-size:10px;margin-bottom:5px;}
+.surv-bar-name.g1{color:var(--green);}
+.surv-bar-name.g2{color:var(--alien2);}
+.surv-bar-name.g3{color:var(--alien3);}
+.surv-bar-track{height:6px;background:#020810;border-radius:3px;overflow:hidden;border:1px solid var(--line);margin-bottom:4px;}
+.surv-bar-fill{height:100%;border-radius:3px;transition:width .3s;}
+.surv-bar-fill.g1{background:var(--green);box-shadow:0 0 4px rgba(57,255,20,.4);}
+.surv-bar-fill.g2{background:var(--alien2);}
+.surv-bar-fill.g3{background:var(--alien3);}
+.surv-bar-ticks{font-family:var(--mono);font-size:11px;color:var(--white);}
+
+/* Coord display */
+.coord-live{display:flex;gap:7px;flex-wrap:wrap;padding:9px 13px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;}
+.coord-live .cl{background:#020810;border:1px solid var(--line);border-radius:4px;padding:4px 9px;color:var(--muted);}
+.coord-live .cl b{color:var(--white);}
+.coord-live .cl.dead b{color:var(--fail);text-decoration:line-through;}
+
+/* Game footer */
+.game-footer{padding:10px 13px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);align-items:center;}
+button.btn-start{font-family:var(--mono);background:var(--green);color:#020a00;border:none;padding:9px 18px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 0 10px rgba(57,255,20,.2);}
+button.btn-start:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+button.btn-stop{font-family:var(--mono);background:transparent;color:var(--fail);border:1px solid var(--fail);padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;}
+.speed-label{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:auto;}
+.speed-label select{font-family:var(--mono);font-size:11px;background:var(--space-mid);color:var(--white);border:1px solid var(--line);border-radius:4px;padding:3px 6px;}
+
+/* Outcome */
+.outcome-overlay{display:none;text-align:center;padding:20px 18px;border-top:1px solid var(--line);}
+.outcome-overlay.show{display:block;}
+.outcome-title{font-family:var(--mono);font-size:17px;letter-spacing:2px;margin-bottom:6px;}
+.outcome-title.win{color:var(--green);text-shadow:0 0 10px rgba(57,255,20,.5);}
+.outcome-title.lose{color:var(--fail);}
+.outcome-sub{font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.8;}
+.outcome-score{display:inline-block;margin-top:10px;background:var(--space-mid);border:1px solid var(--line);border-radius:7px;padding:8px 18px;font-family:var(--mono);font-size:12px;color:var(--green);}
+
+/* Move log chips */
+.move-log{padding:8px 13px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;min-height:32px;color:var(--muted);display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
+.move-chip{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:3px;border:1px solid var(--line);background:var(--space-mid);color:var(--muted);margin:1px;}
+.move-chip.active{border-color:var(--green);color:var(--green);}
+.move-chip.done{border-color:var(--amber);color:var(--amber);}
+
+footer{text-align:center;color:var(--muted);font-size:10.5px;margin-top:26px;font-family:var(--mono);letter-spacing:.5px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- Header -->
+<div class="hdr">
+  <div class="hdr-badge">👾</div>
+  <div class="hdr-text">
+    <h1>NOVA COMMAND — SURVIVAL ASSESSMENT</h1>
+    <p>Program alien movement behaviour · dodge bullets · survive as long as possible</p>
+  </div>
+  <div class="hdr-meta"><div class="pill" id="globalPill">Level 1</div></div>
+</div>
+
+<!-- Engine -->
+<div class="engine-banner" id="engineBanner">
+  <div class="spinner" id="engineSpinner"></div>
+  <span id="engineText">Booting Python engine — may take up to 15 seconds on first load…</span>
+</div>
+
+<!-- Tabs -->
+<div class="level-tabs">
+  <div class="level-tab active" id="tab1" onclick="switchLevel(1)">👾 Level 1 — Movement <span class="bdg">1</span></div>
+  <div class="level-tab"        id="tab2" onclick="switchLevel(2)">🔫 Level 2 — Dodge Bullets <span class="bdg">2</span></div>
+  <div class="level-tab"        id="tab3" onclick="switchLevel(3)">🛸 Level 3 — Swarm Survival <span class="bdg">3</span></div>
+</div>
+
+<!-- ══════════════════════════════════════ LEVEL 1 ══ -->
+<div class="level-panel active" id="panel1">
+  <div class="brief-card">
+    <h2>📡 Level 1 — Movement Sequencing</h2>
+    <p>Open space — no threats yet. Your alien starts at <code>col 5, row 5</code>. The grid is <strong>20 columns × 15 rows</strong>. Call <code>alien.move(x, y)</code> to move one step at a time.</p>
+    <p>Write a sequence of moves to navigate to the <strong>target zone</strong> marked on the grid — <code>col 14, row 10</code>. Then try reaching it in the fewest steps possible.</p>
+    <div class="api-box">
+      <div class="api-box-title">alien — level 1 reference</div>
+      <div class="api-row"><span class="api-call">alien.move(1, 0)</span><span class="api-desc">Move <b>right</b> one column</span></div>
+      <div class="api-row"><span class="api-call">alien.move(-1, 0)</span><span class="api-desc">Move <b>left</b> one column</span></div>
+      <div class="api-row"><span class="api-call">alien.move(0, 1)</span><span class="api-desc">Move <b>down</b> one row</span></div>
+      <div class="api-row"><span class="api-call">alien.move(0, -1)</span><span class="api-desc">Move <b>up</b> one row</span></div>
+      <div class="api-sep"></div>
+      <div class="api-row"><span class="api-call">alien.col / alien.row</span><span class="api-desc">Current <b>position</b></span></div>
+      <div class="api-row"><span class="api-call">alien.target_col / alien.target_row</span><span class="api-desc">Target zone coordinates — use <code>print()</code> to inspect</span></div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <div>
+      <div class="editor-panel">
+        <div class="editor-topbar">
+          <div class="editor-topbar-left"><div class="mac-dot mac-r"></div><div class="mac-dot mac-y"></div><div class="mac-dot mac-g"></div><span class="file-label">alien_moves.py</span></div>
+          <span class="fn-label">alien.move(x, y)</span>
+        </div>
+        <div class="editor-wrap" id="l1-wrap">
+          <pre class="editor-highlight" id="l1-hl" aria-hidden="true"></pre>
+          <textarea id="l1-editor" spellcheck="false" autocomplete="off">def run(alien):
+    alien.move(1, 0)
+</textarea>
+        </div>
+        <div class="editor-footer">
+          <button class="btn-run" id="l1-btnRun" disabled onclick="l1Load()">▶ Load My Code</button>
+          <button class="btn-reset" onclick="l1Reset()">↺ Reset</button>
+          <button class="btn-hint" onclick="toggleHint('l1-hint')">💡 Hint</button>
+        </div>
+      </div>
+
+      <div class="hint-box" id="l1-hint">
+        <h3>💡 Navigation Hints</h3>
+        <p>Start: <code>col 5, row 5</code> → Target: <code>col 14, row 10</code></p>
+        <p>Column gap: 14 − 5 = <strong>9 right</strong>. Row gap: 10 − 5 = <strong>5 down</strong>. That's 14 moves total.</p>
+        <p>Can you reach it in fewer? Try combining directions differently — or use <code>print(alien.col, alien.row)</code> to trace where you are mid-sequence.</p>
+      </div>
+
+      <div class="feedback-panel">
+        <div class="feedback-header">Mission Log</div>
+        <div class="feedback-body" id="l1-feedback">Load your code, then press Launch.</div>
+      </div>
+
+      <details class="mark-panel">
+        <summary>📊 Marking Criteria — Level 1</summary>
+        <table class="mark-table">
+          <thead><tr><th>Criterion</th><th>What the examiner looks for</th><th>Marks</th></tr></thead>
+          <tbody>
+            <tr><td><span class="lvl">STRUCTURE</span></td><td>Function defined correctly; uses <code>alien.move()</code></td><td class="marks">1</td></tr>
+            <tr><td><span class="lvl">SYNTAX</span></td><td>All calls pass exactly two integer arguments</td><td class="marks">1</td></tr>
+            <tr><td><span class="lvl">LOGIC</span></td><td>Alien reaches the target zone</td><td class="marks">2</td></tr>
+            <tr><td><span class="lvl">EFFICIENCY</span></td><td>Route uses the minimum 14 moves (no wasted steps)</td><td class="marks">1</td></tr>
+            <tr><td><span class="lvl">EXTENSION</span></td><td>Uses <code>print()</code> to show position mid-route; can explain coordinate system</td><td class="marks">1</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 13px;font-family:var(--mono);font-size:11px;color:var(--muted);border-top:1px solid var(--line);">Total: 6 marks | Screenshot your run for OneNote evidence</div>
+      </details>
+    </div>
+
+    <div>
+      <div class="game-panel">
+        <div class="game-topbar">
+          <div class="game-topbar-title">👾 Level 1 — Open Space</div>
+          <div class="game-stats"><span>Step: <b id="l1-step">0</b></span><span>Target: <b style="color:var(--amber)">col 14, row 10</b></span></div>
+        </div>
+        <canvas class="game-canvas" id="l1-canvas" width="420" height="315"></canvas>
+        <div class="coord-live">
+          <div class="cl">Alien: <b id="l1-pos">col 5, row 5</b></div>
+          <div class="cl">Target: <b id="l1-tgt">col 14, row 10</b></div>
+          <div class="cl">Δcol: <b id="l1-dc">+9</b></div>
+          <div class="cl">Δrow: <b id="l1-dr">+5</b></div>
+        </div>
+        <div class="move-log" id="l1-log"><span style="color:var(--muted)">— move log —</span></div>
+        <div class="game-footer">
+          <button class="btn-start" id="l1-btnStart" disabled onclick="l1Start()">▶ Launch</button>
+          <button class="btn-stop" id="l1-btnStop" style="display:none" onclick="l1Stop()">⏹ Abort</button>
+          <span class="speed-label">Speed: <select id="l1-speed"><option value="500">Slow</option><option value="250" selected>Normal</option><option value="80">Fast</option></select></span>
+        </div>
+        <div class="outcome-overlay" id="l1-outcome">
+          <div class="outcome-title" id="l1-otitle"></div>
+          <div class="outcome-sub"   id="l1-osub"></div>
+          <div class="outcome-score" id="l1-oscore"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ LEVEL 2 ══ -->
+<div class="level-panel" id="panel2">
+  <div class="brief-card">
+    <h2>💣 Level 2 — The Minefield</h2>
+    <p>The enemy has scattered a field of <strong>static bullets</strong> between your alien and the target zone. Nothing moves — but one wrong step means game over.</p>
+    <p>Just like Ghost Protocol: plan your <strong>whole route first</strong>. Write a sequence of <code>alien.move(x, y)</code> calls (loops are fine) inside <code>run(alien)</code>, press <strong>Load &amp; Test</strong>, then watch your route play out. There are <strong>3 minefields</strong> — use the tabs above the editor to switch between them.</p>
+    <div class="api-box">
+      <div class="api-box-title">alien — level 2 reference</div>
+      <div class="api-row"><span class="api-call">alien.move(1, 0)</span><span class="api-desc">Move <b>right</b> one column</span></div>
+      <div class="api-row"><span class="api-call">alien.move(-1, 0)</span><span class="api-desc">Move <b>left</b> one column</span></div>
+      <div class="api-row"><span class="api-call">alien.move(0, 1)</span><span class="api-desc">Move <b>down</b> one row</span></div>
+      <div class="api-row"><span class="api-call">alien.move(0, -1)</span><span class="api-desc">Move <b>up</b> one row</span></div>
+      <div class="api-sep"></div>
+      <div class="api-row"><span class="api-call">alien.col / alien.row</span><span class="api-desc">Current <b>position</b></span></div>
+      <div class="api-row"><span class="api-call">alien.target_col / alien.target_row</span><span class="api-desc">Target zone coordinates — use <code>print()</code> to inspect</span></div>
+      <div class="api-row"><span class="api-call">for i in range(n):</span><span class="api-desc">Repeat a move <b>n times</b> — same as Ghost Protocol L3</span></div>
+    </div>
+  </div>
+
+  <div class="side-grid">
+    <div>
+      <div class="editor-panel">
+        <div class="editor-topbar">
+          <div class="editor-topbar-left"><div class="mac-dot mac-r"></div><div class="mac-dot mac-y"></div><div class="mac-dot mac-g"></div><span class="file-label">minefield.py</span></div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn-run" id="l2-tab0" onclick="l2SelectPuzzle(0)" style="padding:5px 12px;font-size:11px;background:var(--green);color:#020a00;border:none">Field A</button>
+            <button class="btn-run" id="l2-tab1" onclick="l2SelectPuzzle(1)" style="padding:5px 12px;font-size:11px;background:var(--space-mid);color:var(--muted);border:1px solid var(--line)">Field B</button>
+            <button class="btn-run" id="l2-tab2" onclick="l2SelectPuzzle(2)" style="padding:5px 12px;font-size:11px;background:var(--space-mid);color:var(--muted);border:1px solid var(--line)">Field C</button>
+          </div>
+        </div>
+        <div class="editor-wrap" id="l2-wrap">
+          <pre class="editor-highlight" id="l2-hl" aria-hidden="true"></pre>
+          <textarea id="l2-editor" spellcheck="false" autocomplete="off">def run(alien):
+    alien.move(1, 0)
+</textarea>
+        </div>
+        <div class="editor-footer">
+          <button class="btn-run" id="l2-btnRun" disabled onclick="l2Load()">▶ Load &amp; Test</button>
+          <button class="btn-reset" onclick="l2Reset()">↺ Reset</button>
+          <button class="btn-hint" onclick="toggleHint('l2-hint')">💡 Hint</button>
+        </div>
+      </div>
+
+      <div class="hint-box" id="l2-hint">
+        <h3>💡 Minefield Hints</h3>
+        <p>Bullets don't move in this level — the challenge is <strong>planning a route through the gaps</strong>, just like finding a path through a maze.</p>
+        <p>Use <code>print(alien.col, alien.row)</code> mid-route to trace exactly where you'll be after each move.</p>
+        <p>Field B and Field C need more than one straight line — you'll have to change direction to reach each gap.</p>
+        <p><strong>Extension:</strong> use <code>for i in range(n): alien.move(...)</code> to write the same route with fewer lines of code.</p>
+      </div>
+
+      <div class="feedback-panel">
+        <div class="feedback-header">Mission Log — Field A</div>
+        <div class="feedback-body" id="l2-fb0">Not tested yet.</div>
+      </div>
+      <div class="feedback-panel" style="margin-top:8px;">
+        <div class="feedback-header">Mission Log — Field B</div>
+        <div class="feedback-body" id="l2-fb1">Not tested yet.</div>
+      </div>
+      <div class="feedback-panel" style="margin-top:8px;">
+        <div class="feedback-header">Mission Log — Field C</div>
+        <div class="feedback-body" id="l2-fb2">Not tested yet.</div>
+      </div>
+
+      <details class="mark-panel">
+        <summary>📊 Marking Criteria — Level 2</summary>
+        <table class="mark-table">
+          <thead><tr><th>Criterion</th><th>What the examiner looks for</th><th>Marks</th></tr></thead>
+          <tbody>
+            <tr><td><span class="lvl">FIELD A</span></td><td>Alien navigates the single gap and reaches the target</td><td class="marks">2</td></tr>
+            <tr><td><span class="lvl">FIELD B</span></td><td>Alien navigates both walls, changing direction between gaps</td><td class="marks">3</td></tr>
+            <tr><td><span class="lvl">FIELD C</span></td><td>Alien finds all three narrow single-column gaps</td><td class="marks">3</td></tr>
+            <tr><td><span class="lvl">EFFICIENCY</span></td><td>Each route uses the minimum number of moves</td><td class="marks">1</td></tr>
+            <tr><td><span class="lvl">DEBUGGING</span></td><td>Evidence of using <code>print()</code> to check positions</td><td class="marks">1</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 13px;font-family:var(--mono);font-size:11px;color:var(--muted);border-top:1px solid var(--line);">Total: 10 marks | Screenshot all three solved fields</div>
+      </details>
+    </div>
+
+    <div>
+      <div class="game-panel">
+        <div class="game-topbar">
+          <div class="game-topbar-title">💣 <b id="l2-whichfield" style="color:var(--green)">Field A — Open Corridor</b></div>
+          <div class="game-stats"><span>Step: <b id="l2-step">0</b></span></div>
+        </div>
+        <canvas class="game-canvas" id="l2-canvas" width="420" height="315"></canvas>
+        <div class="coord-live">
+          <div class="cl">Alien: <b id="l2-pos">—</b></div>
+          <div class="cl">Target: <b id="l2-tgt">—</b></div>
+          <div class="cl">Δcol: <b id="l2-dc">—</b></div>
+          <div class="cl">Δrow: <b id="l2-dr">—</b></div>
+        </div>
+        <div class="move-log" id="l2-log"><span style="color:var(--muted)">— move log —</span></div>
+        <div class="game-footer">
+          <button class="btn-start" id="l2-btnStart" disabled onclick="l2Start()">▶ Launch</button>
+          <button class="btn-stop" id="l2-btnStop" style="display:none" onclick="l2Stop()">⏹ Abort</button>
+          <span class="speed-label">Speed: <select id="l2-speed"><option value="500">Slow</option><option value="250" selected>Normal</option><option value="80">Fast</option></select></span>
+        </div>
+        <div class="outcome-overlay" id="l2-outcome">
+          <div class="outcome-title" id="l2-otitle"></div>
+          <div class="outcome-sub"   id="l2-osub"></div>
+          <div class="outcome-score" id="l2-oscore"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ LEVEL 3 ══ -->
+<div class="level-panel" id="panel3">
+  <div class="brief-card">
+    <h2>🛸 Level 3 — Swarm Survival</h2>
+    <p>Three aliens, three editors. The ship moves and fires bullets. Aliens must dodge bullets <strong>and avoid colliding with each other</strong>. But the real goal is to <strong>destroy the ship</strong> — move an alien up to row 0 in the ship's column to defeat it.</p>
+    <p>Use <code>alien.ship_col</code> to track the ship and <code>alien.move(0, -1)</code> to advance upward. Coordinate all three aliens — can one reach the ship while the others survive?</p>
+    <div class="api-box">
+      <div class="api-box-title">alien — level 3 additions</div>
+      <div class="api-row"><span class="api-call">alien.others</span><span class="api-desc">List of the <b>other two aliens</b> — each has <code>col</code> and <code>row</code></span></div>
+      <div class="api-row"><span class="api-call">alien.others[0]["col"]</span><span class="api-desc">Column of the <b>first other alien</b></span></div>
+      <div class="api-row"><span class="api-call">alien.bullets</span><span class="api-desc">Same as Level 2 — list of <code>{"col", "row"}</code> dicts</span></div>
+      <div class="api-row"><span class="api-call">alien.move(x, y)</span><span class="api-desc">Move one step — avoid landing on another alien's position</span></div>
+      <div class="api-row"><span class="api-call">alien.stay()</span><span class="api-desc">Stay put — only safe if no bullet is incoming in your column</span></div>
+    </div>
+  </div>
+
+  <div class="side-grid">
+  <div>
+  <div class="triple-editors" style="grid-template-columns:1fr 1fr;gap:8px;">
+    <!-- Alien 1 -->
+    <div>
+      <div class="editor-panel">
+        <div class="editor-topbar">
+          <div class="editor-topbar-left"><div class="mac-dot mac-r"></div><div class="mac-dot mac-y"></div><div class="mac-dot mac-g"></div><span class="file-label" style="color:var(--green)">alien1.py 👾</span></div>
+        </div>
+        <div class="editor-wrap" id="l3-wrap1">
+          <pre class="editor-highlight" id="l3-hl1" aria-hidden="true"></pre>
+          <textarea id="l3-editor1" spellcheck="false" autocomplete="off">def run(alien):
+    for b in alien.bullets:
+        if b["col"] == alien.col:
+            alien.move(1, 0)
+            return
+    alien.stay()
+</textarea>
+        </div>
+        <div class="editor-footer">
+          <button class="btn-run" id="l3-btnRun1" disabled onclick="l3Load(1)">▶ Load Alien 1</button>
+          <button class="btn-reset" onclick="l3Reset(1)">↺</button>
+        </div>
+      </div>
+    </div>
+    <!-- Alien 2 -->
+    <div>
+      <div class="editor-panel">
+        <div class="editor-topbar">
+          <div class="editor-topbar-left"><div class="mac-dot mac-r"></div><div class="mac-dot mac-y"></div><div class="mac-dot mac-g"></div><span class="file-label" style="color:var(--alien2)">alien2.py 👾</span></div>
+        </div>
+        <div class="editor-wrap" id="l3-wrap2">
+          <pre class="editor-highlight" id="l3-hl2" aria-hidden="true"></pre>
+          <textarea id="l3-editor2" spellcheck="false" autocomplete="off">def run(alien):
+    for b in alien.bullets:
+        if b["col"] == alien.col:
+            alien.move(1, 0)
+            return
+    alien.stay()
+</textarea>
+        </div>
+        <div class="editor-footer">
+          <button class="btn-run a2" id="l3-btnRun2" disabled onclick="l3Load(2)">▶ Load Alien 2</button>
+          <button class="btn-reset" onclick="l3Reset(2)">↺</button>
+        </div>
+      </div>
+    </div>
+    <!-- Alien 3 -->
+    <div>
+      <div class="editor-panel">
+        <div class="editor-topbar">
+          <div class="editor-topbar-left"><div class="mac-dot mac-r"></div><div class="mac-dot mac-y"></div><div class="mac-dot mac-g"></div><span class="file-label" style="color:var(--alien3)">alien3.py 👾</span></div>
+        </div>
+        <div class="editor-wrap" id="l3-wrap3">
+          <pre class="editor-highlight" id="l3-hl3" aria-hidden="true"></pre>
+          <textarea id="l3-editor3" spellcheck="false" autocomplete="off">def run(alien):
+    for b in alien.bullets:
+        if b["col"] == alien.col:
+            alien.move(1, 0)
+            return
+    alien.stay()
+</textarea>
+        </div>
+        <div class="editor-footer">
+          <button class="btn-run a3" id="l3-btnRun3" disabled onclick="l3Load(3)">▶ Load Alien 3</button>
+          <button class="btn-reset" onclick="l3Reset(3)">↺</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /triple-editors -->
+
+  <div class="hint-box show" id="l3-hint" style="margin-bottom:10px;">
+    <h3>💡 Swarm Hints</h3>
+    <p>Check <code>alien.others</code> to see where the other aliens are — don't move into their position:</p>
+    <p><code>for other in alien.others:<br>&nbsp;&nbsp;&nbsp;&nbsp;if other["col"] == alien.col + 1:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# don't move right!</code></p>
+    <p>Priority order: <strong>1)</strong> dodge bullets first, <strong>2)</strong> avoid other aliens, <strong>3)</strong> advance up towards the ship, <strong>4)</strong> stay if safe. Use <code>return</code> after a move to stop executing further code that tick.</p>
+    <p><strong>Extension:</strong> spread out — give each alien a preferred column range. Then send one alien upward (<code>alien.move(0, -1)</code>) towards <code>alien.ship_col</code> to destroy the ship!</p>
+  </div>
+
+  <div class="feedback-panel" style="margin-bottom:0;">
+    <div class="feedback-header">Mission Log</div>
+    <div class="feedback-body" id="l3-feedback">Load all three aliens, then press Begin Swarm.</div>
+  </div>
+
+  </div><!-- /left col -->
+  <div><!-- right col: game -->
+  <div class="game-panel">
+    <div class="game-topbar">
+      <div class="game-topbar-title">🛸 Level 3 — Swarm Survival</div>
+      <div class="game-stats">
+        <span>Tick: <b id="l3-tick">0</b></span>
+        <span style="color:var(--fail)">Bullets: <b id="l3-bcount">0</b></span>
+        <span>Alive: <b id="l3-alive">3</b></span>
+      </div>
+    </div>
+    <canvas class="game-canvas" id="l3-canvas" width="300" height="225"></canvas>
+
+    <div class="survival-bars">
+      <div class="surv-bar">
+        <div class="surv-bar-name g1">👾 Alien 1</div>
+        <div class="surv-bar-track"><div class="surv-bar-fill g1" id="l3-bar1" style="width:0%"></div></div>
+        <div class="surv-bar-ticks" id="l3-ticks1">0 ticks</div>
+      </div>
+      <div class="surv-bar">
+        <div class="surv-bar-name g2">👾 Alien 2</div>
+        <div class="surv-bar-track"><div class="surv-bar-fill g2" id="l3-bar2" style="width:0%"></div></div>
+        <div class="surv-bar-ticks" id="l3-ticks2">0 ticks</div>
+      </div>
+      <div class="surv-bar">
+        <div class="surv-bar-name g3">👾 Alien 3</div>
+        <div class="surv-bar-track"><div class="surv-bar-fill g3" id="l3-bar3" style="width:0%"></div></div>
+        <div class="surv-bar-ticks" id="l3-ticks3">0 ticks</div>
+      </div>
+    </div>
+
+    <div class="coord-live" id="l3-coords">
+      <div class="cl">Alien 1: <b id="l3-p1">—</b></div>
+      <div class="cl a2">Alien 2: <b id="l3-p2">—</b></div>
+      <div class="cl" style="border-color:var(--amber)">Alien 3: <b id="l3-p3">—</b></div>
+    </div>
+
+    <div class="game-footer">
+      <button class="btn-start" id="l3-btnStart" disabled onclick="l3Start()">▶ Begin Swarm</button>
+      <button class="btn-stop" id="l3-btnStop" style="display:none" onclick="l3Stop()">⏹ Stop</button>
+      <span class="speed-label">Speed: <select id="l3-speed"><option value="400">Slow</option><option value="200" selected>Normal</option><option value="80">Fast</option></select></span>
+    </div>
+    <div class="outcome-overlay" id="l3-outcome">
+      <div class="outcome-title" id="l3-otitle"></div>
+      <div class="outcome-sub"   id="l3-osub"></div>
+      <div class="outcome-score" id="l3-oscore"></div>
+    </div>
+  </div><!-- /game-panel -->
+  </div><!-- /right col -->
+  </div><!-- /side-grid -->
+
+  <details class="mark-panel" style="margin-top:14px;">
+    <summary>📊 Marking Criteria — Level 3</summary>
+    <table class="mark-table">
+      <thead><tr><th>Criterion</th><th>What the examiner looks for</th><th>Marks</th></tr></thead>
+      <tbody>
+        <tr><td><span class="lvl">STRUCTURE</span></td><td>All three functions run correctly each tick</td><td class="marks">2</td></tr>
+        <tr><td><span class="lvl">BULLET DODGE</span></td><td>Each alien reads and reacts to <code>alien.bullets</code></td><td class="marks">2</td></tr>
+        <tr><td><span class="lvl">AVOIDANCE</span></td><td>Uses <code>alien.others</code> to avoid collisions between aliens</td><td class="marks">3</td></tr>
+        <tr><td><span class="lvl">SURVIVAL</span></td><td>All three aliens survive more than 50 ticks</td><td class="marks">3</td></tr>
+        <tr><td><span class="lvl">EXTENSION</span></td><td>Aliens spread into different zones; last alien alive past 100 ticks</td><td class="marks">2</td></tr>
+      </tbody>
+    </table>
+    <div style="padding:8px 13px;font-family:var(--mono);font-size:11px;color:var(--muted);border-top:1px solid var(--line);">Total: 12 marks | Screenshot the survival bars and tick count</div>
+  </details>
+</div>
+
+<footer>NOVA COMMAND · SURVIVAL EDITION · RUNS REAL PYTHON VIA PYODIDE · REQUIRES INTERNET ACCESS</footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ═════════════════════════ CONFIG ═══════════════════════ */
+var COLS=20, ROWS=15, CELL=21;
+
+/* ═════════════════════════ PYODIDE WORKER ═══════════════ */
+var WORKER_SRC=[
+'self.pyodideReady=false;',
+'importScripts("https://cdn.jsdelivr.net/pyodide/v0.26.3/full/pyodide.js");',
+'async function init(){try{self.pyodide=await loadPyodide({indexURL:"https://cdn.jsdelivr.net/pyodide/v0.26.3/full/"});self.pyodideReady=true;self.postMessage({type:"ready"});}catch(e){self.postMessage({type:"load-error",error:String(e)});}}',
+'init();',
+'self.onmessage=function(e){',
+'  var d=e.data;',
+'  if(!self.pyodideReady){self.postMessage({id:d.id,ok:false,error:"Engine loading."});return;}',
+'  try{',
+'    var bulletsJson=JSON.stringify(d.bullets||[]);',
+'    var othersJson=JSON.stringify(d.others||[]);',
+'    var setup=[',
+'      "import sys,io,json",',
+'      "sys.stdout=io.StringIO()",',
+'      "class Alien:",',
+'      "    def __init__(self):",',
+'      "        self._action=None",',
+'      "        self.col="+d.col+";self.row="+d.row,',
+'      "        self.target_col="+d.tc+";self.target_row="+d.tr,',
+'      "        self.ship_col="+d.sc,',
+'      "        self.bullets=json.loads(\'"+bulletsJson.replace(/\'/g,"\\\\\'")+"\')",',
+'      "        self.others=json.loads(\'"+othersJson.replace(/\'/g,"\\\\\'")+"\')",',
+'      "    def move(self,x,y):",',
+'      "        if self._action is None:",',
+'      "            self._action={\'type\':\'move\',\'x\':int(x),\'y\':int(y)}",',
+'      "    def stay(self):",',
+'      "        if self._action is None:",',
+'      "            self._action={\'type\':\'stay\'}",',
+'      "alien=Alien()"',
+'    ].join("\\n");',
+'    self.pyodide.runPython(setup);',
+'    self.pyodide.runPython(d.code);',
+'    self.pyodide.runPython("run(alien)");',
+'    var action=self.pyodide.runPython("json.dumps(alien._action or {\'type\':\'stay\'})");',
+'    var stdout=self.pyodide.runPython("sys.stdout.getvalue()");',
+'    self.postMessage({id:d.id,ok:true,action:action,stdout:stdout});',
+'  }catch(err){self.postMessage({id:d.id,ok:false,error:String(err)});}',
+'};'
+].join('\n');
+
+var workerBlob=URL.createObjectURL(new Blob([WORKER_SRC],{type:'application/javascript'}));
+var worker=null, pyodideReady=false, pendingResolve=null, pendingTimeout=null;
+
+function startWorker(){
+  worker=new Worker(workerBlob);
+  worker.onmessage=function(e){
+    var d=e.data;
+    if(d.type==='ready'){pyodideReady=true;setBanner('ready','✓ Python engine ready. Aliens standing by.');enableBtns();return;}
+    if(d.type==='load-error'){setBanner('error','⚠️ Engine failed. Check internet and refresh.');return;}
+    if(pendingResolve){clearTimeout(pendingTimeout);var r=pendingResolve;pendingResolve=null;pendingTimeout=null;r(d);}
+  };
+  worker.onerror=function(){setBanner('error','⚠️ Engine error. Refresh the page.');};
+}
+startWorker();
+
+function callWorker(code,col,row,tc,tr,sc,bullets,others){
+  return new Promise(function(resolve){
+    pendingResolve=resolve;
+    pendingTimeout=setTimeout(function(){pendingResolve=null;resolve({ok:false,timeout:true});},5000);
+    worker.postMessage({id:Date.now(),code:code,col:col,row:row,tc:tc||0,tr:tr||0,sc:sc||0,bullets:bullets||[],others:others||[]});
+  });
+}
+
+function setBanner(kind,text){
+  var b=document.getElementById('engineBanner'),s=document.getElementById('engineSpinner');
+  b.className='engine-banner'+(kind==='ready'?' ready':kind==='error'?' error':'');
+  s.style.display=(kind==='loading')?'':'none';
+  document.getElementById('engineText').textContent=text;
+}
+function enableBtns(){['l1-btnRun','l2-btnRun','l3-btnRun1','l3-btnRun2','l3-btnRun3'].forEach(function(id){var el=document.getElementById(id);if(el)el.disabled=false;});}
+
+/* ═════════════════════════ TABS ════════════════════════ */
+window.switchLevel=function(n){
+  [1,2,3].forEach(function(i){document.getElementById('panel'+i).classList.toggle('active',i===n);document.getElementById('tab'+i).classList.toggle('active',i===n);});
+  document.getElementById('globalPill').textContent='Level '+n;
+};
+window.toggleHint=function(id){var el=document.getElementById(id);el.className=el.className.includes('show')?'hint-box':'hint-box show';};
+
+/* ═════════════════════════ SYNTAX HIGHLIGHTER ══════════ */
+function escH(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function highlight(code){
+  return code.split('\n').map(function(line){
+    var ci=-1,inStr=false,sc='';
+    for(var i=0;i<line.length;i++){var ch=line[i];if(!inStr&&(ch==='"'||ch==="'")){inStr=true;sc=ch;}else if(inStr&&ch===sc){inStr=false;}else if(!inStr&&ch==='#'){ci=i;break;}}
+    var code2=ci>=0?line.slice(0,ci):line,cmt=ci>=0?line.slice(ci):'';
+    var toks=[];
+    var prot=code2.replace(/(["'])(?:(?!\1).)*\1/g,function(m){var i=toks.length;toks.push('<span class="tok-str">'+escH(m)+'</span>');return'\x00S'+i+'\x00';});
+    var h=escH(prot);
+    h=h.replace(/\b(def|return|if|elif|else|for|while|in|not|and|or|pass|True|False|None|len)\b/g,'<span class="tok-kw">$1</span>');
+    h=h.replace(/\b(print|range|int|float|str|abs|isinstance|min|max)\b/g,'<span class="tok-builtin">$1</span>');
+    h=h.replace(/\balien3\b/g,'<span class="tok-obj3">alien3</span>');
+    h=h.replace(/\balien2\b/g,'<span class="tok-obj2">alien2</span>');
+    h=h.replace(/\balien1\b/g,'<span class="tok-obj">alien1</span>');
+    h=h.replace(/\balien\b/g,'<span class="tok-obj">alien</span>');
+    h=h.replace(/\.(move|stay|col|row|bullets|others|ship_col|target_col|target_row)\b/g,'.<span class="tok-method">$1</span>');
+    h=h.replace(/\b(-?\d+)\b/g,'<span class="tok-num">$1</span>');
+    h=h.replace(/([()])/g,'<span class="tok-paren">$1</span>');
+    h=h.replace(/([[|\]])/g,'<span class="tok-bracket">$1</span>');
+    h=h.replace(/\x00S(\d+)\x00/g,function(_,i){return toks[parseInt(i,10)];});
+    return h+(cmt?'<span class="tok-comment">'+escH(cmt)+'</span>':'');
+  }).join('\n')+'\n';
+}
+function bindEditor(taId,hlId,wrapId){
+  var ta=document.getElementById(taId),hl=document.getElementById(hlId),wrap=document.getElementById(wrapId);
+  function sync(){hl.innerHTML=highlight(ta.value);hl.scrollTop=ta.scrollTop;hl.scrollLeft=ta.scrollLeft;var h=Math.max(160,ta.scrollHeight);if(wrap){wrap.style.minHeight=h+'px';ta.style.height=h+'px';}}
+  ta.addEventListener('input',sync);
+  ta.addEventListener('scroll',function(){hl.scrollTop=this.scrollTop;hl.scrollLeft=this.scrollLeft;});
+  ta.addEventListener('keydown',function(e){if(e.key==='Tab'){e.preventDefault();var s=this.selectionStart,end=this.selectionEnd;this.value=this.value.slice(0,s)+'    '+this.value.slice(end);this.selectionStart=this.selectionEnd=s+4;sync();}});
+  sync();return sync;
+}
+var l1Sync=bindEditor('l1-editor','l1-hl','l1-wrap');
+var l2Sync=bindEditor('l2-editor','l2-hl','l2-wrap');
+var l3Sync1=bindEditor('l3-editor1','l3-hl1','l3-wrap1');
+var l3Sync2=bindEditor('l3-editor2','l3-hl2','l3-wrap2');
+var l3Sync3=bindEditor('l3-editor3','l3-hl3','l3-wrap3');
+
+/* ═════════════════════════ DRAWING ════════════════════ */
+function initCanvas(id,cellOverride){
+  var cv=document.getElementById(id);
+  var c=cellOverride||CELL;
+  cv.width=COLS*c;cv.height=ROWS*c;
+  cv._cell=c;
+  return cv.getContext('2d');
+}
+function drawBg(ctx){
+  var _C=ctx.canvas._cell||CELL;
+  ctx.fillStyle='#000408';ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
+  ctx.fillStyle='rgba(255,255,255,0.55)';
+  for(var i=0;i<60;i++){ctx.fillRect((i*97+13)%(COLS*_C),(i*61+7)%(ROWS*_C),i%3===0?1.5:1,i%3===0?1.5:1);}
+  ctx.strokeStyle='rgba(13,37,72,0.3)';ctx.lineWidth=0.5;
+  for(var c=0;c<=COLS;c++){ctx.beginPath();ctx.moveTo(c*_C,0);ctx.lineTo(c*_C,ROWS*_C);ctx.stroke();}
+  for(var r=0;r<=ROWS;r++){ctx.beginPath();ctx.moveTo(0,r*_C);ctx.lineTo(COLS*_C,r*_C);ctx.stroke();}
+}
+
+function drawAlienSprite(ctx,cx,cy,clr,dead,_cell_){
+  var CELL=_cell_||21;
+  if(dead){
+    ctx.strokeStyle=clr;ctx.lineWidth=1.5;ctx.globalAlpha=0.4;
+    ctx.beginPath();ctx.moveTo(cx-6,cy-6);ctx.lineTo(cx+6,cy+6);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx+6,cy-6);ctx.lineTo(cx-6,cy+6);ctx.stroke();
+    ctx.globalAlpha=1;return;
+  }
+  var s=CELL*0.38;
+  ctx.fillStyle=clr;
+  ctx.fillRect(cx-s,cy-s*0.55,s*2,s*1.1);
+  ctx.fillRect(cx-s*0.65,cy-s,s*0.35,s*0.48);
+  ctx.fillRect(cx+s*0.3,cy-s,s*0.35,s*0.48);
+  ctx.fillRect(cx-s,cy+s*0.52,s*0.38,s*0.45);
+  ctx.fillRect(cx-s*0.18,cy+s*0.52,s*0.38,s*0.45);
+  ctx.fillRect(cx+s*0.62,cy+s*0.52,s*0.38,s*0.45);
+  ctx.fillStyle='#000408';
+  ctx.fillRect(cx-s*0.52,cy-s*0.18,s*0.32,s*0.32);
+  ctx.fillRect(cx+s*0.2,cy-s*0.18,s*0.32,s*0.32);
+  ctx.fillStyle='rgba(255,255,255,0.9)';
+  ctx.fillRect(cx-s*0.46,cy-s*0.12,s*0.13,s*0.13);
+  ctx.fillRect(cx+s*0.26,cy-s*0.12,s*0.13,s*0.13);
+}
+
+function drawShip(ctx,col,tick,_cell_){
+  var CELL=_cell_||21;
+  var cx=col*CELL+CELL/2,cy=CELL*0.7;
+  var s=CELL*0.4,glow=Math.sin(tick*0.4)*0.3+0.7;
+  ctx.fillStyle='rgba(68,136,204,'+glow*0.5+')';ctx.beginPath();ctx.ellipse(cx,cy+s*1.2,s*0.25,s*0.2,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#4488CC';ctx.beginPath();ctx.ellipse(cx,cy,s,s*0.42,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#88CCFF';ctx.beginPath();ctx.ellipse(cx,cy-s*0.08,s*0.3,s*0.25,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#336699';
+  ctx.beginPath();ctx.moveTo(cx-s,cy+s*0.08);ctx.lineTo(cx-s*1.45,cy+s*0.65);ctx.lineTo(cx-s*0.25,cy+s*0.38);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(cx+s,cy+s*0.08);ctx.lineTo(cx+s*1.45,cy+s*0.65);ctx.lineTo(cx+s*0.25,cy+s*0.38);ctx.closePath();ctx.fill();
+}
+
+function drawBullet(ctx,col,row,tick,_cell_){
+  var CELL=_cell_||21;
+  var cx=col*CELL+CELL/2,cy=row*CELL+CELL/2;
+  var glow=Math.sin(tick*0.6)*0.3+0.7;
+  ctx.fillStyle='rgba(255,51,51,'+glow+')';
+  ctx.beginPath();ctx.ellipse(cx,cy,2.5,5,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(255,150,150,0.5)';
+  ctx.beginPath();ctx.ellipse(cx,cy-3,1.5,3,0,0,Math.PI*2);ctx.fill();
+}
+
+function drawTarget(ctx,col,row){
+  var cx=col*CELL+CELL/2,cy=row*CELL+CELL/2,r=CELL*0.42;
+  ctx.strokeStyle='rgba(255,184,0,0.7)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+  ctx.strokeStyle='rgba(255,184,0,0.4)';
+  ctx.beginPath();ctx.moveTo(cx-r*1.3,cy);ctx.lineTo(cx+r*1.3,cy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,cy-r*1.3);ctx.lineTo(cx,cy+r*1.3);ctx.stroke();
+  ctx.fillStyle='rgba(255,184,0,0.15)';ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();
+}
+
+function drawExplosion(ctx,col,row,age,_cell_){
+  var CELL=_cell_||21;
+  var cx=col*CELL+CELL/2,cy=row*CELL+CELL/2;
+  var alpha=Math.max(0,1-age/8);
+  for(var i=0;i<6;i++){
+    var ang=i/6*Math.PI*2,dist=(age/8)*CELL*0.8;
+    ctx.fillStyle='rgba(255,'+(100+i*20)+',0,'+alpha+')';
+    ctx.beginPath();ctx.arc(cx+Math.cos(ang)*dist,cy+Math.sin(ang)*dist,3*alpha,0,Math.PI*2);ctx.fill();
+  }
+  ctx.fillStyle='rgba(255,255,200,'+alpha+')';
+  ctx.beginPath();ctx.arc(cx,cy,CELL*0.25*alpha,0,Math.PI*2);ctx.fill();
+}
+
+function getHintMsg(err){
+  if(/IndentationError/.test(err))return'💡 Check indentation — 4 spaces inside your function.';
+  if(/SyntaxError/.test(err))return'💡 Check for missing colon after def run(alien): or mismatched brackets.';
+  if(/TypeError.*alien/.test(err))return'💡 alien.move() needs two numbers; alien.stay() takes no arguments.';
+  if(/KeyError/.test(err))return'💡 Bullet dicts use string keys: b["col"] and b["row"], not b.col.';
+  if(/IndexError/.test(err))return'💡 Check alien.bullets has items before accessing alien.bullets[0] — use if len(alien.bullets) > 0.';
+  return'💡 Read the error above — it usually points to the exact line.';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LEVEL 1 — OPEN SPACE SEQUENCING
+═══════════════════════════════════════════════════════════ */
+var L1={ctx:null,alienC:5,alienR:5,tgtC:14,tgtR:10,moves:null,stepIdx:0,stepCount:0,running:false,loopId:null};
+L1.ctx=initCanvas('l1-canvas');
+
+function l1Draw(){
+  drawBg(L1.ctx);
+  drawTarget(L1.ctx,L1.tgtC,L1.tgtR);
+  drawAlienSprite(L1.ctx,L1.alienC*CELL+CELL/2,L1.alienR*CELL+CELL/2,'#39FF14',false);
+  // coord labels
+  L1.ctx.fillStyle='rgba(90,122,154,0.2)';L1.ctx.font='7px monospace';
+  for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++)L1.ctx.fillText(c+','+r,c*CELL+1,r*CELL+8);
+}
+
+function l1UpdateCoords(){
+  document.getElementById('l1-pos').textContent='col '+L1.alienC+', row '+L1.alienR;
+  var dc=L1.tgtC-L1.alienC,dr=L1.tgtR-L1.alienR;
+  document.getElementById('l1-dc').textContent=(dc>=0?'+':'')+dc;
+  document.getElementById('l1-dr').textContent=(dr>=0?'+':'')+dr;
+  document.getElementById('l1-step').textContent=L1.stepCount;
+}
+
+function l1BuildChips(moves){
+  var log=document.getElementById('l1-log');log.innerHTML='';
+  moves.forEach(function(m,i){var ch=document.createElement('span');ch.className='move-chip';ch.id='l1c'+i;ch.textContent='('+m.x+','+m.y+')';log.appendChild(ch);});
+}
+function l1TickChip(i){if(i>0){var p=document.getElementById('l1c'+(i-1));if(p)p.className='move-chip done';}var c=document.getElementById('l1c'+i);if(c)c.className='move-chip active';}
+
+window.l1Load=function(){
+  if(!pyodideReady)return;
+  var code=document.getElementById('l1-editor').value;
+  document.getElementById('l1-feedback').textContent='Checking…';document.getElementById('l1-btnRun').disabled=true;
+  callWorker(code,L1.alienC,L1.alienR,L1.tgtC,L1.tgtR,0,[],[]).then(function(res){
+    document.getElementById('l1-btnRun').disabled=false;
+    if(!res.ok){var e=res.timeout?'Timed out.':(res.error||'Error');document.getElementById('l1-feedback').textContent='⚠️ '+e+'\n\n'+getHintMsg(e);L1.moves=null;document.getElementById('l1-btnStart').disabled=true;return;}
+    // L1 expects multiple moves — we collect by running tick-by-tick simulation
+    // We simulate: load code, collect all moves at once by running repeatedly
+    collectL1Moves(code);
+  });
+};
+
+function collectL1Moves(code){
+  // Run the code once — it should call move() multiple times
+  // We modify the worker call to collect all moves in one pass
+  // Re-use the already-validated code path, but call a multi-move collector
+  var MULTI_SETUP=[
+    'import sys,io,json',
+    'sys.stdout=io.StringIO()',
+    'class Alien:',
+    '    def __init__(self):',
+    '        self._moves=[]',
+    '        self.col=5;self.row=5',
+    '        self.target_col=14;self.target_row=10',
+    '        self.ship_col=0',
+    '        self.bullets=[]',
+    '        self.others=[]',
+    '    def move(self,x,y):',
+    '        self.col+=int(x);self.row+=int(y)',
+    '        self._moves.append({"x":int(x),"y":int(y)})',
+    '    def stay(self): pass',
+    'alien=Alien()',
+  ].join('\n');
+
+  // Use worker directly with a modified setup
+  var fullCode=MULTI_SETUP+'\n'+code+'\nrun(alien)\nimport json\nprint("MOVES:"+json.dumps(alien._moves))';
+  // We call the raw worker approach through a special path
+  callWorker(
+    // Trick: pass everything via code field, suppress action path
+    'class Alien:\n    def __init__(self):\n        self._action=None\n        self.col=5;self.row=5\n        self.target_col=14;self.target_row=10\n        self.ship_col=0\n        self.bullets=[]\n        self.others=[]\n        self._moves=[]\n    def move(self,x,y):\n        self.col+=int(x);self.row+=int(y)\n        self._moves.append({"x":int(x),"y":int(y)})\n    def stay(self): self._action={"type":"stay"}\nalien=Alien()\n'+
+    code.replace(/^def run\(alien\):/,'').split('\n').map(function(l){return '    '+l;}).join('\n')+
+    '\nrun(alien)',
+    5,5,14,10,0,[],[]
+  ).then(function(){
+    // Actually use a simpler approach — run via direct pyodide call path
+    // that returns _moves list
+    runMultiMove(code);
+  });
+}
+
+function runMultiMove(code){
+  // Call worker with special flag to return _moves array
+  var wrappedCode=
+    'def run(alien):\n'+
+    code.split('\n').filter(function(l){return !/^def run/.test(l);}).map(function(l){return '    '+l;}).join('\n');
+
+  // Direct approach: just simulate step by step up to 50 moves
+  var sim={col:5,row:5,moves:[]};
+  // We can't run arbitrary Python here, so we use the existing worker
+  // but collect moves by running with accumulator class
+  // The cleanest approach: send code that self-collects using _moves
+  var accumCode=[
+    'class _Coll:',
+    '    def __init__(self):',
+    '        self._action=None;self._moves=[]',
+    '        self.col=5;self.row=5',
+    '        self.target_col=14;self.target_row=10',
+    '        self.ship_col=0;self.bullets=[];self.others=[]',
+    '    def move(self,x,y):',
+    '        self.col+=int(x);self.row+=int(y)',
+    '        self._moves.append({"x":int(x),"y":int(y)})',
+    '    def stay(self):',
+    '        self._action={"type":"stay"}',
+    'alien=_Coll()',
+    code,
+    'run(alien)',
+    'import json as _j',
+    'print("__MOVES__:"+_j.dumps(alien._moves))'
+  ].join('\n');
+
+  // Use raw promise
+  var p=new Promise(function(resolve){
+    var oldResolve=pendingResolve;
+    pendingResolve=resolve;
+    pendingTimeout=setTimeout(function(){pendingResolve=null;resolve({ok:false,timeout:true});},6000);
+    worker.postMessage({id:Date.now(),code:accumCode,col:5,row:5,tc:14,tr:10,sc:0,bullets:[],others:[]});
+  });
+  p.then(function(res){
+    document.getElementById('l1-btnRun').disabled=false;
+    if(!res.ok){document.getElementById('l1-feedback').textContent='⚠️ '+(res.error||'Error')+'\n\n'+getHintMsg(res.error||'');L1.moves=null;document.getElementById('l1-btnStart').disabled=true;return;}
+    // Extract moves from stdout
+    var stdout=res.stdout||'';
+    var movesMatch=stdout.match(/__MOVES__:(\[.*\])/);
+    var parsed=[];
+    if(movesMatch){try{parsed=JSON.parse(movesMatch[1]);}catch(e){}}
+    if(!parsed.length){
+      // Try from action if only one move
+      try{var act=JSON.parse(res.action||'{}');if(act.type==='move')parsed=[{x:act.x,y:act.y}];}catch(e){}
+    }
+    if(!parsed.length){document.getElementById('l1-feedback').textContent='⚠️ No alien.move() calls found. Add some!';L1.moves=null;document.getElementById('l1-btnStart').disabled=true;return;}
+    L1.moves=parsed;l1BuildChips(parsed);
+    var preview=parsed.map(function(m,i){return '  '+(i+1)+'. alien.move('+m.x+','+m.y+')'}).join('\n');
+    document.getElementById('l1-feedback').textContent='✓ '+parsed.length+' move(s) loaded:\n'+preview+'\n\nPress Launch.';
+    document.getElementById('l1-btnStart').disabled=false;document.getElementById('l1-outcome').className='outcome-overlay';
+  });
+}
+
+function l1ResetState(){L1.alienC=5;L1.alienR=5;L1.stepIdx=0;L1.stepCount=0;l1UpdateCoords();l1Draw();document.getElementById('l1-log').innerHTML='<span style="color:var(--muted)">— move log —</span>';document.getElementById('l1-outcome').className='outcome-overlay';}
+
+window.l1Start=function(){
+  if(!L1.moves)return;
+  l1ResetState();l1BuildChips(L1.moves);
+  var f=document.getElementById('l1c0');if(f)f.className='move-chip active';
+  document.getElementById('l1-btnStart').style.display='none';document.getElementById('l1-btnStop').style.display='';
+  L1.running=true;l1Draw();
+  var tick=function(){
+    if(!L1.running)return;
+    if(L1.stepIdx>=L1.moves.length){l1End(false,'out');return;}
+    var m=L1.moves[L1.stepIdx];
+    var nc=Math.max(0,Math.min(COLS-1,L1.alienC+m.x));
+    var nr=Math.max(0,Math.min(ROWS-1,L1.alienR+m.y));
+    L1.alienC=nc;L1.alienR=nr;L1.stepIdx++;L1.stepCount++;
+    l1TickChip(L1.stepIdx);l1UpdateCoords();l1Draw();
+    if(L1.alienC===L1.tgtC&&L1.alienR===L1.tgtR){l1End(true,'');return;}
+    L1.loopId=setTimeout(tick,parseInt(document.getElementById('l1-speed').value));
+  };
+  L1.loopId=setTimeout(tick,parseInt(document.getElementById('l1-speed').value));
+};
+
+function l1End(caught,reason){
+  L1.running=false;clearTimeout(L1.loopId);l1Draw();
+  var ov=document.getElementById('l1-outcome');ov.className='outcome-overlay show';
+  var ti=document.getElementById('l1-otitle'),su=document.getElementById('l1-osub'),sc=document.getElementById('l1-oscore');
+  if(caught){
+    ti.className='outcome-title win';ti.textContent='👾 TARGET REACHED!';
+    su.textContent='Navigation complete in '+L1.stepCount+' steps.\nScreenshot for your OneNote evidence.';
+    sc.textContent='Steps: '+L1.stepCount+' | Marks: '+(L1.stepCount<=14?'5–6':L1.stepCount<=20?'3–4':'1–2')+' / 6';
+    document.getElementById('tab1').classList.add('completed');
+  }else{
+    ti.className='outcome-title lose';ti.textContent='🛸 MISSED TARGET';
+    var dc=L1.tgtC-L1.alienC,dr=L1.tgtR-L1.alienR;
+    su.textContent='Ran out of moves. Alien at col '+L1.alienC+', row '+L1.alienR+'.\nStill '+Math.abs(dc)+' col(s) and '+Math.abs(dr)+' row(s) away.';
+    sc.textContent='Add more alien.move() calls to reach col 14, row 10.';
+  }
+  document.getElementById('l1-btnStart').style.display='';document.getElementById('l1-btnStart').textContent='▶ Try Again';
+  document.getElementById('l1-btnStop').style.display='none';
+}
+window.l1Stop=function(){L1.running=false;clearTimeout(L1.loopId);document.getElementById('l1-btnStart').style.display='';document.getElementById('l1-btnStart').textContent='▶ Launch';document.getElementById('l1-btnStop').style.display='none';};
+window.l1Reset=function(){document.getElementById('l1-editor').value='def run(alien):\n    alien.move(1, 0)\n';l1Sync();L1.moves=null;document.getElementById('l1-btnStart').disabled=true;document.getElementById('l1-feedback').textContent='Code reset.';L1.running=false;clearTimeout(L1.loopId);l1ResetState();};
+l1Draw();
+
+/* ═══════════════════════════════════════════════════════════
+   SHARED: SHIP + BULLETS SIMULATION
+═══════════════════════════════════════════════════════════ */
+function makeShipBullets(){
+  return {
+    shipCol:8, shipDir:1, shipSpeed:3, shipTick:0,
+    bullets:[], bulletTick:0, fireCooldown:4
+  };
+}
+
+function stepShip(sb,tick){
+  sb.shipTick++;
+  if(sb.shipTick%sb.shipSpeed===0){
+    sb.shipCol+=sb.shipDir;
+    if(sb.shipCol>=COLS-1){sb.shipDir=-1;}
+    if(sb.shipCol<=0){sb.shipDir=1;}
+  }
+  sb.bulletTick++;
+  if(sb.bulletTick>=sb.fireCooldown){
+    sb.bullets.push({col:sb.shipCol,row:1});
+    sb.bulletTick=0;
+    // vary cooldown slightly
+    sb.fireCooldown=3+Math.floor(Math.random()*3);
+  }
+  // Move bullets down
+  for(var i=sb.bullets.length-1;i>=0;i--){
+    sb.bullets[i].row+=1;
+    if(sb.bullets[i].row>=ROWS)sb.bullets.splice(i,1);
+  }
+}
+
+function bulletHits(bullets,col,row){
+  for(var i=0;i<bullets.length;i++){if(bullets[i].col===col&&Math.abs(bullets[i].row-row)<=1)return true;}
+  return false;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LEVEL 2 — THE MINEFIELD (plan-then-play, static bullets)
+═══════════════════════════════════════════════════════════ */
+var L2_FIELDS=[
+  {name:'Field A — Open Corridor', start:[2,13], target:[17,1], walls:[{row:7,gaps:[9,10]}]},
+  {name:'Field B — Two Walls',     start:[1,13], target:[18,1], walls:[{row:5,gaps:[9,10]},{row:10,gaps:[14,15]}]},
+  {name:'Field C — Tight Squeeze', start:[1,13], target:[18,1], walls:[{row:4,gaps:[10]},{row:8,gaps:[6]},{row:11,gaps:[16]}]}
+];
+function l2BuildBullets(field){
+  var bullets=[];
+  field.walls.forEach(function(w){
+    for(var c=0;c<COLS;c++){ if(w.gaps.indexOf(c)===-1) bullets.push({col:c,row:w.row}); }
+  });
+  return bullets;
+}
+L2_FIELDS.forEach(function(f){f.bullets=l2BuildBullets(f);});
+
+var L2_DEFAULT_CODE='def run(alien):\n    alien.move(1, 0)\n';
+
+var L2={
+  selected:0,
+  solved:[false,false,false],
+  loadedMoves:[null,null,null],
+  savedCode:[L2_DEFAULT_CODE,L2_DEFAULT_CODE,L2_DEFAULT_CODE],
+  ctx:null,alienC:0,alienR:0,stepIdx:0,stepCount:0,running:false,loopId:null
+};
+L2.ctx=initCanvas('l2-canvas');
+
+function l2Draw(){
+  var field=L2_FIELDS[L2.selected];
+  drawBg(L2.ctx);
+  drawTarget(L2.ctx,field.target[0],field.target[1]);
+  field.bullets.forEach(function(b){drawBullet(L2.ctx,b.col,b.row,0);});
+  drawAlienSprite(L2.ctx,L2.alienC*CELL+CELL/2,L2.alienR*CELL+CELL/2,'#39FF14',false);
+  document.getElementById('l2-pos').textContent='col '+L2.alienC+', row '+L2.alienR;
+  document.getElementById('l2-tgt').textContent='col '+field.target[0]+', row '+field.target[1];
+  var dc=field.target[0]-L2.alienC, dr=field.target[1]-L2.alienR;
+  document.getElementById('l2-dc').textContent=(dc>=0?'+':'')+dc;
+  document.getElementById('l2-dr').textContent=(dr>=0?'+':'')+dr;
+  document.getElementById('l2-step').textContent=L2.stepCount;
+  document.getElementById('l2-whichfield').textContent=field.name;
+}
+
+function l2BuildChips(moves){
+  var log=document.getElementById('l2-log');log.innerHTML='';
+  moves.forEach(function(m,i){var ch=document.createElement('span');ch.className='move-chip';ch.id='l2c'+i;ch.textContent='('+m.x+','+m.y+')';log.appendChild(ch);});
+}
+function l2TickChip(i){if(i>0){var p=document.getElementById('l2c'+(i-1));if(p)p.className='move-chip done';}var c=document.getElementById('l2c'+i);if(c)c.className='move-chip active';}
+
+window.l2SelectPuzzle=function(idx){
+  L2.savedCode[L2.selected]=document.getElementById('l2-editor').value;
+  L2.selected=idx;
+  document.getElementById('l2-editor').value=L2.savedCode[idx];
+  l2Sync();
+  [0,1,2].forEach(function(i){
+    var btn=document.getElementById('l2-tab'+i);
+    if(i===idx){btn.style.background='var(--green)';btn.style.color='#020a00';btn.style.border='none';}
+    else{btn.style.background='var(--space-mid)';btn.style.color='var(--muted)';btn.style.border='1px solid var(--line)';}
+  });
+  var field=L2_FIELDS[idx];
+  L2.alienC=field.start[0];L2.alienR=field.start[1];L2.stepIdx=0;L2.stepCount=0;
+  l2Draw();
+  document.getElementById('l2-log').innerHTML='<span style="color:var(--muted)">— move log —</span>';
+  document.getElementById('l2-btnStart').disabled=!L2.loadedMoves[idx];
+  document.getElementById('l2-outcome').className='outcome-overlay';
+};
+
+window.l2Load=function(){
+  if(!pyodideReady)return;
+  var idx=L2.selected, field=L2_FIELDS[idx];
+  var code=document.getElementById('l2-editor').value;
+  L2.savedCode[idx]=code;
+  document.getElementById('l2-fb'+idx).textContent='Checking…';
+  document.getElementById('l2-btnRun').disabled=true;
+  l2CollectMoves(code,field,idx);
+};
+
+function l2CollectMoves(code,field,idx){
+  // Collect the FULL route from one call to run(alien), Ghost-Protocol style.
+  // The shared worker always re-runs "run(alien)" once after our code —
+  // we neutralise that forced second call by shadowing run() with a no-op
+  // straight after we've already run it and captured the moves ourselves.
+  var accumCode=[
+    'class _Coll:',
+    '    def __init__(self):',
+    '        self._action=None;self._moves=[]',
+    '        self.col='+field.start[0]+';self.row='+field.start[1],
+    '        self.target_col='+field.target[0]+';self.target_row='+field.target[1],
+    '        self.ship_col=0;self.bullets=[];self.others=[]',
+    '    def move(self,x,y):',
+    '        self.col+=int(x);self.row+=int(y)',
+    '        self._moves.append({"x":int(x),"y":int(y)})',
+    '    def stay(self):',
+    '        self._action={"type":"stay"}',
+    'alien=_Coll()',
+    code,
+    'run(alien)',
+    'def run(alien): pass', // neutralise the worker's forced second run(alien) call
+    'import json as _j',
+    'print("__MOVES__:"+_j.dumps(alien._moves))'
+  ].join('\n');
+  pendingResolve=null;clearTimeout(pendingTimeout);
+  var p=new Promise(function(resolve){
+    pendingResolve=resolve;
+    pendingTimeout=setTimeout(function(){pendingResolve=null;resolve({ok:false,timeout:true});},6000);
+    worker.postMessage({id:Date.now(),code:accumCode,col:field.start[0],row:field.start[1],tc:field.target[0],tr:field.target[1],sc:0,bullets:[],others:[]});
+  });
+  p.then(function(res){
+    document.getElementById('l2-btnRun').disabled=false;
+    if(!res.ok){
+      var e=res.timeout?'Timed out.':(res.error||'Error');
+      document.getElementById('l2-fb'+idx).textContent='⚠️ '+e+'\n'+getHintMsg(e);
+      L2.loadedMoves[idx]=null;document.getElementById('l2-btnStart').disabled=true;return;
+    }
+    var stdout=res.stdout||'';
+    var m=stdout.match(/__MOVES__:(\[.*\])/);
+    var parsed=[];
+    if(m){try{parsed=JSON.parse(m[1]);}catch(ex){}}
+    if(!parsed.length){
+      document.getElementById('l2-fb'+idx).textContent='⚠️ No alien.move() calls found. Add some!';
+      L2.loadedMoves[idx]=null;document.getElementById('l2-btnStart').disabled=true;return;
+    }
+    L2.loadedMoves[idx]=parsed;
+    var otherOut=stdout.replace(/__MOVES__:\[.*\]\n?/,'');
+    var extra=otherOut.trim()?'\nPrint output:\n'+otherOut.trim():'';
+    document.getElementById('l2-fb'+idx).textContent='✓ '+parsed.length+' move(s) queued.'+extra+'\nPress Launch to test the route.';
+    document.getElementById('l2-btnStart').disabled=false;
+    document.getElementById('l2-outcome').className='outcome-overlay';
+  });
+}
+
+window.l2Start=function(){
+  var idx=L2.selected, field=L2_FIELDS[idx];
+  var moves=L2.loadedMoves[idx]; if(!moves)return;
+  L2.alienC=field.start[0];L2.alienR=field.start[1];L2.stepIdx=0;L2.stepCount=0;L2.running=true;
+  document.getElementById('l2-btnStart').style.display='none';
+  document.getElementById('l2-btnStop').style.display='';
+  document.getElementById('l2-outcome').className='outcome-overlay';
+  l2BuildChips(moves);
+  var fc=document.getElementById('l2c0');if(fc)fc.className='move-chip active';
+  l2Draw();
+  var speed=parseInt(document.getElementById('l2-speed').value);
+  var tick=function(){
+    if(!L2.running)return;
+    if(L2.stepIdx>=moves.length){l2End(false,'out',idx);return;}
+    var m=moves[L2.stepIdx];
+    var nc=L2.alienC+m.x, nr=L2.alienR+m.y;
+    if(nc<0||nc>=COLS||nr<0||nr>=ROWS){l2End(false,'edge',idx);return;}
+    var hitBullet=field.bullets.some(function(b){return b.col===nc&&b.row===nr;});
+    L2.alienC=nc;L2.alienR=nr;L2.stepIdx++;L2.stepCount++;
+    l2TickChip(L2.stepIdx);
+    l2Draw();
+    if(hitBullet){l2End(false,'hit',idx);return;}
+    if(L2.alienC===field.target[0]&&L2.alienR===field.target[1]){l2End(true,'',idx);return;}
+    L2.loopId=setTimeout(tick,speed);
+  };
+  L2.loopId=setTimeout(tick,speed);
+};
+
+function l2End(caught,reason,idx){
+  L2.running=false;clearTimeout(L2.loopId);
+  var field=L2_FIELDS[idx];
+  l2Draw();
+  var ov=document.getElementById('l2-outcome');ov.className='outcome-overlay show';
+  var ti=document.getElementById('l2-otitle'),su=document.getElementById('l2-osub'),sc=document.getElementById('l2-oscore');
+  var letter=idx===0?'A':idx===1?'B':'C';
+  if(caught){
+    ti.className='outcome-title win';ti.textContent='🎯 FIELD '+letter+' SOLVED!';
+    su.textContent='Route complete in '+L2.stepCount+' moves.\nScreenshot for your OneNote evidence.';
+    sc.textContent='Field '+letter+' complete ✓';
+    if(!L2.solved[idx]){L2.solved[idx]=true;document.getElementById('l2-tab'+idx).classList.add('completed');l2UpdateProgress();}
+    document.getElementById('l2-fb'+idx).textContent='✓ SOLVED in '+L2.stepCount+' moves!';
+  }else{
+    ti.className='outcome-title lose';
+    if(reason==='hit'){ti.textContent='💥 HIT A BULLET!';su.textContent='Your route walked straight into a bullet at col '+L2.alienC+', row '+L2.alienR+'. Check the gaps and try a different route.';}
+    else if(reason==='edge'){ti.textContent='🛸 OUT OF BOUNDS!';su.textContent='Your route left the grid. Keep col 0–'+(COLS-1)+' and row 0–'+(ROWS-1)+'.';}
+    else{ti.textContent='🟡 TARGET NOT REACHED';su.textContent='Ran out of moves. Alien at col '+L2.alienC+', row '+L2.alienR+'. Target at col '+field.target[0]+', row '+field.target[1]+'.';}
+    sc.textContent='Try again with a different route.';
+  }
+  document.getElementById('l2-btnStart').style.display='';document.getElementById('l2-btnStart').textContent='▶ Try Again';
+  document.getElementById('l2-btnStop').style.display='none';
+}
+
+function l2UpdateProgress(){
+  var n=L2.solved.filter(Boolean).length;
+  if(n===3)document.getElementById('tab2').classList.add('completed');
+}
+
+window.l2Stop=function(){L2.running=false;clearTimeout(L2.loopId);document.getElementById('l2-btnStart').style.display='';document.getElementById('l2-btnStart').textContent='▶ Launch';document.getElementById('l2-btnStop').style.display='none';};
+window.l2Reset=function(){
+  var idx=L2.selected;
+  document.getElementById('l2-editor').value=L2_DEFAULT_CODE;
+  l2Sync();
+  L2.savedCode[idx]=L2_DEFAULT_CODE;
+  L2.loadedMoves[idx]=null;
+  document.getElementById('l2-btnStart').disabled=true;
+  document.getElementById('l2-fb'+idx).textContent='Code reset.';
+  L2.running=false;clearTimeout(L2.loopId);
+  var field=L2_FIELDS[idx];
+  L2.alienC=field.start[0];L2.alienR=field.start[1];L2.stepIdx=0;L2.stepCount=0;
+  l2Draw();
+  document.getElementById('l2-log').innerHTML='<span style="color:var(--muted)">— move log —</span>';
+  document.getElementById('l2-outcome').className='outcome-overlay';
+};
+
+(function(){var f0=L2_FIELDS[0];L2.alienC=f0.start[0];L2.alienR=f0.start[1];l2Draw();})();
+
+
+/* ═══════════════════════════════════════════════════════════
+   LEVEL 3 — SWARM SURVIVAL
+═══════════════════════════════════════════════════════════ */
+var L3={
+  ctx:null,
+  code1:null,code2:null,code3:null,
+  aliens:[
+    {c:9, r:10,alive:true,ticks:0,clr:'#39FF14'},
+    {c:10,r:10,alive:true,ticks:0,clr:'#FF6FCF'},
+    {c:11,r:10,alive:true,ticks:0,clr:'#FFB800'}
+  ],
+  sb:null,tick:0,running:false,loopId:null,
+  explosions:[],maxTicks:200
+};
+L3.ctx=initCanvas('l3-canvas',15);
+
+var L3_STARTS=[[9,10],[10,10],[11,10]];
+var L3_CODES=[null,null,null];
+
+function l3Draw(){
+  var _C=L3.ctx.canvas._cell||CELL;
+  drawBg(L3.ctx);
+  drawShip(L3.ctx,L3.sb.shipCol,L3.tick,_C);
+  L3.sb.bullets.forEach(function(b){drawBullet(L3.ctx,b.col,b.row,L3.tick,_C);});
+  L3.explosions.forEach(function(ex){drawExplosion(L3.ctx,ex.col,ex.row,ex.age,_C);});
+  L3.aliens.forEach(function(a){
+    drawAlienSprite(L3.ctx,a.c*_C+_C/2,a.r*_C+_C/2,a.clr,!a.alive,_C);
+  });
+  document.getElementById('l3-bcount').textContent=L3.sb.bullets.length;
+  document.getElementById('l3-tick').textContent=L3.tick;
+  document.getElementById('l3-alive').textContent=L3.aliens.filter(function(a){return a.alive;}).length;
+  L3.aliens.forEach(function(a,i){
+    var el=document.getElementById('l3-p'+(i+1));
+    if(el)el.textContent=a.alive?'col '+a.c+', row '+a.r:'DEAD (tick '+a.ticks+')';
+    var bar=document.getElementById('l3-bar'+(i+1));
+    var ticks=document.getElementById('l3-ticks'+(i+1));
+    var pct=Math.min(100,(a.ticks/L3.maxTicks)*100);
+    if(bar)bar.style.width=pct+'%';
+    if(ticks)ticks.textContent=(a.alive?a.ticks:a.ticks)+' ticks'+(a.alive?' ⬆':'');
+  });
+}
+
+window.l3Load=function(n){
+  if(!pyodideReady)return;
+  var code=document.getElementById('l3-editor'+n).value;
+  var btnId='l3-btnRun'+n;
+  document.getElementById('l3-feedback').textContent='Checking Alien '+n+'…';document.getElementById(btnId).disabled=true;
+  var testBullets=[{col:L3_STARTS[n-1][0],row:5}];
+  var others=L3_STARTS.filter(function(_,i){return i!==n-1;}).map(function(s){return{col:s[0],row:s[1]};});
+  callWorker(code,L3_STARTS[n-1][0],L3_STARTS[n-1][1],0,0,10,testBullets,others).then(function(res){
+    document.getElementById(btnId).disabled=false;
+    if(!res.ok){var e=res.timeout?'Timed out.':(res.error||'Error');document.getElementById('l3-feedback').textContent='⚠️ Alien '+n+' error:\n'+e+'\n'+getHintMsg(e);L3_CODES[n-1]=null;document.getElementById('l3-btnStart').disabled=true;return;}
+    var act;try{act=JSON.parse(res.action||'{}');}catch(e){act={type:'stay'};}
+    L3_CODES[n-1]=code;
+    var stdout=res.stdout?'\nPrint: '+res.stdout:'';
+    var allLoaded=L3_CODES[0]&&L3_CODES[1]&&L3_CODES[2];
+    document.getElementById('l3-feedback').textContent='✓ Alien '+n+' loaded! Action: '+act.type+(act.type==='move'?' ('+act.x+','+act.y+')':'')+stdout+(allLoaded?'\n\nAll 3 loaded — press Begin Swarm!':'\n\nLoad the other alien(s) too.');
+    document.getElementById('l3-btnStart').disabled=!allLoaded;
+    document.getElementById('l3-outcome').className='outcome-overlay';
+  });
+};
+
+window.l3Start=function(){
+  if(!L3_CODES[0]||!L3_CODES[1]||!L3_CODES[2])return;
+  L3.aliens=[
+    {c:L3_STARTS[0][0],r:L3_STARTS[0][1],alive:true,ticks:0,clr:'#39FF14'},
+    {c:L3_STARTS[1][0],r:L3_STARTS[1][1],alive:true,ticks:0,clr:'#FF6FCF'},
+    {c:L3_STARTS[2][0],r:L3_STARTS[2][1],alive:true,ticks:0,clr:'#FFB800'}
+  ];
+  L3.sb=makeShipBullets();L3.tick=0;L3.running=true;L3.explosions=[];
+  document.getElementById('l3-outcome').className='outcome-overlay';
+  document.getElementById('l3-btnStart').style.display='none';document.getElementById('l3-btnStop').style.display='';
+  var speed=parseInt(document.getElementById('l3-speed').value);
+
+  var tick=function(){
+    if(!L3.running)return;
+    stepShip(L3.sb,L3.tick);L3.tick++;
+    L3.explosions.forEach(function(ex){ex.age++;});
+    L3.explosions=L3.explosions.filter(function(ex){return ex.age<10;});
+
+    // Tick alive aliens
+    L3.aliens.forEach(function(a){if(a.alive)a.ticks=L3.tick;});
+
+    // Check bullet hits on alive aliens
+    L3.aliens.forEach(function(a,i){
+      if(!a.alive)return;
+      if(bulletHits(L3.sb.bullets,a.c,a.r)){
+        a.alive=false;L3.explosions.push({col:a.c,row:a.r,age:0});
+        document.getElementById('l3-feedback').textContent='💥 Alien '+(i+1)+' destroyed at tick '+L3.tick+'!';
+      }
+    });
+
+    // Check collisions between alive aliens
+    for(var i=0;i<3;i++){
+      if(!L3.aliens[i].alive)continue;
+      for(var j=i+1;j<3;j++){
+        if(!L3.aliens[j].alive)continue;
+        if(L3.aliens[i].c===L3.aliens[j].c&&L3.aliens[i].r===L3.aliens[j].r){
+          L3.aliens[j].alive=false;
+          L3.explosions.push({col:L3.aliens[j].c,row:L3.aliens[j].r,age:0});
+          document.getElementById('l3-feedback').textContent='💥 Alien '+(j+1)+' collided with Alien '+(i+1)+' at tick '+L3.tick+'!';
+        }
+      }
+    }
+
+    var aliveAliens=L3.aliens.filter(function(a){return a.alive;});
+    if(!aliveAliens.length){l3End('destroyed');return;}
+    if(L3.tick>=L3.maxTicks){l3End('timeout');return;}
+
+    // Run each alive alien's code in sequence
+    function runAlien(idx,done){
+      if(idx>=3){done();return;}
+      var a=L3.aliens[idx];
+      if(!a.alive){runAlien(idx+1,done);return;}
+      var others=L3.aliens.filter(function(_,i){return i!==idx;}).map(function(oa){return{col:oa.c,row:oa.r,alive:oa.alive};});
+      callWorker(L3_CODES[idx],a.c,a.r,0,0,L3.sb.shipCol,L3.sb.bullets,others).then(function(res){
+        if(res.ok){
+          var act;try{act=JSON.parse(res.action||'{}');}catch(e){act={type:'stay'};}
+          if(act.type==='move'){
+            a.c=Math.max(0,Math.min(COLS-1,a.c+act.x));
+            a.r=Math.max(0,Math.min(ROWS-1,a.r+act.y));
+          }
+          if(a.r===0&&Math.abs(a.c-L3.sb.shipCol)<=1){l3End('victory',idx);return;}
+        }
+        runAlien(idx+1,done);
+      });
+    }
+
+    runAlien(0,function(){
+      l3Draw();
+      if(L3.running)L3.loopId=setTimeout(tick,speed);
+    });
+  };
+
+  l3Draw();L3.loopId=setTimeout(tick,speed);
+};
+
+function l3End(reason,winnerIdx){
+  L3.running=false;clearTimeout(L3.loopId);l3Draw();
+  var ov=document.getElementById('l3-outcome');ov.className='outcome-overlay show';
+  var ti=document.getElementById('l3-otitle'),su=document.getElementById('l3-osub'),sc=document.getElementById('l3-oscore');
+  var survivors=L3.aliens.filter(function(a){return a.alive;});
+  var best=L3.aliens.reduce(function(mx,a){return a.ticks>mx?a.ticks:mx;},0);
+  var marks=best>=100?'10–12':best>=50?'7–9':best>=25?'4–6':'1–3';
+  if(reason==='victory'){
+    ti.className='outcome-title win';ti.textContent='🚀 SHIP DESTROYED!';
+    su.textContent='Alien '+(winnerIdx+1)+' reached the ship at tick '+L3.tick+' — enemy defeated!\nScreenshot the survival bars for your evidence.';
+    sc.textContent='Ship destroyed at tick '+L3.tick+' | Survivors: '+survivors.length+'/3 | Max marks!';
+    document.getElementById('tab3').classList.add('completed');
+  }else if(survivors.length){
+    ti.className='outcome-title win';ti.textContent='👾 SWARM SURVIVED!';
+    su.textContent=survivors.length+' alien(s) still alive at tick '+L3.tick+'!\nScreenshot the survival bars for your evidence.';
+    sc.textContent='Survivors: '+survivors.length+'/3 | Best: '+best+' ticks | Marks: ~'+marks+' / 12';
+    document.getElementById('tab3').classList.add('completed');
+  }else{
+    ti.className='outcome-title lose';ti.textContent='💥 SWARM DESTROYED!';
+    su.textContent='Last alien fell at tick '+L3.tick+'. Best individual: '+best+' ticks.\nImprove your dodge and collision logic.';
+    sc.textContent='Survivors: 0/3 | Best: '+best+' ticks | Marks: ~'+marks+' / 12';
+  }
+  document.getElementById('l3-btnStart').style.display='';document.getElementById('l3-btnStart').textContent='▶ Try Again';
+  document.getElementById('l3-btnStop').style.display='none';
+}
+
+window.l3Stop=function(){L3.running=false;clearTimeout(L3.loopId);document.getElementById('l3-btnStart').style.display='';document.getElementById('l3-btnStart').textContent='▶ Begin Swarm';document.getElementById('l3-btnStop').style.display='none';};
+
+var L3_STARTERS=[
+  'def run(alien):\n    for b in alien.bullets:\n        if b["col"] == alien.col:\n            alien.move(1, 0)\n            return\n    alien.stay()\n',
+  'def run(alien):\n    for b in alien.bullets:\n        if b["col"] == alien.col:\n            alien.move(1, 0)\n            return\n    alien.stay()\n',
+  'def run(alien):\n    for b in alien.bullets:\n        if b["col"] == alien.col:\n            alien.move(1, 0)\n            return\n    alien.stay()\n'
+];
+window.l3Reset=function(n){
+  document.getElementById('l3-editor'+n).value=L3_STARTERS[n-1];
+  [l3Sync1,l3Sync2,l3Sync3][n-1]();
+  L3_CODES[n-1]=null;document.getElementById('l3-btnStart').disabled=true;
+  document.getElementById('l3-feedback').textContent='Alien '+n+' reset.';
+};
+
+L3.sb=makeShipBullets();l3Draw();
+
+})();
+</script>
+</body>
+</html>

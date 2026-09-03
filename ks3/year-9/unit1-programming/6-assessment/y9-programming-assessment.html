@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Year 9 Computing — Programming Assessment</title>
+<style>
+:root{
+  --navy:#0D1B2A; --panel:#0F2236; --line:#1F3A52;
+  --teal:#1B7E8B; --amber:#D89A1F; --white:#EAF6FB;
+  --muted:#7F93A8; --pass:#3DDC97; --fail:#FF6B6B;
+  --mono:'Consolas','Courier New',monospace;
+  --sans:-apple-system,'Segoe UI',Arial,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--navy);color:var(--white);font-family:var(--sans);min-height:100vh;padding:20px 14px 60px;}
+.wrap{max-width:980px;margin:0 auto;}
+h1{font-family:var(--mono);font-size:18px;letter-spacing:1.5px;color:var(--teal);}
+.hdr{display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:18px;flex-wrap:wrap;}
+.hdr-badge{width:44px;height:44px;border-radius:10px;background:linear-gradient(150deg,#0A3A4A,var(--panel));border:1px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.hdr-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+.pill{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--teal);margin-left:auto;}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:20px;}
+.tab{font-family:var(--mono);font-size:13px;padding:10px 18px;border-radius:8px 8px 0 0;cursor:pointer;border:1px solid var(--line);border-bottom:none;background:var(--panel);color:var(--muted);transition:all .15s;position:relative;bottom:-1px;}
+.tab:hover{color:var(--white);}
+.tab.active{background:#0D1B2A;color:var(--teal);border-color:var(--teal);border-bottom:1px solid #0D1B2A;}
+.tab-panel{display:none;}.tab-panel.active{display:block;}
+
+/* Cards */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:16px;}
+.card h2{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--teal);margin-bottom:10px;}
+.card p{font-size:13.5px;line-height:1.6;color:var(--white);margin-bottom:6px;}
+.card code{font-family:var(--mono);background:#081420;padding:2px 6px;border-radius:3px;color:var(--amber);}
+
+/* Q&A */
+.q-block{background:#081420;border:1px solid var(--line);border-radius:8px;margin-bottom:12px;overflow:hidden;}
+.q-head{padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--line);font-size:13px;display:flex;align-items:center;gap:10px;}
+.q-num{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:4px;background:var(--teal);color:#021a1a;}
+.q-text{flex:1;line-height:1.5;}
+.q-body{padding:12px 14px;}
+pre.snippet{background:#020D18;border-radius:6px;padding:10px 12px;font-family:var(--mono);font-size:13px;color:#CDE4F5;line-height:1.7;margin-bottom:10px;overflow-x:auto;}
+pre.snippet .kw{color:#C586C0;}
+pre.snippet .fn{color:#DCDCAA;}
+pre.snippet .nm{color:#9CDCFE;}
+pre.snippet .cm{color:#6A9955;}
+pre.snippet .st{color:#CE9178;}
+pre.snippet .nu{color:#B5CEA8;}
+
+/* Inputs */
+select.ans-select, input.ans-input{
+  font-family:var(--mono);font-size:13px;padding:7px 10px;border-radius:6px;
+  background:#020D18;border:1px solid var(--line);color:var(--white);width:100%;margin-top:4px;
+}
+select.ans-select:disabled, input.ans-input:disabled{opacity:0.6;cursor:not-allowed;}
+.blank-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
+.blank-label{font-size:13px;color:var(--muted);min-width:160px;}
+input.blank{font-family:var(--mono);font-size:13px;padding:6px 9px;background:#020D18;border:1px solid var(--line);color:var(--white);border-radius:5px;width:180px;}
+input.blank:disabled{opacity:0.6;}
+
+/* Submit */
+.btn{font-family:var(--mono);font-size:13px;padding:9px 20px;border-radius:7px;border:none;cursor:pointer;transition:all .15s;}
+.btn-submit{background:var(--teal);color:#021a1a;}
+.btn-submit:hover{filter:brightness(1.1);}
+.btn-submit:disabled{background:var(--line);color:var(--muted);cursor:not-allowed;}
+
+/* Results panel */
+.results-panel{background:#020D18;border:2px solid var(--teal);border-radius:10px;padding:16px;margin-top:18px;display:none;}
+.results-panel.show{display:block;}
+.results-title{font-family:var(--mono);font-size:12px;color:var(--teal);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+.res-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:13px;}
+.res-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.res-dot.pass{background:var(--pass);color:#021a10;}
+.res-dot.fail{background:var(--fail);color:#1a0000;}
+.res-q{color:var(--muted);min-width:20px;font-family:var(--mono);font-size:11px;}
+.res-ans{font-family:var(--mono);font-size:12px;}
+.res-correct{color:var(--pass);}
+.res-wrong{color:var(--fail);}
+.score-line{font-family:var(--mono);font-size:16px;color:var(--amber);margin-top:12px;padding-top:10px;border-top:1px solid var(--line);}
+.screenshot-hint{font-size:12px;color:var(--muted);margin-top:8px;font-style:italic;}
+
+/* Tab 3/4 — Mario */
+.mario-wrap{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start;}
+@media(max-width:800px){.mario-wrap{grid-template-columns:1fr;}}
+canvas.mario-canvas{display:block;border-radius:8px;border:2px solid var(--line);}
+.editor-panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.editor-topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--line);background:#081420;}
+.mac-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px;}
+.mac-r{background:#FF5F56;}.mac-y{background:#FFBD2E;}.mac-g{background:#27C93F;}
+.editor-wrap{position:relative;background:#081420;border-bottom:1px solid var(--line);}
+.editor-wrap textarea,.editor-wrap .hl{font-family:var(--mono);font-size:13px;line-height:1.65;padding:12px;tab-size:4;white-space:pre;overflow-wrap:normal;overflow-x:auto;min-height:160px;width:100%;}
+.editor-wrap textarea{position:absolute;top:0;left:0;height:100%;background:transparent;color:transparent;caret-color:#fff;border:none;outline:none;resize:none;z-index:2;-webkit-text-fill-color:transparent;}
+.editor-wrap .hl{position:relative;z-index:1;pointer-events:none;color:#cdeaf5;margin:0;overflow:hidden;}
+.editor-footer{padding:8px 12px;display:flex;gap:8px;background:var(--panel);}
+.btn-run{background:var(--teal);color:#021a1a;font-family:var(--mono);font-size:12px;padding:7px 16px;border-radius:6px;border:none;cursor:pointer;}
+.btn-run:disabled{background:var(--line);color:var(--muted);cursor:not-allowed;}
+.btn-reset{background:transparent;color:var(--muted);font-family:var(--mono);font-size:12px;padding:7px 12px;border-radius:6px;border:1px solid var(--line);cursor:pointer;}
+.fb-panel{background:#020D18;border-radius:0 0 10px 10px;padding:10px 12px;font-family:var(--mono);font-size:12px;color:var(--muted);white-space:pre-wrap;min-height:50px;max-height:120px;overflow-y:auto;}
+.game-stats{display:flex;gap:16px;font-family:var(--mono);font-size:12px;color:var(--muted);padding:8px 0;}
+.outcome{display:none;background:#020D18;border-radius:8px;padding:16px;text-align:center;margin-top:12px;border:2px solid var(--line);}
+.outcome.show{display:block;}
+.outcome.win{border-color:var(--pass);}
+.outcome.lose{border-color:var(--fail);}
+.outcome-title{font-family:var(--mono);font-size:18px;font-weight:bold;margin-bottom:6px;}
+.outcome-title.win{color:var(--pass);}
+.outcome-title.lose{color:var(--fail);}
+.outcome-sub{font-size:13px;color:var(--muted);}
+
+/* API box */
+.api-box{background:#020D18;border:1px solid var(--line);border-radius:7px;padding:10px 14px;margin-top:10px;}
+.api-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:5px;}
+.api-row:last-child{margin-bottom:0;}
+.api-call{font-family:var(--mono);font-size:12px;color:var(--amber);min-width:160px;white-space:nowrap;}
+.api-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+
+/* Marking */
+.mark-panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;margin-top:14px;}
+.mark-panel summary{padding:10px 14px;cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--teal);}
+.mark-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.mark-table th{background:#020D18;padding:7px 12px;text-align:left;color:var(--muted);font-family:var(--mono);font-size:11px;}
+.mark-table td{padding:7px 12px;border-top:1px solid var(--line);}
+.mark-table td:last-child{text-align:right;font-family:var(--mono);color:var(--amber);}
+.lvl{font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:3px;background:var(--line);color:var(--teal);}
+
+/* Tab 4 multi-char */
+.char-editors{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+@media(max-width:700px){.char-editors{grid-template-columns:1fr;}}
+.char-label{font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:4px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div class="hdr-badge">🎮</div>
+    <div>
+      <h1>YEAR 9 COMPUTING — PROGRAMMING ASSESSMENT</h1>
+      <div class="hdr-sub">Sequencing · Loops · Selection · Subroutines · Code Reading</div>
+    </div>
+    <span class="pill">Lessons 1–5</span>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" id="tab1" onclick="switchTab(1)">📝 Tab 1 — Fill in the Blanks</div>
+    <div class="tab" id="tab2" onclick="switchTab(2)">🔍 Tab 2 — Predict the Output</div>
+    <div class="tab" id="tab3" onclick="switchTab(3)">🍄 Tab 3 — Mario Maze</div>
+    <div class="tab" id="tab4" onclick="switchTab(4)">🔥 Tab 4 — Full Level</div>
+  </div>
+
+  <!-- ═══════ TAB 1 — FILL IN THE BLANKS ═══════ -->
+  <div class="tab-panel active" id="panel1">
+    <div class="card">
+      <h2>Tab 1 — Fill in the Blanks</h2>
+      <p>Ten questions on code from Lessons 1–5. Each blank has a drop-down or text box. You get <strong>one attempt only</strong> — once you press Submit your answers are locked. Screenshot the results panel at the bottom as your evidence.</p>
+    </div>
+
+    <div id="t1-questions"></div>
+    <button class="btn btn-submit" id="t1-submit" onclick="t1Submit()">Submit All Answers</button>
+
+    <div class="results-panel" id="t1-results">
+      <div class="results-title">📊 Results — Tab 1 (screenshot this section)</div>
+      <div id="t1-result-rows"></div>
+      <div class="score-line" id="t1-score"></div>
+      <div class="screenshot-hint">📷 Take a screenshot of this results panel and paste it into your OneNote evidence sheet.</div>
+    </div>
+  </div>
+
+  <!-- ═══════ TAB 2 — PREDICT OUTPUT ═══════ -->
+  <div class="tab-panel" id="panel2">
+    <div class="card">
+      <h2>Tab 2 — Predict the Output</h2>
+      <p>Read each Python program carefully and type what you think will be printed or what will happen. You get <strong>one attempt only</strong>. Screenshot the results panel as your evidence.</p>
+    </div>
+
+    <div id="t2-questions"></div>
+    <button class="btn btn-submit" id="t2-submit" onclick="t2Submit()">Submit All Answers</button>
+
+    <div class="results-panel" id="t2-results">
+      <div class="results-title">📊 Results — Tab 2 (screenshot this section)</div>
+      <div id="t2-result-rows"></div>
+      <div class="score-line" id="t2-score"></div>
+      <div class="screenshot-hint">📷 Take a screenshot of this results panel and paste it into your OneNote evidence sheet.</div>
+    </div>
+  </div>
+
+  <!-- ═══════ TAB 3 — MARIO MAZE ═══════ -->
+  <div class="tab-panel" id="panel3">
+    <div class="card">
+      <h2>Tab 3 — Mario Maze</h2>
+      <p>Write a sequence of commands to guide Mario through the level to reach Pauline at the top. Use <code>move_right()</code>, <code>move_left()</code>, <code>climb_up()</code> and <code>climb_down()</code>. You can use <code>for i in range(n):</code> to repeat moves. Your full sequence runs once — plan carefully before pressing Run!</p>
+      <div class="api-box">
+        <div class="api-row"><span class="api-call">move_right()</span><span class="api-desc">Move one step right along the current platform</span></div>
+        <div class="api-row"><span class="api-call">move_left()</span><span class="api-desc">Move one step left along the current platform</span></div>
+        <div class="api-row"><span class="api-call">climb_up()</span><span class="api-desc">Climb one level up a ladder (must be standing on a ladder cell)</span></div>
+        <div class="api-row"><span class="api-call">climb_down()</span><span class="api-desc">Climb one level down a ladder</span></div>
+        <div class="api-row"><span class="api-call">jump()</span><span class="api-desc">Jump over a barrel — moves Mario one row up then back down, useful when a barrel is blocking your path</span></div>
+      </div>
+    </div>
+
+    <div id="t3-levels" style="margin-bottom:14px;">
+      <div style="display:flex;gap:6px;margin-bottom:14px;">
+        <button class="btn btn-reset" id="t3l1btn" onclick="t3SelectLevel(0)" style="color:var(--teal);border-color:var(--teal);">Level 1</button>
+        <button class="btn btn-reset" id="t3l2btn" onclick="t3SelectLevel(1)">Level 2</button>
+        <button class="btn btn-reset" id="t3l3btn" onclick="t3SelectLevel(2)">Level 3</button>
+      </div>
+    </div>
+
+    <div class="mario-wrap">
+      <div>
+        <canvas id="t3-canvas" class="mario-canvas" width="560" height="480"></canvas>
+        <div class="game-stats">
+          <span>Step: <b id="t3-step">0</b></span>
+          <span id="t3-pos">Mario: col 0, row 4</span>
+        </div>
+        <div class="outcome" id="t3-outcome">
+          <div class="outcome-title" id="t3-title"></div>
+          <div class="outcome-sub" id="t3-sub"></div>
+        </div>
+      </div>
+      <div>
+        <div class="editor-panel">
+          <div class="editor-topbar">
+            <span><span class="mac-dot mac-r"></span><span class="mac-dot mac-y"></span><span class="mac-dot mac-g"></span><span style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:6px;">mario.py</span></span>
+            <span style="font-family:var(--mono);font-size:11px;color:var(--teal);">🍄 Mario</span>
+          </div>
+          <div class="editor-wrap" id="t3-ew">
+            <pre class="hl" id="t3-hl" aria-hidden="true"></pre>
+            <textarea id="t3-editor" spellcheck="false" autocomplete="off">def run(mario):
+    move_right()
+    move_right()
+    climb_up()
+</textarea>
+          </div>
+          <div class="editor-footer">
+            <button class="btn btn-run" id="t3-btnRun" onclick="t3Run()">▶ Run</button>
+            <button class="btn btn-reset" onclick="t3Reset()">↺ Reset</button>
+          </div>
+          <div class="fb-panel" id="t3-fb">Write your sequence and press Run.</div>
+        </div>
+
+        <details class="mark-panel" style="margin-top:12px;">
+          <summary>📊 Marking Criteria — Tab 3</summary>
+          <table class="mark-table">
+            <thead><tr><th>Criterion</th><th>Description</th><th>Marks</th></tr></thead>
+            <tbody>
+              <tr><td><span class="lvl">STRUCTURE</span></td><td>Function defined; uses correct command names</td><td>2</td></tr>
+              <tr><td><span class="lvl">LOOPS</span></td><td>Uses for i in range(n) to repeat moves efficiently</td><td>3</td></tr>
+              <tr><td><span class="lvl">ROUTE</span></td><td>Mario reaches Pauline — correct sequence of platforms and ladders</td><td>4</td></tr>
+              <tr><td><span class="lvl">EXTENSION</span></td><td>Completes all three levels; explains route in comments</td><td>3</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ TAB 4 — FULL LEVEL ═══════ -->
+  <div class="tab-panel" id="panel4">
+    <div class="card">
+      <h2>Tab 4 — Full Level</h2>
+      <p>Mario follows a <strong>fixed route</strong> to the top: he walks to each ladder in turn, climbs it, and repeats until he escapes. He always <strong>jumps</strong> any stopped barrel or turtle blocking his path. Your job is to roll barrels and move the turtle to intercept him <em>before</em> he can jump over them. Load all three characters, then press Start Game.</p>
+      <div class="api-box">
+        <div class="api-row"><span class="api-call">roll()</span><span class="api-desc">Roll the barrel one step right, then down a ladder if available</span></div>
+        <div class="api-row"><span class="api-call">move_right() / move_left()</span><span class="api-desc">Move the turtle one step horizontally</span></div>
+        <div class="api-row"><span class="api-call">climb_up() / climb_down()</span><span class="api-desc">Move the turtle up or down a ladder</span></div>
+      </div>
+    </div>
+    <canvas id="t4-canvas" class="mario-canvas" width="800" height="520" style="width:100%;max-width:800px;display:block;margin-bottom:12px;"></canvas>
+    <div class="game-stats" style="margin-bottom:8px;">
+      <span>Tick: <b id="t4-tick">0</b></span>
+      <span id="t4-mario-pos">Mario: —</span>
+      <span id="t4-status" style="color:var(--amber);"></span>
+    </div>
+    <div class="char-editors">
+      <div class="editor-panel">
+        <div class="editor-topbar">
+          <span><span class="mac-dot mac-r"></span><span class="mac-dot mac-y"></span><span class="mac-dot mac-g"></span><span style="font-family:var(--mono);font-size:11px;color:#CD853F;margin-left:6px;">barrel1.py 🛢️</span></span>
+        </div>
+        <div class="editor-wrap" id="t4-ew1"><pre class="hl" id="t4-hl1"></pre><textarea id="t4-ed1" spellcheck="false">def run(barrel):
+    for i in range(6):
+        roll()
+    for i in range(3):
+        roll()
+</textarea></div>
+        <div class="editor-footer">
+          <button class="btn btn-run" id="t4-b1run" onclick="t4Load(1)">▶ Load Barrel 1</button>
+          <button class="btn btn-reset" onclick="t4Reset(1)">↺</button>
+        </div>
+      </div>
+      <div class="editor-panel">
+        <div class="editor-topbar">
+          <span><span class="mac-dot mac-r"></span><span class="mac-dot mac-y"></span><span class="mac-dot mac-g"></span><span style="font-family:var(--mono);font-size:11px;color:#CD853F;margin-left:6px;">barrel2.py 🛢️</span></span>
+        </div>
+        <div class="editor-wrap" id="t4-ew2"><pre class="hl" id="t4-hl2"></pre><textarea id="t4-ed2" spellcheck="false">def run(barrel):
+    for i in range(4):
+        roll()
+    for i in range(5):
+        roll()
+</textarea></div>
+        <div class="editor-footer">
+          <button class="btn btn-run" id="t4-b2run" onclick="t4Load(2)">▶ Load Barrel 2</button>
+          <button class="btn btn-reset" onclick="t4Reset(2)">↺</button>
+        </div>
+      </div>
+      <div class="editor-panel" style="grid-column:1/-1;">
+        <div class="editor-topbar">
+          <span><span class="mac-dot mac-r"></span><span class="mac-dot mac-y"></span><span class="mac-dot mac-g"></span><span style="font-family:var(--mono);font-size:11px;color:#44CC44;margin-left:6px;">turtle.py 🐢</span></span>
+        </div>
+        <div class="editor-wrap" id="t4-ewt"><pre class="hl" id="t4-hlt"></pre><textarea id="t4-edt" spellcheck="false">def run(turtle):
+    for i in range(4):
+        move_right()
+    climb_up()
+    for i in range(3):
+        move_right()
+</textarea></div>
+        <div class="editor-footer">
+          <button class="btn btn-run" id="t4-trun" onclick="t4Load('t')">▶ Load Turtle</button>
+          <button class="btn btn-reset" onclick="t4Reset('t')">↺</button>
+          <button class="btn btn-run" id="t4-start" style="background:var(--amber);color:#1a0a00;margin-left:auto;" disabled onclick="t4Start()">▶ Start Game</button>
+          <button class="btn btn-reset" id="t4-stop" style="display:none;" onclick="t4Stop()">■ Stop</button>
+        </div>
+        <div class="fb-panel" id="t4-fb">Load all three characters, then press Start Game.</div>
+      </div>
+    </div>
+    <details class="mark-panel" style="margin-top:14px;">
+      <summary>📊 Marking Criteria — Tab 4</summary>
+      <table class="mark-table">
+        <thead><tr><th>Criterion</th><th>Description</th><th>Marks</th></tr></thead>
+        <tbody>
+          <tr><td><span class="lvl">STRUCTURE</span></td><td>All three characters defined; uses roll(), move_right(), climb_up() etc correctly</td><td>2</td></tr>
+          <tr><td><span class="lvl">LOOPS</span></td><td>Uses for i in range(n) for repeated movement in at least two characters</td><td>3</td></tr>
+          <tr><td><span class="lvl">BARREL ROUTE</span></td><td>Barrels roll along platforms and reach Mario's likely path</td><td>3</td></tr>
+          <tr><td><span class="lvl">TURTLE CHASE</span></td><td>Turtle navigates platforms and ladders toward Mario</td><td>3</td></tr>
+          <tr><td><span class="lvl">COORDINATION</span></td><td>Barrels and turtle take different routes; at least one reaches Mario within 60 ticks</td><td>1</td></tr>
+        </tbody>
+      </table>
+    </details>
+  </div>
+</div><!-- /wrap -->
+
+<script>
+(function(){
+'use strict';
+
+// ══════════════════════════════════════════════════════════════
+//  TAB SWITCHING
+// ══════════════════════════════════════════════════════════════
+function switchTab(n){
+  [1,2,3,4].forEach(function(i){
+    document.getElementById('panel'+i).classList.toggle('active',i===n);
+    document.getElementById('tab'+i).classList.toggle('active',i===n);
+  });
+  if(n===3&&!t3Inited){t3Init();}
+  if(n===4&&!t4Inited){t4Init();}
+}
+window.switchTab=switchTab;
+
+// ══════════════════════════════════════════════════════════════
+//  SYNTAX HIGHLIGHTER
+// ══════════════════════════════════════════════════════════════
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function highlight(code){
+  return code.split('\n').map(function(line){
+    var ci=-1,inStr=false,sc='';
+    for(var i=0;i<line.length;i++){var ch=line[i];if(!inStr&&(ch==='"'||ch==="'")){inStr=true;sc=ch;}else if(inStr&&ch===sc){inStr=false;}else if(!inStr&&ch==='#'){ci=i;break;}}
+    var base=ci>=0?line.slice(0,ci):line;
+    var cmt=ci>=0?line.slice(ci):'';
+    var toks=[];
+    var p2=base.replace(/(['"]).+?\1/g,function(m){var i=toks.length;toks.push('<span style="color:#CE9178">'+esc(m)+'</span>');return'\x00S'+i+'\x00';});
+    var h=esc(p2);
+    h=h.replace(/\b(def|for|if|elif|else|return|in|range|and|or|not|True|False|None)\b/g,'<span style="color:#C586C0">$1</span>');
+    h=h.replace(/\b(print|int|float|str|input|len|abs)\b/g,'<span style="color:#DCDCAA">$1</span>');
+    h=h.replace(/\b(move_right|move_left|climb_up|climb_down|roll|alien\.move|ghost\.move|alien\.stay)\b/g,'<span style="color:#4EC9B0">$1</span>');
+    h=h.replace(/\b(\d+)\b/g,'<span style="color:#B5CEA8">$1</span>');
+    h=h.replace(/\x00S(\d+)\x00/g,function(_,i){return toks[parseInt(i)];});
+    return h+(cmt?'<span style="color:#6A9955">'+esc(cmt)+'</span>':'');
+  }).join('\n')+'\n';
+}
+function bindEditor(edId,hlId,wrapId){
+  var ta=document.getElementById(edId),hl=document.getElementById(hlId),wrap=document.getElementById(wrapId);
+  function sync(){hl.innerHTML=highlight(ta.value);var h=Math.max(160,ta.scrollHeight);wrap.style.minHeight=h+'px';ta.style.height=h+'px';}
+  ta.addEventListener('input',sync);
+  ta.addEventListener('keydown',function(e){if(e.key==='Tab'){e.preventDefault();var s=this.selectionStart,en=this.selectionEnd;this.value=this.value.slice(0,s)+'    '+this.value.slice(en);this.selectionStart=this.selectionEnd=s+4;sync();}});
+  sync();return sync;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  TAB 1 — FILL IN THE BLANKS
+// ══════════════════════════════════════════════════════════════
+var T1_QS=[
+  {
+    prompt:'Complete the for loop so the alien moves right <b>5</b> times:',
+    code:'def run(alien):\n    for i in range(<b>___</b>):\n        alien.move(<b>___</b>, 0)',
+    blanks:[
+      {label:'range( ___ )',options:['2','3','5','7','10'],correct:'5'},
+      {label:'alien.move( ___, 0)',options:['-1','0','1','2'],correct:'1'},
+    ]
+  },
+  {
+    prompt:'Fill in the blank so the ghost moves <b>left</b>:',
+    code:'def run(ghost):\n    ghost.move(<b>___</b>, 0)',
+    blanks:[
+      {label:'ghost.move( ___, 0)',options:['-2','-1','0','1'],correct:'-1'},
+    ]
+  },
+  {
+    prompt:'Complete the if statement so the alien dodges when a bullet is in the same column:',
+    code:'def run(alien):\n    if alien.col <b>___</b> 5:\n        alien.move(1, 0)',
+    blanks:[
+      {label:'alien.col  ___  5',options:['=','==','>','<'],correct:'=='},
+    ]
+  },
+  {
+    prompt:'The alien starts at col 3. Fill in the range so it reaches col 8:',
+    code:'def run(alien):\n    for i in range(<b>___</b>):\n        alien.move(1, 0)',
+    blanks:[
+      {label:'range( ___ )',options:['3','5','6','8'],correct:'5'},
+    ]
+  },
+  {
+    prompt:'Complete the def so the subroutine is named correctly and has a parameter:',
+    code:'<b>___</b> draw_square(<b>___</b>):\n    for i in range(4):\n        forward(size)',
+    blanks:[
+      {label:'keyword before draw_square',options:['for','if','def','return'],correct:'def'},
+      {label:'parameter name',options:['size','4','square','forward'],correct:'size'},
+    ]
+  },
+  {
+    prompt:'Fill in the blank so the ghost moves <b>down</b> one step:',
+    code:'def run(ghost):\n    ghost.move(0, <b>___</b>)',
+    blanks:[
+      {label:'ghost.move(0, ___)',options:['-2','-1','0','1'],correct:'1'},
+    ]
+  },
+  {
+    prompt:'Complete the elif so the ghost moves left when Pac-Man is to the left:',
+    code:'def run(ghost):\n    if ghost.pac_col > ghost.col:\n        ghost.move(1, 0)\n    elif ghost.pac_col <b>___</b> ghost.col:\n        ghost.move(-1, 0)',
+    blanks:[
+      {label:'comparison operator',options:['==','!=','<','>'],correct:'<'},
+    ]
+  },
+  {
+    prompt:'Fill in the blank so the function returns the correct value:',
+    code:'def get_perimeter(size):\n    result = size <b>___</b> 4\n    return result',
+    blanks:[
+      {label:'operator',options:['+','-','*','/'],correct:'*'},
+    ]
+  },
+  {
+    prompt:'Complete the if so the alien only dodges bullets that are close (row > 8):',
+    code:'def run(alien):\n    for b in alien.bullets:\n        if b["col"]==alien.col <b>___</b> b["row"]>8:\n            alien.move(1,0)',
+    blanks:[
+      {label:'logical operator',options:['or','and','not','=='],correct:'and'},
+    ]
+  },
+  {
+    prompt:'Fill in the blank so input() gives a whole number:',
+    code:'size = <b>___</b>(input("Size? "))',
+    blanks:[
+      {label:'conversion function',options:['str','float','int','round'],correct:'int'},
+    ]
+  },
+];
+
+(function buildT1(){
+  var container=document.getElementById('t1-questions');
+  T1_QS.forEach(function(q,qi){
+    var div=document.createElement('div');div.className='q-block';
+    var head=document.createElement('div');head.className='q-head';
+    var num=document.createElement('span');num.className='q-num';num.textContent='Q'+(qi+1);
+    var txt=document.createElement('span');txt.className='q-text';txt.innerHTML=q.prompt;
+    head.appendChild(num);head.appendChild(txt);div.appendChild(head);
+    var body=document.createElement('div');body.className='q-body';
+    if(q.code){var pre=document.createElement('pre');pre.className='snippet';pre.innerHTML=q.code.replace(/def\b/g,'<span class="kw">def</span>').replace(/\bfor\b/g,'<span class="kw">for</span>').replace(/\bif\b/g,'<span class="kw">if</span>').replace(/\belif\b/g,'<span class="kw">elif</span>').replace(/\breturn\b/g,'<span class="kw">return</span>').replace(/\bin\b/g,'<span class="kw">in</span>').replace(/\brange\b/g,'<span class="fn">range</span>');body.appendChild(pre);}
+    q.blanks.forEach(function(b,bi){
+      var row=document.createElement('div');row.className='blank-row';
+      var lbl=document.createElement('span');lbl.className='blank-label';lbl.textContent=b.label+':';
+      var sel=document.createElement('select');sel.className='ans-select';sel.id='t1_q'+qi+'_b'+bi;
+      var def=document.createElement('option');def.value='';def.textContent='— choose —';sel.appendChild(def);
+      b.options.forEach(function(o){var opt=document.createElement('option');opt.value=o;opt.textContent=o;sel.appendChild(opt);});
+      row.appendChild(lbl);row.appendChild(sel);body.appendChild(row);
+    });
+    div.appendChild(body);container.appendChild(div);
+  });
+})();
+
+window.t1Submit=function(){
+  // Check all answered
+  var allDone=true;
+  T1_QS.forEach(function(q,qi){q.blanks.forEach(function(_,bi){if(!document.getElementById('t1_q'+qi+'_b'+bi).value){allDone=false;}});});
+  if(!allDone){alert('Please answer all questions before submitting.');return;}
+  document.getElementById('t1-submit').disabled=true;
+  // Lock all selects
+  T1_QS.forEach(function(q,qi){q.blanks.forEach(function(_,bi){document.getElementById('t1_q'+qi+'_b'+bi).disabled=true;});});
+  // Score
+  var score=0,rows='';
+  T1_QS.forEach(function(q,qi){
+    var correct=true;
+    var userAnswers=[];
+    q.blanks.forEach(function(b,bi){
+      var val=document.getElementById('t1_q'+qi+'_b'+bi).value;
+      userAnswers.push(val);
+      if(val!==b.correct)correct=false;
+    });
+    if(correct)score++;
+    rows+='<div class="res-row"><div class="res-dot '+(correct?'pass':'fail')+'">'+(correct?'✓':'✗')+'</div><span class="res-q">Q'+(qi+1)+'</span><span class="res-ans '+(correct?'res-correct':'res-wrong')+'">'+userAnswers.join(', ')+(correct?'':' — correct: '+q.blanks.map(function(b){return b.correct;}).join(', '))+'</span></div>';
+  });
+  document.getElementById('t1-result-rows').innerHTML=rows;
+  document.getElementById('t1-score').textContent='Score: '+score+' / 10';
+  var rp=document.getElementById('t1-results');rp.className='results-panel show';rp.scrollIntoView({behavior:'smooth',block:'nearest'});
+};
+
+// ══════════════════════════════════════════════════════════════
+//  TAB 2 — PREDICT OUTPUT
+// ══════════════════════════════════════════════════════════════
+var T2_QS=[
+  {prompt:'What does this print?',
+   code:'a = 3\nb = 4\nc = a + b\nprint(c)',
+   answer:'7'},
+  {prompt:'What does this print?',
+   code:'for i in range(4):\n    print(i)',
+   answer:'0\n1\n2\n3'},
+  {prompt:'What does this print?',
+   code:'x = 10\nif x > 5:\n    print("big")\nelse:\n    print("small")',
+   answer:'big'},
+  {prompt:'What does this print?',
+   code:'total = 0\nfor i in range(5):\n    total = total + i\nprint(total)',
+   answer:'10'},
+  {prompt:'What does this print?',
+   code:'def greet(name):\n    print("Hello " + name)\n\ngreet("Mario")',
+   answer:'Hello Mario'},
+  {prompt:'What does this print?',
+   code:'score = 63\nif score >= 70:\n    print("Distinction")\nelif score >= 50:\n    print("Pass")\nelse:\n    print("Not yet")',
+   answer:'Pass'},
+  {prompt:'What does this print?',
+   code:'def double(n):\n    return n * 2\n\nresult = double(6)\nprint(result)',
+   answer:'12'},
+  {prompt:'What does this print?',
+   code:'count = 0\nfor i in range(3):\n    for j in range(2):\n        count = count + 1\nprint(count)',
+   answer:'6'},
+  {prompt:'What does this print?',
+   code:'print(17 % 5)',
+   answer:'2'},
+  {prompt:'The alien starts at col 2. What column does it end on?',
+   code:'def run(alien):\n    for i in range(5):\n        alien.move(1, 0)\n    alien.move(-2, 0)',
+   answer:'5'},
+];
+
+(function buildT2(){
+  var container=document.getElementById('t2-questions');
+  T2_QS.forEach(function(q,qi){
+    var div=document.createElement('div');div.className='q-block';
+    var head=document.createElement('div');head.className='q-head';
+    var num=document.createElement('span');num.className='q-num';num.textContent='Q'+(qi+1);
+    var txt=document.createElement('span');txt.className='q-text';txt.innerHTML=q.prompt;
+    head.appendChild(num);head.appendChild(txt);div.appendChild(head);
+    var body=document.createElement('div');body.className='q-body';
+    var pre=document.createElement('pre');pre.className='snippet';
+    pre.innerHTML=highlight(q.code);
+    body.appendChild(pre);
+    var lbl=document.createElement('div');lbl.style.cssText='font-size:12px;color:var(--muted);margin-bottom:4px;';lbl.textContent='Your answer:';
+    var inp=document.createElement('textarea');inp.className='ans-input';inp.id='t2_q'+qi;inp.rows=q.answer.includes('\n')?Math.min(q.answer.split('\n').length+1,5):1;inp.style.cssText='font-family:var(--mono);font-size:13px;padding:7px 10px;border-radius:6px;background:#020D18;border:1px solid var(--line);color:var(--white);width:100%;resize:vertical;';
+    body.appendChild(lbl);body.appendChild(inp);div.appendChild(body);container.appendChild(div);
+  });
+})();
+
+window.t2Submit=function(){
+  var allDone=true;
+  T2_QS.forEach(function(_,qi){if(!document.getElementById('t2_q'+qi).value.trim())allDone=false;});
+  if(!allDone){alert('Please answer all questions before submitting.');return;}
+  document.getElementById('t2-submit').disabled=true;
+  T2_QS.forEach(function(_,qi){document.getElementById('t2_q'+qi).disabled=true;});
+  var score=0,rows='';
+  T2_QS.forEach(function(q,qi){
+    var val=document.getElementById('t2_q'+qi).value.trim().replace(/\r/g,'');
+    var correct=(val===q.answer.trim());
+    if(correct)score++;
+    rows+='<div class="res-row"><div class="res-dot '+(correct?'pass':'fail')+'">'+(correct?'✓':'✗')+'</div><span class="res-q">Q'+(qi+1)+'</span><span class="res-ans '+(correct?'res-correct':'res-wrong')+'">'+esc(val)+(correct?'':' — correct: '+esc(q.answer))+'</span></div>';
+  });
+  document.getElementById('t2-result-rows').innerHTML=rows;
+  document.getElementById('t2-score').textContent='Score: '+score+' / 10';
+  var rp=document.getElementById('t2-results');rp.className='results-panel show';rp.scrollIntoView({behavior:'smooth',block:'nearest'});
+};
+
+// ══════════════════════════════════════════════════════════════
+//  TAB 3 — MARIO MAZE
+// ══════════════════════════════════════════════════════════════
+var t3Inited=false;
+var CELL=72; // pixel size per grid cell
+
+// Level definitions: 0=open, 1=wall/solid, 2=ladder, 3=platform floor (can stand)
+// Grid is COLS wide × ROWS tall. 0,0 = top-left.
+// Platforms: rows where you can walk. Ladders: cols where you can climb.
+// We use a simple flat array: platforms[][] and ladders.
+// Notation: each level = {cols, rows, platforms (array of {row,colStart,colEnd}),
+//   ladders (array of {col,rowTop,rowBottom}), marioStart{col,row}, goal{col,row}}
+
+var T3_LEVELS=[
+  { // Level 1 — simple 3 platforms, 2 ladders
+    cols:10, rows:6,
+    platforms:[
+      {row:5,cs:0,ce:9}, // bottom
+      {row:3,cs:0,ce:6}, // middle
+      {row:1,cs:3,ce:9}, // top
+    ],
+    ladders:[
+      {col:6,rTop:3,rBot:5}, // right side bottom
+      {col:3,rTop:1,rBot:3}, // left side middle
+    ],
+    mStart:{c:0,r:5}, goal:{c:9,r:1},
+    hint:'Hint: move right along the bottom, climb up, move right again, climb up to the top.'
+  },
+  { // Level 2 — 4 platforms, 3 ladders, longer route
+    cols:12, rows:7,
+    platforms:[
+      {row:6,cs:0,ce:11},
+      {row:4,cs:2,ce:11},
+      {row:2,cs:0,ce:8},
+      {row:0,cs:5,ce:11},
+    ],
+    ladders:[
+      {col:10,rTop:4,rBot:6},
+      {col:2, rTop:2,rBot:4},
+      {col:8, rTop:0,rBot:2},
+    ],
+    mStart:{c:0,r:6}, goal:{c:11,r:0},
+    hint:'Hint: there are 4 platforms and 3 ladders to navigate.'
+  },
+  { // Level 3 — full DK-style zig-zag
+    cols:14, rows:8,
+    platforms:[
+      {row:7,cs:0,ce:13},
+      {row:5,cs:0,ce:10},
+      {row:3,cs:1,ce:13},
+      {row:1,cs:0,ce:12},
+    ],
+    ladders:[
+      {col:9, rTop:5,rBot:7},
+      {col:1, rTop:3,rBot:5},  // connects row5 to row3 via left side
+      {col:12,rTop:1,rBot:3},
+      {col:3, rTop:1,rBot:3},
+    ],
+    mStart:{c:0,r:7}, goal:{c:0,r:1},
+    hint:'Hint: the classic zig-zag — right to ladder, up, cross to the other side, up again.'
+  },
+];
+
+var T3={level:0,mario:{c:0,r:5},moves:[],idx:0,running:false,loopId:null,canvas:null,ctx:null,jumping:0};
+
+function t3Init(){
+  t3Inited=true;
+  T3.canvas=document.getElementById('t3-canvas');
+  T3.ctx=T3.canvas.getContext('2d');
+  bindEditor('t3-editor','t3-hl','t3-ew');
+  t3SelectLevel(0);
+}
+
+function t3SelectLevel(idx){
+  T3.level=idx;
+  [0,1,2].forEach(function(i){
+    var b=document.getElementById('t3l'+(i+1)+'btn');
+    b.style.color=i===idx?'var(--teal)':'';
+    b.style.borderColor=i===idx?'var(--teal)':'';
+  });
+  t3ResetState();
+  document.getElementById('t3-editor').value='def run(mario):\n    move_right()\n';
+  if(window._t3sync)window._t3sync();
+  document.getElementById('t3-fb').textContent=T3_LEVELS[idx].hint;
+}
+window.t3SelectLevel=t3SelectLevel;
+
+function t3ResetState(){
+  var lv=T3_LEVELS[T3.level];
+  T3.mario={c:lv.mStart.c,r:lv.mStart.r};
+  T3.moves=[];T3.idx=0;T3.running=false;T3.jumping=0;clearTimeout(T3.loopId);
+  t3UpdateStats();t3Draw();
+  document.getElementById('t3-outcome').className='outcome';
+}
+
+function t3OnPlatform(c,r,lv){
+  return lv.platforms.some(function(p){return p.row===r&&c>=p.cs&&c<=p.ce;});
+}
+function t3OnLadder(c,r,lv){
+  return lv.ladders.some(function(l){return l.col===c&&r>=l.rTop&&r<=l.rBot;});
+}
+function t3ParseCode(code){
+  // Simple interpreter — no Pyodide needed. Parse def run(mario): body, collect calls.
+  var moves=[];
+  var lines=code.split('\n');
+  var inBody=false;
+  var loopStack=[]; // {count,remaining}
+  function emit(m){
+    if(loopStack.length){
+      // inside loop — add count copies
+      loopStack[loopStack.length-1].moves.push(m);
+    } else {
+      moves.push(m);
+    }
+  }
+  for(var i=0;i<lines.length;i++){
+    var raw=lines[i];
+    var line=raw.trim();
+    if(line.startsWith('def run'))  {inBody=true;continue;}
+    if(!inBody||line===''||line.startsWith('#'))continue;
+    var indent=(raw.match(/^ */)||[''])[0].length;
+    // Close loops based on indent
+    while(loopStack.length&&indent<=loopStack[loopStack.length-1].indent){
+      var lp=loopStack.pop();
+      var expanded=[];
+      for(var k=0;k<lp.count;k++)lp.moves.forEach(function(m){expanded.push(m);});
+      if(loopStack.length){loopStack[loopStack.length-1].moves=loopStack[loopStack.length-1].moves.concat(expanded);}
+      else{expanded.forEach(function(m){moves.push(m);});}
+    }
+    var fm=line.match(/^for\s+\w+\s+in\s+range\s*\(\s*(\d+)\s*\)/);
+    if(fm){loopStack.push({count:parseInt(fm[1]),moves:[],indent:indent});continue;}
+    if(/^move_right\s*\(\s*\)/.test(line)){emit('R');continue;}
+    if(/^move_left\s*\(\s*\)/.test(line)){emit('L');continue;}
+    if(/^climb_up\s*\(\s*\)/.test(line)){emit('U');continue;}
+    if(/^climb_down\s*\(\s*\)/.test(line)){emit('D');continue;}
+    if(/^jump\s*\(\s*\)/.test(line)){emit('J');continue;}
+  }
+  // flush remaining loops
+  while(loopStack.length){
+    var lp=loopStack.pop();
+    var expanded=[];
+    for(var k=0;k<lp.count;k++)lp.moves.forEach(function(m){expanded.push(m);});
+    if(loopStack.length){loopStack[loopStack.length-1].moves=loopStack[loopStack.length-1].moves.concat(expanded);}
+    else{expanded.forEach(function(m){moves.push(m);});}
+  }
+  return moves;
+}
+
+window.t3Run=function(){
+  var code=document.getElementById('t3-editor').value;
+  var moves;
+  try{moves=t3ParseCode(code);}catch(e){document.getElementById('t3-fb').textContent='⚠️ Parse error: '+e;return;}
+  if(!moves.length){document.getElementById('t3-fb').textContent='⚠️ No commands found. Check your function is named run(mario) and uses move_right(), climb_up() etc.';return;}
+  T3.moves=moves;T3.idx=0;T3.running=true;
+  t3ResetState();T3.moves=moves;T3.running=true;
+  document.getElementById('t3-fb').textContent='Running '+moves.length+' move(s)…';
+  document.getElementById('t3-outcome').className='outcome';
+  function tick(){
+    if(!T3.running)return;
+    if(T3.idx>=T3.moves.length){t3End(false);return;}
+    var m=T3.moves[T3.idx++];
+    var lv=T3_LEVELS[T3.level];
+    var nc=T3.mario.c,nr=T3.mario.r;
+    var err=null;
+    if(m==='R'){if(t3OnPlatform(nc+1,nr,lv)){nc++;}else{err='Cannot move right — no platform at col '+(nc+1)+', row '+nr;}}
+    else if(m==='L'){if(t3OnPlatform(nc-1,nr,lv)){nc--;}else{err='Cannot move left — no platform at col '+(nc-1)+', row '+nr;}}
+    else if(m==='U'){if(t3OnLadder(nc,nr,lv)&&t3OnLadder(nc,nr-1,lv)){nr--;}else if(t3OnLadder(nc,nr-1,lv)&&t3OnPlatform(nc,nr,lv)){nr--;}else{err='Cannot climb up — no ladder at col '+nc+', row '+(nr-1);}}
+    else if(m==='D'){if(t3OnLadder(nc,nr,lv)&&t3OnLadder(nc,nr+1,lv)){nr++;}else{err='Cannot climb down — no ladder at col '+nc+', row '+(nr+1);}}
+    else if(m==='J'){
+      // Jump: Mario leaps one step right, drawn with an upward arc offset
+      if(t3OnPlatform(nc+1,nr,lv)){
+        nc++;
+        T3.jumping=2; // ticks of jump visual remaining
+      }else{err='Cannot jump — no platform to land on at col '+(nc+1);}
+    }
+    if(err){T3.running=false;document.getElementById('t3-fb').textContent='⚠️ Step '+T3.idx+': '+err;t3Draw();return;}
+    T3.mario={c:nc,r:nr};
+    if(T3.jumping>0)T3.jumping--;
+    t3UpdateStats();t3Draw();
+    var gl=lv.goal;
+    if(nc===gl.c&&nr===gl.r){t3End(true);return;}
+    T3.loopId=setTimeout(tick,280);
+  }
+  setTimeout(tick,200);
+};
+
+window.t3Reset=function(){
+  document.getElementById('t3-editor').value='def run(mario):\n    move_right()\n';
+  if(window._t3sync)window._t3sync();
+  t3ResetState();
+  document.getElementById('t3-fb').textContent=T3_LEVELS[T3.level].hint;
+};
+
+function t3End(won){
+  T3.running=false;clearTimeout(T3.loopId);t3Draw();
+  var ov=document.getElementById('t3-outcome');
+  var ti=document.getElementById('t3-title'),su=document.getElementById('t3-sub');
+  if(won){ov.className='outcome show win';ti.className='outcome-title win';ti.textContent='🍄 MARIO REACHED PAULINE!';su.textContent='Level '+(T3.level+1)+' complete in '+T3.moves.length+' moves. Screenshot this for your evidence!';}
+  else{ov.className='outcome show lose';ti.className='outcome-title lose';ti.textContent='❌ Out of moves';su.textContent='Mario ended at col '+T3.mario.c+', row '+T3.mario.r+'. Add more commands or adjust your route.';}
+}
+
+function t3UpdateStats(){
+  document.getElementById('t3-step').textContent=T3.idx;
+  document.getElementById('t3-pos').textContent='Mario: col '+T3.mario.c+', row '+T3.mario.r;
+}
+
+function t3Draw(){
+  var lv=T3_LEVELS[T3.level];
+  var cv=T3.canvas,ctx=T3.ctx;
+  var W=lv.cols*CELL,H=lv.rows*CELL;
+  if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
+  // Sky blue-black background
+  ctx.fillStyle='#050A14';ctx.fillRect(0,0,W,H);
+  // Grid dots
+  ctx.fillStyle='rgba(31,58,82,0.4)';
+  for(var r=0;r<lv.rows;r++)for(var c=0;c<lv.cols;c++){ctx.fillRect(c*CELL+CELL/2-1,r*CELL+CELL/2-1,2,2);}
+  // Platforms
+  lv.platforms.forEach(function(p){
+    var x=p.cs*CELL,y=p.row*CELL,w2=(p.ce-p.cs+1)*CELL,h=10;
+    // Steel beam style
+    var grad=ctx.createLinearGradient(x,y+CELL-h,x,y+CELL);
+    grad.addColorStop(0,'#CC3300');grad.addColorStop(0.3,'#FF4422');grad.addColorStop(1,'#AA2200');
+    ctx.fillStyle=grad;ctx.fillRect(x,y+CELL-h,w2,h);
+    // Rivet dots
+    ctx.fillStyle='#FFD080';
+    for(var rx=x+8;rx<x+w2-4;rx+=16){ctx.beginPath();ctx.arc(rx,y+CELL-5,2,0,Math.PI*2);ctx.fill();}
+    // Walkable surface
+    ctx.fillStyle='rgba(255,100,50,0.12)';ctx.fillRect(x,y,w2,CELL-h);
+  });
+  // Ladders
+  lv.ladders.forEach(function(l){
+    var x=l.col*CELL+CELL/2;
+    var yTop=l.rTop*CELL+CELL-10,yBot=(l.rBot+1)*CELL-10;
+    // Side rails
+    ctx.strokeStyle='#4488FF';ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(x-7,yTop);ctx.lineTo(x-7,yBot);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x+7,yTop);ctx.lineTo(x+7,yBot);ctx.stroke();
+    // Rungs
+    ctx.lineWidth=2.5;
+    for(var ry=yTop+8;ry<yBot;ry+=14){
+      ctx.beginPath();ctx.moveTo(x-7,ry);ctx.lineTo(x+7,ry);ctx.stroke();
+    }
+  });
+  // Goal — Pauline (pink heart above gold star)
+  var gl=lv.goal;
+  var gx=gl.c*CELL+CELL/2,gy=gl.r*CELL+CELL-12;
+  ctx.fillStyle='#FFD700';ctx.font='bold 22px serif';ctx.textAlign='center';ctx.textBaseline='bottom';
+  ctx.fillText('★',gx,gy-2);
+  ctx.fillStyle='#FF69B4';ctx.font='14px serif';ctx.fillText('♥',gx,gy-22);
+  // Mario — arc upward when jumping
+  var t3JumpOff=T3.jumping>0?(CELL*0.55):0;
+  drawMario(ctx,T3.mario.c*CELL+CELL/2,T3.mario.r*CELL+CELL-12-t3JumpOff,CELL);
+}
+
+function drawMario(ctx,cx,cy,cell){
+  var s=cell/28; // scale x2
+  // Cap
+  ctx.fillStyle='#CC0000';ctx.fillRect(cx-10*s,cy-30*s,20*s,8*s);
+  ctx.fillRect(cx-7*s,cy-38*s,16*s,8*s);
+  // Face
+  ctx.fillStyle='#FFCC88';ctx.fillRect(cx-8*s,cy-24*s,16*s,10*s);
+  // Moustache
+  ctx.fillStyle='#663300';ctx.fillRect(cx-7*s,cy-17*s,14*s,3*s);
+  // Overalls
+  ctx.fillStyle='#1144CC';ctx.fillRect(cx-9*s,cy-14*s,18*s,14*s);
+  // Buttons
+  ctx.fillStyle='#FFD700';ctx.fillRect(cx-5*s,cy-12*s,3*s,3*s);ctx.fillRect(cx+2*s,cy-12*s,3*s,3*s);
+  // Arms
+  ctx.fillStyle='#CC0000';ctx.fillRect(cx-13*s,cy-13*s,5*s,9*s);ctx.fillRect(cx+8*s,cy-13*s,5*s,9*s);
+  // Boots
+  ctx.fillStyle='#441100';ctx.fillRect(cx-9*s,cy,8*s,5*s);ctx.fillRect(cx+1*s,cy,8*s,5*s);
+}
+
+function drawBarrel(ctx,cx,cy,cell){
+  var s=cell/28;
+  ctx.fillStyle='#8B4513';ctx.beginPath();ctx.ellipse(cx,cy-8*s,10*s,12*s,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#D2691E';ctx.lineWidth=2*s;
+  ctx.beginPath();ctx.moveTo(cx-10*s,cy-12*s);ctx.lineTo(cx+10*s,cy-12*s);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-10*s,cy-4*s);ctx.lineTo(cx+10*s,cy-4*s);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-10*s,cy+4*s);ctx.lineTo(cx+10*s,cy+4*s);ctx.stroke();
+}
+
+function drawTurtle(ctx,cx,cy,cell){
+  var s=cell/28;
+  // Shell
+  ctx.fillStyle='#228B22';ctx.beginPath();ctx.ellipse(cx,cy-10*s,12*s,9*s,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#006400';ctx.lineWidth=1.5*s;
+  // Shell pattern
+  ctx.beginPath();ctx.moveTo(cx,cy-18*s);ctx.lineTo(cx,cy-2*s);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-10*s,cy-10*s);ctx.lineTo(cx+10*s,cy-10*s);ctx.stroke();
+  // Head
+  ctx.fillStyle='#32CD32';ctx.beginPath();ctx.arc(cx+10*s,cy-10*s,5*s,0,Math.PI*2);ctx.fill();
+  // Eye
+  ctx.fillStyle='#000';ctx.beginPath();ctx.arc(cx+12*s,cy-12*s,1.5*s,0,Math.PI*2);ctx.fill();
+  // Legs
+  ctx.fillStyle='#32CD32';
+  ctx.fillRect(cx-14*s,cy-8*s,5*s,4*s);ctx.fillRect(cx-14*s,cy-2*s,5*s,4*s);
+  ctx.fillRect(cx+9*s,cy-2*s,5*s,4*s);
+}
+
+// Sync reference for reset
+window._t3sync=null;
+
+// ══════════════════════════════════════════════════════════════
+//  TAB 4 — FULL LEVEL
+// ══════════════════════════════════════════════════════════════
+var t4Inited=false;
+var T4_CELL=56;
+
+// Full DK-style level
+var T4_LV={
+  cols:20, rows:13,
+  platforms:[
+    {row:12,cs:0,ce:19}, // ground
+    {row:10,cs:0,ce:14}, // L1
+    {row:8, cs:5,ce:19}, // L2
+    {row:6, cs:0,ce:14}, // L3
+    {row:4, cs:5,ce:19}, // L4
+    {row:2, cs:0,ce:19}, // top
+  ],
+  ladders:[
+    {col:13,rTop:10,rBot:12},  // ground → L1  (col 13 on both)
+    {col:5, rTop:8, rBot:10},  // L1 → L2      (col 5 on both)
+    {col:12,rTop:6, rBot:8 },  // L2 → L3      (col 12: on L2 5-19, on L3 0-14) ✓
+    {col:6, rTop:4, rBot:6 },  // L3 → L4      (col 6: on L3 0-14, on L4 5-19) ✓
+    {col:15,rTop:2, rBot:4 },  // L4 → top
+    {col:7, rTop:2, rBot:4 },  // L4 → top (second ladder)
+  ],
+  marioStart:{c:0,r:12},
+  barrel1Start:{c:0,r:6},
+  barrel2Start:{c:14,r:10},
+  turtleStart:{c:10,r:2},
+  goal:{c:0,r:2},
+};
+
+var T4={
+  canvas:null,ctx:null,cell:T4_CELL,
+  mario:{c:0,r:12,jumping:false,jumpTick:0},
+  barrel1:{c:0,r:6},barrel2:{c:14,r:10},
+  turtle:{c:10,r:2},
+  marioDir:1,
+  moves_b1:[],moves_b2:[],moves_t:[],
+  idx_b1:0,idx_b2:0,idx_t:0,
+  loaded_b1:false,loaded_b2:false,loaded_t:false,
+  tick:0,running:false,loopId:null,
+};
+
+function t4Init(){
+  t4Inited=true;
+  T4.canvas=document.getElementById('t4-canvas');
+  T4.ctx=T4.canvas.getContext('2d');
+  // Fit canvas
+  var W=T4_LV.cols*T4_CELL,H=T4_LV.rows*T4_CELL;
+  T4.canvas.width=W;T4.canvas.height=H;
+  bindEditor('t4-ed1','t4-hl1','t4-ew1');
+  bindEditor('t4-ed2','t4-hl2','t4-ew2');
+  bindEditor('t4-edt','t4-hlt','t4-ewt');
+  t4Draw();
+}
+
+function t4ParseCode(code,validCmds){
+  // Same simple parser as t3
+  var moves=[];
+  var lines=code.split('\n');
+  var inBody=false;
+  var loopStack=[];
+  function emit(m){if(loopStack.length){loopStack[loopStack.length-1].moves.push(m);}else{moves.push(m);}}
+  for(var i=0;i<lines.length;i++){
+    var raw=lines[i];var line=raw.trim();
+    if(line.startsWith('def run')){inBody=true;continue;}
+    if(!inBody||line===''||line.startsWith('#'))continue;
+    var indent=(raw.match(/^ */)||[''])[0].length;
+    while(loopStack.length&&indent<=loopStack[loopStack.length-1].indent){
+      var lp=loopStack.pop();var ex=[];
+      for(var k=0;k<lp.count;k++)lp.moves.forEach(function(m){ex.push(m);});
+      if(loopStack.length){loopStack[loopStack.length-1].moves=loopStack[loopStack.length-1].moves.concat(ex);}
+      else{ex.forEach(function(m){moves.push(m);});}
+    }
+    var fm=line.match(/^for\s+\w+\s+in\s+range\s*\(\s*(\d+)\s*\)/);
+    if(fm){loopStack.push({count:parseInt(fm[1]),moves:[],indent:indent});continue;}
+    var found=false;
+    validCmds.forEach(function(vc){if(new RegExp('^'+vc.re+'\\s*\\(\\s*\\)').test(line)){emit(vc.code);found=true;}});
+  }
+  while(loopStack.length){
+    var lp=loopStack.pop();var ex=[];
+    for(var k=0;k<lp.count;k++)lp.moves.forEach(function(m){ex.push(m);});
+    if(loopStack.length){loopStack[loopStack.length-1].moves=loopStack[loopStack.length-1].moves.concat(ex);}
+    else{ex.forEach(function(m){moves.push(m);});}
+  }
+  return moves;
+}
+
+var BARREL_CMDS=[{re:'roll',code:'ROLL'}];
+var TURTLE_CMDS=[{re:'move_right',code:'R'},{re:'move_left',code:'L'},{re:'climb_up',code:'U'},{re:'climb_down',code:'D'}];
+
+function t4OnPlatform(c,r){return T4_LV.platforms.some(function(p){return p.row===r&&c>=p.cs&&c<=p.ce;});}
+function t4OnLadder(c,r){return T4_LV.ladders.some(function(l){return l.col===c&&r>=l.rTop&&r<=l.rBot;});}
+
+window.t4Load=function(who){
+  var code,cmds;
+  if(who===1){code=document.getElementById('t4-ed1').value;cmds=BARREL_CMDS;}
+  else if(who===2){code=document.getElementById('t4-ed2').value;cmds=BARREL_CMDS;}
+  else{code=document.getElementById('t4-edt').value;cmds=TURTLE_CMDS;}
+  var moves=t4ParseCode(code,cmds);
+  if(!moves.length){document.getElementById('t4-fb').textContent='⚠️ No commands found in '+(who==='t'?'turtle':'barrel '+who)+' code.';return;}
+  if(who===1){T4.moves_b1=moves;T4.loaded_b1=true;}
+  else if(who===2){T4.moves_b2=moves;T4.loaded_b2=true;}
+  else{T4.moves_t=moves;T4.loaded_t=true;}
+  var all=T4.loaded_b1&&T4.loaded_b2&&T4.loaded_t;
+  document.getElementById('t4-start').disabled=!all;
+  document.getElementById('t4-fb').textContent='✓ '+(who==='t'?'Turtle':'Barrel '+who)+' loaded — '+moves.length+' move(s).'+(all?'\n\nAll characters ready — press Start Game!':'\n\nLoad the other characters too.');
+};
+
+window.t4Start=function(){
+  if(!T4.loaded_b1||!T4.loaded_b2||!T4.loaded_t)return;
+  // Reset positions
+  var lv=T4_LV;
+  T4.mario={c:lv.marioStart.c,r:lv.marioStart.r};
+  T4.barrel1={c:lv.barrel1Start.c,r:lv.barrel1Start.r};
+  T4.barrel2={c:lv.barrel2Start.c,r:lv.barrel2Start.r};
+  T4.turtle={c:lv.turtleStart.c,r:lv.turtleStart.r};
+  T4.idx_b1=0;T4.idx_b2=0;T4.idx_t=0;T4.tick=0;T4.marioDir=1;T4.running=true;
+  document.getElementById('t4-start').style.display='none';
+  document.getElementById('t4-stop').style.display='';
+  document.getElementById('t4-status').textContent='';
+  t4Draw();
+  var speed=300;
+  function tick(){
+    if(!T4.running)return;
+    T4.tick++;
+    // Move Mario (simple auto-walk along platforms, climb ladders occasionally)
+    t4MoveMario();
+    // Advance barrel 1
+    if(T4.idx_b1<T4.moves_b1.length){t4ApplyBarrel(1,T4.moves_b1[T4.idx_b1++]);}
+    // Advance barrel 2
+    if(T4.idx_b2<T4.moves_b2.length){t4ApplyBarrel(2,T4.moves_b2[T4.idx_b2++]);}
+    // Advance turtle
+    if(T4.idx_t<T4.moves_t.length){t4ApplyTurtle(T4.moves_t[T4.idx_t++]);}
+    t4Draw();
+    document.getElementById('t4-tick').textContent=T4.tick;
+    document.getElementById('t4-mario-pos').textContent='Mario: col '+T4.mario.c+', row '+T4.mario.r;
+    // Check catches — only if Mario is NOT mid-jump
+    if(!T4.mario.jumping){
+      var b1hit=T4.barrel1.c===T4.mario.c&&T4.barrel1.r===T4.mario.r;
+      var b2hit=T4.barrel2.c===T4.mario.c&&T4.barrel2.r===T4.mario.r;
+      var thit=T4.turtle.c===T4.mario.c&&T4.turtle.r===T4.mario.r;
+      if(b1hit||b2hit||thit){
+        t4End('caught',b1hit?'Barrel 1':b2hit?'Barrel 2':'Turtle');return;
+      }
+    }
+    // Mario reaches goal (top platform)
+    if(T4.mario.c===T4_LV.goal.c&&T4.mario.r===T4_LV.goal.r){t4End('escaped','');return;}
+    // Hard tick limit — Mario keeps wandering even after enemy moves run out
+    if(T4.tick>=300){t4End('timeout','');return;}
+    T4.loopId=setTimeout(tick,speed);
+  }
+  T4.loopId=setTimeout(tick,speed);
+};
+
+function t4MoveMario(){
+  var c=T4.mario.c, r=T4.mario.r;
+
+  // Clear jump visual after 1 tick
+  if(T4.mario.jumping && T4.tick-T4.mario.jumpTick>1){T4.mario.jumping=false;}
+
+  // ── Route: ground→col13→row10→col5→row8→col12→row6→col6→row4→col7→row2 ──
+  var route=[
+    {pRow:12, ladderCol:13},
+    {pRow:10, ladderCol:5 },
+    {pRow:8,  ladderCol:12},  // col 12: on L2 (5-19) and L3 (0-14) ✓
+    {pRow:6,  ladderCol:6 },  // col 6:  on L3 (0-14) and L4 (5-19) ✓
+    {pRow:4,  ladderCol:7 },
+  ];
+
+  function enemyAt(c2,rr){
+    return (T4.barrel1.c===c2&&T4.barrel1.r===rr)||
+           (T4.barrel2.c===c2&&T4.barrel2.r===rr)||
+           (T4.turtle.c===c2&&T4.turtle.r===rr);
+  }
+
+  // ── If currently on a ladder (mid-climb) — keep going up ──
+  if(t4OnLadder(c,r) && !t4OnPlatform(c,r)){
+    if(t4OnLadder(c,r-1)){T4.mario.r--;}   // still ladder above — keep climbing
+    else{T4.mario.r--;}                      // top of ladder — step onto platform
+    return;
+  }
+
+  // ── Top platform — walk to goal ──
+  if(r===2){
+    var target=T4_LV.goal.c;
+    var dir2=target>c?1:target<c?-1:0;
+    if(dir2===0){return;}
+    var nc2=c+dir2;
+    if(enemyAt(nc2,r)){T4.mario.jumping=true;T4.mario.jumpTick=T4.tick;}
+    if(t4OnPlatform(nc2,r)){T4.mario.c=nc2;}
+    return;
+  }
+
+  // ── Find stage for current platform row ──
+  var stage=null;
+  for(var i=0;i<route.length;i++){if(route[i].pRow===r){stage=route[i];break;}}
+
+  if(stage){
+    var lc=stage.ladderCol;
+    // Standing on the ladder column — start climbing
+    if(c===lc && t4OnLadder(c,r-1)){
+      T4.mario.r--;
+      return;
+    }
+    // Walk toward ladder column
+    var dir=lc>c?1:lc<c?-1:0;
+    if(dir!==0){
+      var nc=c+dir;
+      if(enemyAt(nc,r)){
+        T4.mario.jumping=true;T4.mario.jumpTick=T4.tick;
+        if(t4OnPlatform(nc,r)){T4.mario.c=nc;}
+      } else if(t4OnPlatform(nc,r)){
+        T4.mario.c=nc;
+      }
+    }
+    return;
+  }
+
+  // Fallback: bounce on unknown row
+  var nc3=c+T4.marioDir;
+  if(t4OnPlatform(nc3,r)){T4.mario.c=nc3;}
+  else{T4.marioDir=-T4.marioDir;nc3=c-T4.marioDir;if(t4OnPlatform(nc3,r))T4.mario.c=nc3;}
+}
+
+function t4ApplyBarrel(which,move){
+  var b=which===1?T4.barrel1:T4.barrel2;
+  // Barrel 1 rolls right (from L3 left side), barrel 2 rolls left (from L1 right side)
+  var dir=which===1?1:-1;
+  if(move==='ROLL'){
+    var nc=b.c+dir,nr=b.r;
+    if(t4OnPlatform(nc,nr)){b.c=nc;}
+    else if(t4OnLadder(b.c,nr+1)){b.r++;} // drop down ladder at end
+    // else stays put
+  }
+  if(which===1)T4.barrel1=b;else T4.barrel2=b;
+}
+
+function t4ApplyTurtle(move){
+  var t=T4.turtle;
+  if(move==='R'){if(t4OnPlatform(t.c+1,t.r))t.c++;}
+  else if(move==='L'){if(t4OnPlatform(t.c-1,t.r))t.c--;}
+  else if(move==='U'){if(t4OnLadder(t.c,t.r-1))t.r--;}
+  else if(move==='D'){if(t4OnLadder(t.c,t.r+1))t.r++;}
+  T4.turtle=t;
+}
+
+function t4End(reason,who){
+  T4.running=false;clearTimeout(T4.loopId);t4Draw();
+  document.getElementById('t4-start').style.display='';
+  document.getElementById('t4-stop').style.display='none';
+  var msg='';
+  if(reason==='caught'){msg='🎮 '+who+' caught Mario at tick '+T4.tick+'! Screenshot for evidence.';}
+  else if(reason==='escaped'){msg='🍄 Mario escaped to the top in '+T4.tick+' ticks! He follows a fixed route — try positioning your barrels and turtle on his path earlier.';}
+  else{msg='300 ticks reached. Mario wandered freely — add more roll() and move() calls to keep your characters in his path longer.';}
+  document.getElementById('t4-fb').textContent=msg;
+  document.getElementById('t4-status').textContent=reason==='caught'?'MARIO CAUGHT! ✓':'Mario escaped…';
+}
+
+window.t4Stop=function(){T4.running=false;clearTimeout(T4.loopId);document.getElementById('t4-start').style.display='';document.getElementById('t4-stop').style.display='none';};
+window.t4Reset=function(who){
+  var starters={1:'def run(barrel):\n    # Barrel 1 starts on L3 (row 6)\n    # Roll right toward ladders\n    for i in range(6):\n        roll()\n    for i in range(4):\n        roll()\n',2:'def run(barrel):\n    # Barrel 2 starts on L1 (row 10)\n    # Roll left to cut off Mario\n    for i in range(8):\n        roll()\n',t:'def run(turtle):\n    # Turtle starts at the top — chase Mario down\n    for i in range(5):\n        move_left()\n    climb_down()\n    for i in range(4):\n        move_left()\n'};
+  var edMap={1:'t4-ed1',2:'t4-ed2',t:'t4-edt'};
+  document.getElementById(edMap[who]).value=starters[who];
+  if(who===1){T4.loaded_b1=false;}else if(who===2){T4.loaded_b2=false;}else{T4.loaded_t=false;}
+  document.getElementById('t4-start').disabled=true;
+};
+
+function t4Draw(){
+  var lv=T4_LV;var ctx=T4.ctx;
+  var W=lv.cols*T4_CELL,H=lv.rows*T4_CELL;
+  // Background
+  ctx.fillStyle='#050A14';ctx.fillRect(0,0,W,H);
+  // Platforms
+  lv.platforms.forEach(function(p){
+    var x=p.cs*T4_CELL,y=p.row*T4_CELL,w2=(p.ce-p.cs+1)*T4_CELL,h=8;
+    var grad=ctx.createLinearGradient(x,y+T4_CELL-h,x,y+T4_CELL);
+    grad.addColorStop(0,'#CC3300');grad.addColorStop(0.4,'#FF4422');grad.addColorStop(1,'#AA2200');
+    ctx.fillStyle=grad;ctx.fillRect(x,y+T4_CELL-h,w2,h);
+    ctx.fillStyle='#FFD080';
+    for(var rx=x+6;rx<x+w2-2;rx+=14){ctx.beginPath();ctx.arc(rx,y+T4_CELL-4,1.5,0,Math.PI*2);ctx.fill();}
+  });
+  // Ladders
+  lv.ladders.forEach(function(l){
+    var x=l.col*T4_CELL+T4_CELL/2;
+    var yTop=l.rTop*T4_CELL+T4_CELL-8,yBot=(l.rBot+1)*T4_CELL-8;
+    ctx.strokeStyle='#3366CC';ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.moveTo(x-6,yTop);ctx.lineTo(x-6,yBot);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x+6,yTop);ctx.lineTo(x+6,yBot);ctx.stroke();
+    ctx.lineWidth=2;
+    for(var ry=yTop+7;ry<yBot;ry+=11){ctx.beginPath();ctx.moveTo(x-6,ry);ctx.lineTo(x+6,ry);ctx.stroke();}
+  });
+  // Goal
+  var gl=lv.goal,gx=gl.c*T4_CELL+T4_CELL/2,gy=gl.r*T4_CELL+T4_CELL-10;
+  ctx.fillStyle='#FFD700';ctx.font='bold 18px serif';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('★',gx,gy);
+  // Barrels
+  drawBarrel(ctx,T4.barrel1.c*T4_CELL+T4_CELL/2,T4.barrel1.r*T4_CELL+T4_CELL-4,T4_CELL);
+  drawBarrel(ctx,T4.barrel2.c*T4_CELL+T4_CELL/2,T4.barrel2.r*T4_CELL+T4_CELL-4,T4_CELL);
+  // Turtle
+  drawTurtle(ctx,T4.turtle.c*T4_CELL+T4_CELL/2,T4.turtle.r*T4_CELL+T4_CELL-4,T4_CELL);
+  // Mario — draw higher if jumping
+  var mJumpOffset=T4.mario.jumping?(T4_CELL*0.6):0;
+  drawMario(ctx,T4.mario.c*T4_CELL+T4_CELL/2,T4.mario.r*T4_CELL+T4_CELL-4-mJumpOffset,T4_CELL);
+}
+
+// Init Tab 3 editor bindings on first use
+var _t3edBound=false;
+var origSwitch=window.switchTab;
+window.switchTab=function(n){
+  origSwitch(n);
+  if(n===3&&!_t3edBound){_t3edBound=true;window._t3sync=bindEditor('t3-editor','t3-hl','t3-ew');}
+};
+
+// Draw initial states when tabs open
+document.addEventListener('DOMContentLoaded',function(){});
+
+})();
+</script>
+</body>
+</html>

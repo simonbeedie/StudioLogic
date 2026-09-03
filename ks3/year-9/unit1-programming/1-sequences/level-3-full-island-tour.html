@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Island Map — Level 3: Full Island Tour</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f2f8;
+    --card: #ffffff;
+    --border: #ddd6ea;
+    --text: #1a1a1a;
+    --text-muted: #6b6860;
+    --text-hint: #9b9890;
+    --purple: #534AB7;
+    --purple-dark: #3C3489;
+    --purple-bg: #EEEDFE;
+    --purple-border: #CECBF6;
+    --purple-text: #26215C;
+    --green: #1D9E75;
+    --amber: #BA7517;
+    --red: #E24B4A;
+    --success-bg: #e8f7f0;
+    --success-text: #0d6e47;
+    --success-border: #9fe1cb;
+    --fail-bg: #fdeaea;
+    --fail-text: #922020;
+    --fail-border: #f7c1c1;
+    --warn-bg: #faeeda;
+    --warn-text: #633806;
+    --warn-border: #FAC775;
+    --info-bg: #e6f1fb;
+    --info-text: #0c447c;
+    --info-border: #b5d4f4;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: 56px;
+  }
+
+  .level-pill {
+    background: var(--purple-bg);
+    color: var(--purple-text);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  header h1 { font-size: 16px; font-weight: 600; }
+
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  .main-top { grid-column: 1 / -1; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .card h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 0.75rem;
+  }
+
+  .card p:last-child { margin-bottom: 0; }
+
+  .task-box {
+    background: var(--purple-bg);
+    border: 1px solid var(--purple-border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-top: 0.75rem;
+  }
+
+  .task-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--purple);
+    margin-bottom: 6px;
+  }
+
+  .task-box p { color: var(--purple-text); margin: 0; }
+
+  .waypoint-status {
+    display: flex;
+    gap: 8px;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .wp-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: #f3f0f8;
+    color: var(--text-muted);
+    transition: all 0.3s;
+  }
+
+  .wp-chip.done {
+    background: var(--success-bg);
+    color: var(--success-text);
+    border-color: var(--success-border);
+  }
+
+  .wp-chip .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--text-hint);
+    transition: background 0.3s;
+    flex-shrink: 0;
+  }
+
+  .wp-chip.done .dot { background: var(--green); }
+
+  .syntax-box {
+    background: #1e1e2e;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-top: 0.75rem;
+  }
+
+  .syntax-box .syntax-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #7f77dd;
+    margin-bottom: 8px;
+  }
+
+  .syntax-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 2;
+    color: #cdd6f4;
+  }
+
+  .syn-keyword { color: #cba6f7; }
+  .syn-func { color: #89b4fa; }
+  .syn-num { color: #fab387; }
+  .syn-dir { color: #a6e3a1; }
+  .syn-comment { color: #6c7086; }
+
+  .steps-list {
+    list-style: none;
+    counter-reset: steps;
+    margin-top: 0.75rem;
+  }
+
+  .steps-list li {
+    counter-increment: steps;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    line-height: 1.6;
+  }
+
+  .steps-list li::before {
+    content: counter(steps);
+    min-width: 22px; height: 22px;
+    background: var(--purple);
+    color: white;
+    border-radius: 50%;
+    font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+
+  .map-wrapper {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .map-wrapper svg { display: block; width: 100%; border-radius: 8px; }
+
+  .map-legend {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  .controls-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+  }
+
+  .controls-card h3 {
+    font-size: 13px; font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+
+  .type-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+  }
+
+  .line-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-hint);
+    min-width: 18px;
+    text-align: right;
+  }
+
+  .code-input {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #f8f7fa;
+    color: var(--text);
+    width: 100%;
+    outline: none;
+  }
+
+  .code-input:focus {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px rgba(83,74,183,0.1);
+  }
+
+  .del-btn {
+    background: none; border: none;
+    color: var(--text-hint); cursor: pointer;
+    font-size: 16px; line-height: 1; padding: 0 4px;
+    flex-shrink: 0;
+  }
+
+  .del-btn:hover { color: #922020; }
+
+  .add-line-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 6px 12px;
+    background: none;
+    border: 1px dashed var(--purple-border);
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--purple);
+    margin-top: 5px;
+    width: 100%;
+    text-align: left;
+  }
+
+  .add-line-btn:hover { background: var(--purple-bg); }
+
+  .program-display {
+    background: #f8f7fa;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    min-height: 70px;
+    margin: 1rem 0;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .prog-line {
+    display: flex; align-items: center; gap: 8px; padding: 2px 0;
+  }
+
+  .prog-num { color: var(--text-hint); font-size: 12px; min-width: 18px; }
+  .prog-text { font-size: 13px; color: var(--text); flex: 1; }
+  .prog-empty { font-size: 13px; color: var(--text-hint); padding: 8px 0; }
+
+  .btn-row { display: flex; gap: 8px; }
+
+  .run-btn {
+    background: var(--purple);
+    color: white; border: none;
+    border-radius: 10px;
+    padding: 10px 24px;
+    font-size: 15px; font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .run-btn:hover { background: var(--purple-dark); }
+  .run-btn:active { transform: scale(0.98); }
+
+  .clear-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 14px; cursor: pointer;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .clear-btn:hover { background: #f0eef8; }
+
+  .feedback {
+    margin-top: 1rem;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    display: none;
+  }
+
+  .feedback.success { background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border); }
+  .feedback.fail { background: var(--fail-bg); color: var(--fail-text); border: 1px solid var(--fail-border); }
+  .feedback.warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
+  .feedback.info { background: var(--info-bg); color: var(--info-text); border: 1px solid var(--info-border); }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(0,0,0,0.08);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+
+  .grid-label { font-size: 10px; fill: rgba(255,255,255,0.7); text-anchor: middle; dominant-baseline: middle; }
+
+  @media (max-width: 700px) { .main { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="level-pill">Level 3</span>
+  <h1>Island Map — Full Island Tour</h1>
+</header>
+
+<div class="main">
+
+  <div class="main-top">
+    <div class="card">
+      <h2>🌟 Your mission</h2>
+      <p>This is the final challenge. Your explorer starts at <strong>B8</strong> and must complete a full island tour — visiting three locations in the correct order.</p>
+      <p>This time, there are <strong>no command buttons</strong>. You must type your own instructions, including a new command: <code>repeat()</code>, which works like a loop.</p>
+
+      <div class="task-box">
+        <div class="task-label">Task — three stops in order</div>
+        <p>B8 → <strong>Lighthouse B (B9)</strong> → <strong>Cabin (I7)</strong> → <strong>Lighthouse J2</strong></p>
+      </div>
+
+      <div class="waypoint-status">
+        <div class="wp-chip" id="wp-lhB"><div class="dot"></div> Lighthouse B (B9)</div>
+        <div class="wp-chip" id="wp-cabin"><div class="dot"></div> Cabin (I7)</div>
+        <div class="wp-chip" id="wp-goal"><div class="dot"></div> Lighthouse J2</div>
+      </div>
+
+      <div class="syntax-box" style="margin-top:1rem;">
+        <div class="syntax-label">Command reference</div>
+        <div class="syntax-line"><span class="syn-func">move_north</span>(<span class="syn-num">3</span>) &nbsp;<span class="syn-comment"># move 3 cells north</span></div>
+        <div class="syntax-line"><span class="syn-func">move_south</span>(<span class="syn-num">1</span>) &nbsp;<span class="syn-comment"># move 1 cell south</span></div>
+        <div class="syntax-line"><span class="syn-func">move_east</span>(<span class="syn-num">7</span>) &nbsp;&nbsp;<span class="syn-comment"># move 7 cells east</span></div>
+        <div class="syntax-line"><span class="syn-func">move_west</span>(<span class="syn-num">2</span>) &nbsp;&nbsp;<span class="syn-comment"># move 2 cells west</span></div>
+        <div class="syntax-line"><span class="syn-keyword">repeat</span>(<span class="syn-num">5</span>, <span class="syn-dir">'north'</span>) &nbsp;<span class="syn-comment"># same as move_north(5)</span></div>
+      </div>
+
+      <ul class="steps-list" style="margin-top:1rem;">
+        <li>Count the grid squares for each leg of your journey on the map before typing.</li>
+        <li>Type each instruction in a separate line. Use <code>repeat(n, 'direction')</code> to practise the loop concept.</li>
+        <li>Remember: direction must be in quotes — <code>'north'</code>, <code>'south'</code>, <code>'east'</code>, or <code>'west'</code>.</li>
+        <li>All three waypoints must be visited in the correct order. Check the trackers above as your explorer moves.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="map-wrapper">
+      <svg id="map" viewBox="0 0 390 310">
+        <rect width="390" height="310" fill="#5ba3c9"/>
+        <ellipse cx="200" cy="160" rx="148" ry="105" fill="#5a9c4a"/>
+        <ellipse cx="148" cy="148" rx="112" ry="93" fill="#5a9c4a"/>
+        <ellipse cx="252" cy="178" rx="112" ry="83" fill="#5a9c4a"/>
+        <ellipse cx="182" cy="225" rx="72" ry="28" fill="#c8b87a" opacity="0.7"/>
+        <circle cx="200" cy="145" r="28" fill="#4a4ac0" opacity="0.82"/>
+        <circle cx="98" cy="178" r="10" fill="#4a4ac0" opacity="0.75"/>
+        <ellipse cx="272" cy="147" rx="34" ry="24" fill="#2d6e2d"/>
+        <ellipse cx="280" cy="141" rx="20" ry="15" fill="#1e4e1e"/>
+
+        <line x1="28" y1="0" x2="28" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="56" y1="0" x2="56" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="84" y1="0" x2="84" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="112" y1="0" x2="112" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="140" y1="0" x2="140" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="168" y1="0" x2="168" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="196" y1="0" x2="196" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="224" y1="0" x2="224" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="252" y1="0" x2="252" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="280" y1="0" x2="280" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="308" y1="0" x2="308" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="336" y1="0" x2="336" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="364" y1="0" x2="364" y2="310" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="0" y1="28" x2="390" y2="28" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="0" y1="56" x2="390" y2="56" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="0" y1="84" x2="390" y2="84" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="0" y1="112" x2="390" y2="112" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="0" y1="140" x2="390" y2="140" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="0" y1="168" x2="390" y2="168" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="0" y1="196" x2="390" y2="196" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="0" y1="224" x2="390" y2="224" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="0" y1="252" x2="390" y2="252" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+        <line x1="0" y1="280" x2="390" y2="280" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+
+        <text x="42" y="14" class="grid-label">A</text><text x="70" y="14" class="grid-label">B</text><text x="98" y="14" class="grid-label">C</text><text x="126" y="14" class="grid-label">D</text><text x="154" y="14" class="grid-label">E</text><text x="182" y="14" class="grid-label">F</text><text x="210" y="14" class="grid-label">G</text><text x="238" y="14" class="grid-label">H</text><text x="266" y="14" class="grid-label">I</text><text x="294" y="14" class="grid-label">J</text><text x="322" y="14" class="grid-label">K</text><text x="350" y="14" class="grid-label">L</text><text x="378" y="14" class="grid-label">M</text>
+        <text x="14" y="42" class="grid-label">1</text><text x="14" y="70" class="grid-label">2</text><text x="14" y="98" class="grid-label">3</text><text x="14" y="126" class="grid-label">4</text><text x="14" y="154" class="grid-label">5</text><text x="14" y="182" class="grid-label">6</text><text x="14" y="210" class="grid-label">7</text><text x="14" y="238" class="grid-label">8</text><text x="14" y="266" class="grid-label">9</text><text x="14" y="294" class="grid-label">10</text>
+
+        <!-- Lighthouse J2 -->
+        <rect x="283" y="44" width="20" height="28" fill="#e8e8e8" rx="2"/>
+        <rect x="287" y="30" width="5" height="16" fill="#888"/>
+        <rect x="281" y="47" width="5" height="18" fill="#d94f4f"/>
+        <rect x="286" y="47" width="5" height="18" fill="white"/>
+        <rect x="291" y="47" width="5" height="18" fill="#d94f4f"/>
+        <rect x="285" y="72" width="10" height="6" fill="#aaa"/>
+        <text x="293" y="86" text-anchor="middle" font-size="9" fill="white" font-family="Inter,sans-serif" font-weight="600">Lighthouse</text>
+        <circle cx="293" cy="56" r="13" fill="none" stroke="#1D9E75" stroke-width="2" stroke-dasharray="5 3"/>
+
+        <!-- Lighthouse B (B9) -->
+        <rect x="58" y="244" width="18" height="24" fill="#e8e8e8" rx="2"/>
+        <rect x="62" y="230" width="4" height="16" fill="#888"/>
+        <rect x="57" y="247" width="4" height="15" fill="#d94f4f"/>
+        <rect x="61" y="247" width="4" height="15" fill="white"/>
+        <rect x="65" y="247" width="4" height="15" fill="#d94f4f"/>
+        <rect x="60" y="268" width="8" height="5" fill="#aaa"/>
+        <text x="67" y="280" text-anchor="middle" font-size="9" fill="white" font-family="Inter,sans-serif" font-weight="600">L-house B</text>
+        <circle cx="67" cy="256" r="13" fill="none" stroke="#BA7517" stroke-width="2" stroke-dasharray="5 3"/>
+
+        <!-- Cabin I7 -->
+        <rect x="254" y="192" width="20" height="16" fill="#a0784a" rx="2"/>
+        <polygon points="254,192 274,192 264,181" fill="#8B4513"/>
+        <rect x="259" y="200" width="7" height="8" fill="#6a4a2a"/>
+        <text x="264" y="218" text-anchor="middle" font-size="9" fill="white" font-family="Inter,sans-serif" font-weight="600">Cabin</text>
+        <circle cx="264" cy="200" r="13" fill="none" stroke="#BA7517" stroke-width="2" stroke-dasharray="5 3"/>
+
+        <polyline id="trail" points="" fill="none" stroke="#7f77dd" stroke-width="2.5" stroke-dasharray="5 3" opacity="0.8"/>
+        <circle id="explorer" cx="70" cy="238" r="11" fill="#534AB7" stroke="white" stroke-width="2.5"/>
+        <text id="exp-txt" x="70" y="242" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="white" font-weight="700">S</text>
+        <text x="70" y="253" text-anchor="middle" font-size="8" fill="white" font-family="Inter,sans-serif" font-weight="500" opacity="0.9">START</text>
+      </svg>
+
+      <div class="map-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#534AB7;"></div> Explorer (B8)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#BA7517;"></div> Waypoints (visit in order)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1D9E75;"></div> Final goal — J2</div>
+      </div>
+  </div>
+
+  <div>
+    <div class="controls-card">
+      <h3>Type your program</h3>
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:10px; line-height:1.6;">Type each instruction on its own line. Use the command reference on the left for syntax. Press <strong>Add line</strong> to add more lines.</p>
+
+      <div id="type-inputs"></div>
+
+      <button class="add-line-btn" onclick="addLine()">+ Add line</button>
+
+      <h3 style="margin-top:1.25rem;">Parsed program</h3>
+      <div class="program-display" id="program-display">
+        <p class="prog-empty">Your typed instructions will be shown here when you run...</p>
+      </div>
+
+      <div class="btn-row">
+        <button class="run-btn" onclick="runProgram()">▶ Run program</button>
+        <button class="clear-btn" onclick="clearAll()">Clear</button>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+
+      <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--border);">
+        <p style="font-size:13px; font-weight:600; color:var(--text-muted); margin-bottom:6px;">Why repeat() matters</p>
+        <p style="font-size:14px; color:var(--text-muted); line-height:1.7;"><code>repeat(7, 'east')</code> does the same job as writing <code>move_east(7)</code> — but the idea behind it is the same as a <strong>for loop</strong> in Python: <em>do this action n times</em>. That's exactly what <code>for _ in range(7):</code> does.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const COLS = ['A','B','C','D','E','F','G','H','I','J','K','L','M'];
+const CW = 28;
+const colX = c => 28 + c * CW + CW / 2;
+const rowY = r => 28 * r - CW / 2;
+
+const START_COL = 1, START_ROW = 8;
+const LHB_COL = 1, LHB_ROW = 9;
+const CABIN_COL = 8, CABIN_ROW = 7;
+const GOAL_COL = 9, GOAL_ROW = 2;
+
+let lines = ['', '', ''];
+let animating = false;
+let lhbVisited = false, cabinVisited = false;
+
+const explorer = document.getElementById('explorer');
+const expTxt = document.getElementById('exp-txt');
+const trail = document.getElementById('trail');
+const feedback = document.getElementById('feedback');
+
+function setPos(col, row) {
+  const x = colX(col), y = rowY(row);
+  explorer.setAttribute('cx', x);
+  explorer.setAttribute('cy', y);
+  expTxt.setAttribute('x', x);
+  expTxt.setAttribute('y', y);
+}
+
+function addToTrail(col, row) {
+  const pts = trail.getAttribute('points');
+  trail.setAttribute('points', pts + ` ${colX(col)},${rowY(row)}`);
+}
+
+function setWaypoint(id, done) {
+  const chip = document.getElementById(id);
+  if (done) chip.classList.add('done');
+  else chip.classList.remove('done');
+}
+
+function addLine() {
+  lines.push('');
+  renderInputs();
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('.code-input');
+    if (inputs.length) inputs[inputs.length - 1].focus();
+  }, 50);
+}
+
+function removeLine(i) {
+  if (lines.length <= 1) { lines[0] = ''; renderInputs(); return; }
+  lines.splice(i, 1);
+  renderInputs();
+}
+
+function renderInputs() {
+  const container = document.getElementById('type-inputs');
+  container.innerHTML = lines.map((v, i) =>
+    `<div class="type-input-row">
+      <span class="line-num">${i+1}</span>
+      <input class="code-input" value="${v.replace(/"/g,'&quot;')}" placeholder="e.g. move_east(7) or repeat(5, 'north')"
+        oninput="lines[${i}]=this.value" onkeydown="handleKey(event,${i})" />
+      ${lines.length > 1 ? `<button class="del-btn" onclick="removeLine(${i})">×</button>` : ''}
+    </div>`
+  ).join('');
+}
+
+function handleKey(e, i) {
+  if (e.key === 'Enter') {
+    lines.splice(i + 1, 0, '');
+    renderInputs();
+    setTimeout(() => {
+      const inputs = document.querySelectorAll('.code-input');
+      if (inputs[i+1]) inputs[i+1].focus();
+    }, 30);
+  }
+}
+
+function clearAll() {
+  lines = ['', '', ''];
+  lhbVisited = cabinVisited = false;
+  renderInputs();
+  resetExplorer();
+  feedback.style.display = 'none';
+  document.getElementById('program-display').innerHTML = '<p class="prog-empty">Your typed instructions will be shown here when you run...</p>';
+  setWaypoint('wp-lhB', false);
+  setWaypoint('wp-cabin', false);
+  setWaypoint('wp-goal', false);
+}
+
+function resetExplorer() {
+  setPos(START_COL, START_ROW);
+  trail.setAttribute('points', `${colX(START_COL)},${rowY(START_ROW)}`);
+  expTxt.textContent = 'S';
+}
+
+function showFeedback(type, msg) {
+  feedback.style.display = 'block';
+  feedback.className = 'feedback ' + type;
+  feedback.innerHTML = msg;
+}
+
+function parseSteps(cmds) {
+  const steps = [];
+  for (const cmd of cmds) {
+    const m = cmd.trim().match(/^move_(north|south|east|west)\(\s*(\d+)?\s*\)$/);
+    const r = cmd.trim().match(/^repeat\(\s*(\d+)\s*,\s*['"]?(north|south|east|west)['"]?\s*\)$/);
+    if (m) {
+      const dir = m[1], n = parseInt(m[2] || '1');
+      for (let i = 0; i < n; i++) steps.push(dir);
+    } else if (r) {
+      const n = parseInt(r[1]), dir = r[2];
+      for (let i = 0; i < n; i++) steps.push(dir);
+    } else {
+      return { error: cmd };
+    }
+  }
+  return { steps };
+}
+
+async function runProgram() {
+  if (animating) return;
+
+  const cmds = lines.map(l => l.trim()).filter(Boolean);
+  if (cmds.length === 0) { showFeedback('info', 'Type some instructions first!'); return; }
+
+  const parsed = parseSteps(cmds);
+  if (parsed.error) {
+    showFeedback('fail', `⚠️ I don't understand: <code>${parsed.error}</code><br>Check spelling and make sure directions are in quotes, e.g. <code>repeat(3, 'north')</code>`);
+    return;
+  }
+
+  const display = document.getElementById('program-display');
+  display.innerHTML = cmds.map((cmd, i) =>
+    `<div class="prog-line">
+      <span class="prog-num">${i+1}.</span>
+      <span class="prog-text">${cmd}</span>
+    </div>`
+  ).join('');
+
+  animating = true;
+  lhbVisited = cabinVisited = false;
+  feedback.style.display = 'none';
+  setWaypoint('wp-lhB', false);
+  setWaypoint('wp-cabin', false);
+  setWaypoint('wp-goal', false);
+
+  let col = START_COL, row = START_ROW;
+  trail.setAttribute('points', `${colX(col)},${rowY(row)}`);
+  setPos(col, row);
+  expTxt.textContent = 'S';
+
+  for (const dir of parsed.steps) {
+    await new Promise(r => setTimeout(r, 280));
+    if (dir === 'north') row--;
+    else if (dir === 'south') row++;
+    else if (dir === 'east') col++;
+    else col--;
+
+    if (col < 0 || col > 12 || row < 1 || row > 10) {
+      showFeedback('fail', '🚫 The explorer fell off the edge of the map! Check your step counts carefully.');
+      animating = false;
+      return;
+    }
+    setPos(col, row);
+    addToTrail(col, row);
+
+    if (col === LHB_COL && row === LHB_ROW && !lhbVisited) {
+      lhbVisited = true;
+      setWaypoint('wp-lhB', true);
+    }
+    if (col === CABIN_COL && row === CABIN_ROW && !cabinVisited) {
+      cabinVisited = true;
+      setWaypoint('wp-cabin', true);
+    }
+  }
+
+  const colName = COLS[col];
+  const atGoal = col === GOAL_COL && row === GOAL_ROW;
+  const missed = [];
+  if (!lhbVisited) missed.push('Lighthouse B (B9)');
+  if (!cabinVisited) missed.push('Cabin (I7)');
+
+  if (atGoal && missed.length === 0) {
+    expTxt.textContent = '★';
+    setWaypoint('wp-goal', true);
+    showFeedback('success', `🏆 <strong>Outstanding!</strong> The explorer completed the full island tour — all three stops visited in order. You've written a real algorithm with ${cmds.length} instruction${cmds.length !== 1 ? 's' : ''} and ${parsed.steps.length} total steps.`);
+  } else if (atGoal && missed.length > 0) {
+    showFeedback('warn', `⚠️ <strong>Lighthouse reached, but stops missed.</strong> You didn't visit: <strong>${missed.join(', ')}</strong>. Revisit your route — remember the order matters!`);
+  } else {
+    const missedMsg = missed.length ? ` Also missed: <strong>${missed.join(', ')}</strong>.` : '';
+    showFeedback('fail', `❌ <strong>Not there yet.</strong> Explorer ended at <strong>${colName}${row}</strong>, not J2.${missedMsg} Count the grid squares on the map for each leg of the journey.`);
+  }
+  animating = false;
+}
+
+renderInputs();
+resetExplorer();
+</script>
+</body>
+</html>
