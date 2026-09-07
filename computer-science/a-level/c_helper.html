@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C# Programming Hub - A-Level</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'DM Sans', sans-serif; background-color: #f8fafc; }
+        .code-font { font-family: 'Fira Code', monospace; }
+        .nav-link.active { background-color: #f5f3ff; color: #7c3aed; border-right: 4px solid #7c3aed; }
+        #sidebar { transition: transform 0.3s ease-in-out; }
+        @media (max-width: 768px) {
+            #sidebar.hidden-mobile { transform: translateX(-100%); }
+        }
+        .keyword { color: #c678dd; }
+        .func { color: #61afef; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+        .comment { color: #7f848e; font-style: italic; }
+        .operator { color: #56b6c2; }
+        .type { color: #e5c07b; }
+
+        .spec-badge {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            padding: 2px 8px;
+            border-radius: 999px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .badge-as { background: #dbeafe; color: #1d4ed8; }
+        .badge-alevel { background: #ede9fe; color: #6d28d9; }
+
+        .tip-box {
+            background: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            border-radius: 0 12px 12px 0;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            color: #166534;
+        }
+        .warn-box {
+            background: #fefce8;
+            border-left: 4px solid #eab308;
+            border-radius: 0 12px 12px 0;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            color: #854d0e;
+        }
+    </style>
+</head>
+<body class="text-slate-800 flex flex-col md:flex-row min-h-screen">
+
+    <!-- Mobile Header -->
+    <header class="md:hidden bg-white border-b p-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-hashtag text-purple-600 text-xl"></i>
+            <span class="font-bold text-lg tracking-tight">C#Hub <span class="text-purple-600">A-Level</span></span>
+        </div>
+        <button onclick="toggleSidebar()" class="text-slate-600 text-2xl">
+            <i class="fas fa-bars"></i>
+        </button>
+    </header>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r transform md:translate-x-0 hidden-mobile md:sticky md:block flex-shrink-0">
+        <div class="h-full flex flex-col">
+            <div class="p-6 border-b hidden md:flex items-center space-x-2">
+                <i class="fas fa-hashtag text-purple-600 text-2xl"></i>
+                <span class="font-bold text-xl tracking-tight">C#Hub <span class="text-purple-600">A-Level</span></span>
+            </div>
+
+            <nav class="flex-grow p-4 space-y-1 overflow-y-auto">
+                <p class="text-xs font-bold text-slate-400 uppercase px-3 mb-2 tracking-widest">General</p>
+                <button onclick="showPage('home')" class="nav-link w-full text-left px-4 py-2.5 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-50 transition">
+                    <i class="fas fa-house text-slate-400 w-4"></i><span>Home</span>
+                </button>
+                <button onclick="showPage('setup')" class="nav-link w-full text-left px-4 py-2.5 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-50 transition">
+                    <i class="fas fa-download text-slate-400 w-4"></i><span>Getting Started</span>
+                </button>
+
+                <p class="text-xs font-bold text-slate-400 uppercase px-3 mt-5 mb-2 tracking-widest">Foundations</p>
+                <button onclick="showPage('basics')" class="nav-link w-full text-left px-4 py-2.5 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-50 transition">
+                    <i class="fas fa-book-open text-slate-400 w-4"></i><span>C# Basics</span>
+                </button>
+                <button onclick="showPage('scope')" class="nav-link w-full text-left px-4 py-2.5 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-50 transition">
+                    <i class="fas fa-sliders text-slate-400 w-4"></i><span>Variables, Constants &amp; Scope</span>
+                </button>
+                <button onclick="showPage('strings')" class="nav-link w-full text-left px-4 py-2.5 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-50 transition">
+                    <i class="fas fa-font text-slate-400 w-4"></i><span>String Handling &amp; Exceptions</span>
+                </button>
+
+                <p class="text-xs font-bold text-slate-400 uppercase px-3 mt-5 mb-2 tracking-widest">Logic &amp; Control</p>
+                <button onclick="showPage('advanced')" class="nav-link w-full text-left px-4 py-2.5 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-50 transition">
+                    <i class="fas fa-microchip text-slate-400 w-4"></i><span>Advanced Control Flow</span>
+                </button>
+                <button onclick="showPage('subroutines')" class="nav-link w-full text-left px-4 py-2.5 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-50 transition">
+                    <i class="fas fa-code-branch text-slate-400 w-4"></i><span>Methods &amp; Recursion</span>
+                </button>
+
+                <p class="text-xs font-bold text-slate-400 uppercase px-3 mt-5 mb-2 tracking-widest">Data</p>
+                <button onclick="showPage('structures')" class="nav-link w-full text-left px-4 py-2.5 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-50 transition">
+                    <i class="fas fa-layer-group text-slate-400 w-4"></i><span>Arrays, Lists &amp; Dicts</span>
+                </button>
+                <button onclick="showPage('arrays2d')" class="nav-link w-full text-left px-4 py-2.5 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-50 transition">
+                    <i class="fas fa-table-cells text-slate-400 w-4"></i><span>2D Arrays &amp; Records</span>
+                </button>
+                <button onclick="showPage('files')" class="nav-link w-full text-left px-4 py-2.5 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-50 transition">
+                    <i class="fas fa-file-export text-slate-400 w-4"></i><span>File Handling</span>
+                </button>
+
+                <p class="text-xs font-bold text-slate-400 uppercase px-3 mt-5 mb-2 tracking-widest">A-Level</p>
+                <button onclick="showPage('oop')" class="nav-link w-full text-left px-4 py-2.5 rounded-xl font-medium flex items-center space-x-3 hover:bg-slate-50 transition">
+                    <i class="fas fa-cubes text-slate-400 w-4"></i><span>OOP Concepts</span>
+                </button>
+            </nav>
+        </div>
+    </aside>
+
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden"></div>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-6 md:p-10 lg:p-12 overflow-x-hidden">
+
+        <!-- Home Page -->
+        <section id="page-home" class="page-content py-6 max-w-5xl">
+            <div class="mb-3">
+                <span class="text-xs font-bold uppercase tracking-widest text-purple-500">AQA 7517</span>
+            </div>
+            <h1 class="text-5xl font-bold mb-4 text-slate-900">C# Programming<br>Reference Hub</h1>
+            <p class="text-xl text-slate-500 mb-12 leading-relaxed max-w-3xl">
+                A-Level Computer Science programming reference. All sections map to the AQA specification — look for the <span class="spec-badge badge-as">AS</span> and <span class="spec-badge badge-alevel">A-Level</span> badges on each topic.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div onclick="showPage('setup')" class="p-7 bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-200 cursor-pointer transition">
+                    <i class="fas fa-download text-purple-500 text-2xl mb-3"></i>
+                    <h3 class="font-bold text-lg">Getting Started</h3>
+                    <p class="text-slate-500 text-sm mt-1">Set up VS Code and .NET at home, plus the project-setup command.</p>
+                    <span class="spec-badge badge-as mt-2">AS</span>
+                </div>
+                <div onclick="showPage('basics')" class="p-7 bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-200 cursor-pointer transition">
+                    <i class="fas fa-book-open text-purple-500 text-2xl mb-3"></i>
+                    <h3 class="font-bold text-lg">C# Basics</h3>
+                    <p class="text-slate-500 text-sm mt-1">Data types, I/O, selection and iteration.</p>
+                    <span class="spec-badge badge-as mt-2">AS</span>
+                </div>
+                <div onclick="showPage('scope')" class="p-7 bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-200 cursor-pointer transition">
+                    <i class="fas fa-sliders text-purple-500 text-2xl mb-3"></i>
+                    <h3 class="font-bold text-lg">Variables, Constants &amp; Scope</h3>
+                    <p class="text-slate-500 text-sm mt-1">Local vs global, const keyword, why scope matters.</p>
+                    <span class="spec-badge badge-as mt-2">AS</span>
+                </div>
+                <div onclick="showPage('strings')" class="p-7 bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-200 cursor-pointer transition">
+                    <i class="fas fa-font text-purple-500 text-2xl mb-3"></i>
+                    <h3 class="font-bold text-lg">String Handling &amp; Exceptions</h3>
+                    <p class="text-slate-500 text-sm mt-1">Built-in string methods, type conversion, try/catch.</p>
+                    <span class="spec-badge badge-as mt-2">AS</span>
+                </div>
+                <div onclick="showPage('advanced')" class="p-7 bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-200 cursor-pointer transition">
+                    <i class="fas fa-microchip text-purple-500 text-2xl mb-3"></i>
+                    <h3 class="font-bold text-lg">Advanced Control Flow</h3>
+                    <p class="text-slate-500 text-sm mt-1">Random numbers, Boolean logic, nested structures.</p>
+                    <span class="spec-badge badge-as mt-2">AS</span>
+                </div>
+                <div onclick="showPage('subroutines')" class="p-7 bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-200 cursor-pointer transition">
+                    <i class="fas fa-code-branch text-purple-500 text-2xl mb-3"></i>
+                    <h3 class="font-bold text-lg">Methods &amp; Recursion</h3>
+                    <p class="text-slate-500 text-sm mt-1">Procedures, functions, parameters, stack frames and recursion.</p>
+                    <span class="spec-badge badge-alevel mt-2">A-Level</span>
+                </div>
+                <div onclick="showPage('structures')" class="p-7 bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-200 cursor-pointer transition">
+                    <i class="fas fa-layer-group text-purple-500 text-2xl mb-3"></i>
+                    <h3 class="font-bold text-lg">Arrays, Lists &amp; Dicts</h3>
+                    <p class="text-slate-500 text-sm mt-1">Fixed arrays, dynamic Lists, Dictionary lookup.</p>
+                    <span class="spec-badge badge-as mt-2">AS</span>
+                </div>
+                <div onclick="showPage('arrays2d')" class="p-7 bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-200 cursor-pointer transition">
+                    <i class="fas fa-table-cells text-purple-500 text-2xl mb-3"></i>
+                    <h3 class="font-bold text-lg">2D Arrays &amp; Records</h3>
+                    <p class="text-slate-500 text-sm mt-1">Grids, matrices and struct-based records.</p>
+                    <span class="spec-badge badge-as mt-2">AS</span>
+                </div>
+                <div onclick="showPage('files')" class="p-7 bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-200 cursor-pointer transition">
+                    <i class="fas fa-file-lines text-purple-500 text-2xl mb-3"></i>
+                    <h3 class="font-bold text-lg">File Handling</h3>
+                    <p class="text-slate-500 text-sm mt-1">Read and write text and binary files.</p>
+                    <span class="spec-badge badge-as mt-2">AS</span>
+                </div>
+                <div onclick="showPage('oop')" class="p-7 bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-200 cursor-pointer transition">
+                    <i class="fas fa-cubes text-purple-500 text-2xl mb-3"></i>
+                    <h3 class="font-bold text-lg">OOP Concepts</h3>
+                    <p class="text-slate-500 text-sm mt-1">Classes, objects, encapsulation, inheritance, polymorphism.</p>
+                    <span class="spec-badge badge-alevel mt-2">A-Level</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Content Section -->
+        <div id="content-container" class="hidden max-w-5xl">
+            <h2 id="section-title" class="text-4xl font-bold text-slate-900 mb-2"></h2>
+            <p id="section-desc" class="text-lg text-slate-500 mb-8"></p>
+            <div id="sections-wrapper" class="space-y-10"></div>
+        </div>
+
+    </main>
+
+    <script>
+    const contentData = {
+
+        setup: {
+            title: "Getting Started",
+            desc: "Set up your own computer for AS/A-Level C# development, and a quick reminder of the command that starts every new project.",
+            badge: "AS",
+            sections: [
+                {
+                    subtitle: "1. Starting a New Project — Terminal Reminder",
+                    text: "Every time you start a new task, open a fresh folder in VS Code first (File → Open Folder), then open a terminal (Terminal → New Terminal) and run this command inside it:",
+                    tip: "One folder per project keeps Program.cs and build files for each task separate — nothing gets overwritten or mixed up.",
+                    code: `<span class="comment">// Creates Program.cs and the project files in the CURRENT folder</span>
+<span class="func">dotnet</span> new console
+
+<span class="comment">// Then, to build and run your program:</span>
+<span class="func">dotnet</span> run`
+                },
+                {
+                    subtitle: "2. Setting Up on Your Home Computer",
+                    text: "Follow these steps once to get C# working on your own laptop or PC. School computers already have everything installed — you only need this at home.",
+                    steps: [
+                        {
+                            title: "Download Visual Studio Code",
+                            body: "Go to code.visualstudio.com and download the installer for your operating system (Windows, macOS or Linux). Run it and accept the default options."
+                        },
+                        {
+                            title: "Install the .NET SDK",
+                            body: "Go to dotnet.microsoft.com/download and install the latest LTS (long-term support) version of the .NET SDK — not just the Runtime. This gives you the dotnet command used to create and run projects."
+                        },
+                        {
+                            title: "Install the C# Dev Kit extension",
+                            body: "Open VS Code, click the Extensions icon in the left sidebar (or press Ctrl+Shift+X / Cmd+Shift+X), search for \u201cC# Dev Kit\u201d, and click Install. This automatically brings in the base C# extension and IntelliSense/IntelliCode support too."
+                        },
+                        {
+                            title: "Restart VS Code",
+                            body: "Close and reopen VS Code so the new extension and SDK are picked up properly. This step is easy to miss and fixes most \u201cnothing is working\u201d issues."
+                        },
+                        {
+                            title: "Verify the install",
+                            body: "Open a terminal (Terminal → New Terminal) and type dotnet --version. If a version number appears, everything is installed correctly."
+                        },
+                        {
+                            title: "Test it with a real project",
+                            body: "Open or create a folder for your first home project, then run dotnet new console followed by dotnet run — you should see \u201cHello, World!\u201d printed in the terminal."
+                        }
+                    ],
+                    warn: "On Windows, installers sometimes need a restart to finish setting up PATH variables — if dotnet --version isn\u2019t recognised, restart your computer and try again before troubleshooting further."
+                }
+            ]
+        },
+
+        basics: {
+            title: "C# Basics",
+            desc: "Core syntax: data types, input/output, selection and iteration.",
+            badge: "AS",
+            sections: [
+                {
+                    subtitle: "1. Data Types",
+                    text: "Every variable in C# must have a declared type. The most common types you will use are shown below. Choosing the right type matters — it affects memory, precision, and what operations are valid.",
+                    tip: "The spec requires you to know: integer, real/float, Boolean, character, string, and how to define your own types from these building blocks.",
+                    code: `<span class="comment">// Whole numbers</span>
+<span class="type">int</span> lives <span class="operator">=</span> <span class="number">3</span>;
+
+<span class="comment">// Decimal numbers</span>
+<span class="type">double</span> speed <span class="operator">=</span> <span class="number">9.81</span>;
+<span class="type">float</span>  distance <span class="operator">=</span> <span class="number">3.5f</span>;   <span class="comment">// note the f suffix</span>
+
+<span class="comment">// True / False</span>
+<span class="type">bool</span> gameOver <span class="operator">=</span> <span class="keyword">false</span>;
+
+<span class="comment">// A single character</span>
+<span class="type">char</span> grade <span class="operator">=</span> <span class="string">'A'</span>;         <span class="comment">// single quotes for char</span>
+
+<span class="comment">// A sequence of characters</span>
+<span class="type">string</span> playerName <span class="operator">=</span> <span class="string">"Alice"</span>;`
+                },
+                {
+                    subtitle: "2. Input & Output",
+                    text: "Console.ReadLine() always returns a string. You must convert it if you need a number.",
+                    code: `<span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Enter your name:"</span>);
+<span class="type">string</span> name <span class="operator">=</span> <span class="type">Console</span>.<span class="func">ReadLine</span>();
+<span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Hello, "</span> <span class="operator">+</span> name);
+
+<span class="comment">// Converting input to an integer</span>
+<span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Enter your age:"</span>);
+<span class="type">int</span> age <span class="operator">=</span> <span class="type">Convert</span>.<span class="func">ToInt32</span>(<span class="type">Console</span>.<span class="func">ReadLine</span>());
+<span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Next year: "</span> <span class="operator">+</span> (age <span class="operator">+</span> <span class="number">1</span>));`
+                },
+                {
+                    subtitle: "3. Arithmetic Operators",
+                    text: "C# supports all standard arithmetic. The modulus operator (%) is particularly useful for checking divisibility and wrapping values.",
+                    code: `<span class="type">int</span> a <span class="operator">=</span> <span class="number">17</span>;
+<span class="type">int</span> b <span class="operator">=</span> <span class="number">5</span>;
+
+<span class="type">int</span> sum       <span class="operator">=</span> a <span class="operator">+</span> b;   <span class="comment">// 22</span>
+<span class="type">int</span> diff      <span class="operator">=</span> a <span class="operator">-</span> b;   <span class="comment">// 12</span>
+<span class="type">int</span> product   <span class="operator">=</span> a <span class="operator">*</span> b;   <span class="comment">// 85</span>
+<span class="type">int</span> quotient  <span class="operator">=</span> a <span class="operator">/</span> b;   <span class="comment">// 3  (integer division — truncated)</span>
+<span class="type">int</span> remainder <span class="operator">=</span> a <span class="operator">%</span> b;   <span class="comment">// 2  (MOD)</span>
+<span class="type">double</span> real   <span class="operator">=</span> (<span class="type">double</span>)a <span class="operator">/</span> b; <span class="comment">// 3.4 (cast first for real division)</span>
+<span class="type">double</span> power  <span class="operator">=</span> <span class="type">Math</span>.<span class="func">Pow</span>(a, <span class="number">2</span>); <span class="comment">// 289 (exponentiation)</span>`
+                },
+                {
+                    subtitle: "4. Selection (if / else if / else)",
+                    text: "Use curly braces to group each branch. Conditions sit inside parentheses.",
+                    code: `<span class="type">int</span> score <span class="operator">=</span> <span class="number">74</span>;
+
+<span class="keyword">if</span> (score <span class="operator">>=</span> <span class="number">90</span>)
+{
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Grade A"</span>);
+}
+<span class="keyword">else if</span> (score <span class="operator">>=</span> <span class="number">70</span>)
+{
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Grade B"</span>);
+}
+<span class="keyword">else</span>
+{
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Grade C or below"</span>);
+}`
+                },
+                {
+                    subtitle: "5. Iteration — Definite (for) and Indefinite (while / do-while)",
+                    text: "Use a for loop when you know how many iterations you need. Use while for condition-controlled loops. The do-while variant guarantees the body runs at least once — useful for input validation.",
+                    code: `<span class="comment">// Definite — count-controlled</span>
+<span class="keyword">for</span> (<span class="type">int</span> i <span class="operator">=</span> <span class="number">1</span>; i <span class="operator"><=</span> <span class="number">5</span>; i<span class="operator">++</span>)
+{
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Row "</span> <span class="operator">+</span> i);
+}
+
+<span class="comment">// Indefinite — condition at the START (may run 0 times)</span>
+<span class="type">string</span> input <span class="operator">=</span> <span class="string">""</span>;
+<span class="keyword">while</span> (input <span class="operator">!=</span> <span class="string">"quit"</span>)
+{
+    input <span class="operator">=</span> <span class="type">Console</span>.<span class="func">ReadLine</span>();
+}
+
+<span class="comment">// Indefinite — condition at the END (always runs at least once)</span>
+<span class="type">int</span> number;
+<span class="keyword">do</span>
+{
+    <span class="type">Console</span>.<span class="func">Write</span>(<span class="string">"Enter a positive number: "</span>);
+    number <span class="operator">=</span> <span class="type">Convert</span>.<span class="func">ToInt32</span>(<span class="type">Console</span>.<span class="func">ReadLine</span>());
+} <span class="keyword">while</span> (number <span class="operator"><=</span> <span class="number">0</span>);`
+                }
+            ]
+        },
+
+        scope: {
+            title: "Variables, Constants & Scope",
+            desc: "Understanding where variables live and why named constants make code safer and clearer.",
+            badge: "AS",
+            sections: [
+                {
+                    subtitle: "1. Variables vs Constants",
+                    text: "A variable's value can change during the program's lifetime. A constant is fixed at the point it is declared. Using constants instead of 'magic numbers' makes code easier to read and maintain — change the value in one place, and it updates everywhere.",
+                    tip: "The spec asks you to explain the advantages of named constants. Key points: readability, maintainability, and preventing accidental modification.",
+                    code: `<span class="comment">// Variable — can be reassigned</span>
+<span class="type">int</span> playerScore <span class="operator">=</span> <span class="number">0</span>;
+playerScore <span class="operator">=</span> playerScore <span class="operator">+</span> <span class="number">10</span>;   <span class="comment">// valid</span>
+
+<span class="comment">// Constant — cannot be changed after declaration</span>
+<span class="keyword">const int</span> MAX_LIVES <span class="operator">=</span> <span class="number">3</span>;
+<span class="keyword">const double</span> PI <span class="operator">=</span> <span class="number">3.14159</span>;
+<span class="keyword">const string</span> GAME_TITLE <span class="operator">=</span> <span class="string">"Space Quest"</span>;
+
+<span class="comment">// MAX_LIVES = 5;  ← compiler ERROR — constants cannot be modified</span>`
+                },
+                {
+                    subtitle: "2. Local Variables",
+                    text: "A local variable is declared inside a method or block. It only exists while that block is executing, and cannot be accessed from outside it. This is good practice because it limits the risk of one part of a program accidentally affecting another.",
+                    code: `<span class="keyword">static void</span> <span class="func">CalculateBonus</span>()
+{
+    <span class="comment">// 'bonus' is LOCAL to this method</span>
+    <span class="type">int</span> bonus <span class="operator">=</span> <span class="number">50</span>;
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Bonus: "</span> <span class="operator">+</span> bonus);
+}   <span class="comment">// 'bonus' ceases to exist here</span>
+
+<span class="keyword">static void</span> <span class="func">Main</span>()
+{
+    <span class="func">CalculateBonus</span>();
+    <span class="comment">// Console.WriteLine(bonus);  ← ERROR — 'bonus' not in scope here</span>
+}`
+                },
+                {
+                    subtitle: "3. Global Variables",
+                    text: "A global (class-level) variable is declared outside any method, and is accessible throughout the entire class. Use them sparingly — they can make bugs hard to trace because any method can modify them.",
+                    warn: "The spec expects you to contrast local and global variables. A common exam point: local variables are preferred in well-structured programs because they make each subroutine self-contained.",
+                    code: `<span class="keyword">class</span> <span class="type">Game</span>
+{
+    <span class="comment">// Global (class-level) — accessible by ALL methods in the class</span>
+    <span class="keyword">static int</span> totalScore <span class="operator">=</span> <span class="number">0</span>;
+    <span class="keyword">static int</span> livesRemaining <span class="operator">=</span> <span class="number">3</span>;
+
+    <span class="keyword">static void</span> <span class="func">AddPoints</span>(<span class="type">int</span> pts)
+    {
+        totalScore <span class="operator">+=</span> pts;   <span class="comment">// can access global directly</span>
+    }
+
+    <span class="keyword">static void</span> <span class="func">ShowScore</span>()
+    {
+        <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Score: "</span> <span class="operator">+</span> totalScore);
+    }
+}`
+                },
+                {
+                    subtitle: "4. Scope in Nested Blocks",
+                    text: "Variables declared inside a loop or if-block only exist within that block. This is a common source of bugs for beginners — declare a variable before the loop if you need its value afterwards.",
+                    code: `<span class="keyword">for</span> (<span class="type">int</span> i <span class="operator">=</span> <span class="number">0</span>; i <span class="operator"><</span> <span class="number">5</span>; i<span class="operator">++</span>)
+{
+    <span class="type">int</span> doubled <span class="operator">=</span> i <span class="operator">*</span> <span class="number">2</span>;   <span class="comment">// 'doubled' only exists inside the loop</span>
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(doubled);
+}
+<span class="comment">// Console.WriteLine(doubled);  ← ERROR — out of scope</span>
+
+<span class="comment">// Fix: declare BEFORE the loop if needed afterwards</span>
+<span class="type">int</span> lastDoubled <span class="operator">=</span> <span class="number">0</span>;
+<span class="keyword">for</span> (<span class="type">int</span> i <span class="operator">=</span> <span class="number">0</span>; i <span class="operator"><</span> <span class="number">5</span>; i<span class="operator">++</span>)
+{
+    lastDoubled <span class="operator">=</span> i <span class="operator">*</span> <span class="number">2</span>;
+}
+<span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Last: "</span> <span class="operator">+</span> lastDoubled);  <span class="comment">// works fine</span>`
+                }
+            ]
+        },
+
+        strings: {
+            title: "String Handling & Exceptions",
+            desc: "Built-in string operations, type conversion, and handling runtime errors with try/catch.",
+            badge: "AS",
+            sections: [
+                {
+                    subtitle: "1. Common String Operations",
+                    text: "C# strings have built-in properties and methods. The spec requires you to know: length, substring, position of a character, concatenation, and conversion between strings and other types.",
+                    code: `<span class="type">string</span> word <span class="operator">=</span> <span class="string">"Computer"</span>;
+
+<span class="comment">// Length</span>
+<span class="type">int</span> len <span class="operator">=</span> word.<span class="func">Length</span>;                    <span class="comment">// 8</span>
+
+<span class="comment">// Substring(startIndex, length)</span>
+<span class="type">string</span> sub <span class="operator">=</span> word.<span class="func">Substring</span>(<span class="number">0</span>, <span class="number">4</span>);        <span class="comment">// "Comp"</span>
+
+<span class="comment">// Position of a character (returns -1 if not found)</span>
+<span class="type">int</span> pos <span class="operator">=</span> word.<span class="func">IndexOf</span>(<span class="string">'u'</span>);               <span class="comment">// 3</span>
+
+<span class="comment">// Upper and lower case</span>
+<span class="type">string</span> upper <span class="operator">=</span> word.<span class="func">ToUpper</span>();            <span class="comment">// "COMPUTER"</span>
+<span class="type">string</span> lower <span class="operator">=</span> word.<span class="func">ToLower</span>();            <span class="comment">// "computer"</span>
+
+<span class="comment">// Concatenation</span>
+<span class="type">string</span> full <span class="operator">=</span> <span class="string">"A-Level "</span> <span class="operator">+</span> word;          <span class="comment">// "A-Level Computer"</span>`
+                },
+                {
+                    subtitle: "2. Character Codes",
+                    text: "Every character has a numeric code (ASCII / Unicode). You can convert between a char and its integer code in C#.",
+                    tip: "The spec explicitly requires: convert a character to its character code and back. 'A' = 65, 'a' = 97, '0' = 48.",
+                    code: `<span class="comment">// Character to its ASCII / Unicode code</span>
+<span class="type">char</span> letter <span class="operator">=</span> <span class="string">'A'</span>;
+<span class="type">int</span> code <span class="operator">=</span> (<span class="type">int</span>)letter;            <span class="comment">// 65</span>
+
+<span class="comment">// Code back to a character</span>
+<span class="type">char</span> back <span class="operator">=</span> (<span class="type">char</span>)<span class="number">66</span>;              <span class="comment">// 'B'</span>
+
+<span class="comment">// Iterating over characters in a string</span>
+<span class="type">string</span> msg <span class="operator">=</span> <span class="string">"Hello"</span>;
+<span class="keyword">foreach</span> (<span class="type">char</span> c <span class="keyword">in</span> msg)
+{
+    <span class="type">Console</span>.<span class="func">Write</span>((<span class="type">int</span>)c <span class="operator">+</span> <span class="string">" "</span>);  <span class="comment">// 72 101 108 108 111</span>
+}`
+                },
+                {
+                    subtitle: "3. Type Conversion",
+                    text: "The spec requires conversions between string and integer, string and float, and string and date/time.",
+                    code: `<span class="comment">// String to number</span>
+<span class="type">int</span>    n <span class="operator">=</span> <span class="type">int</span>.<span class="func">Parse</span>(<span class="string">"42"</span>);
+<span class="type">double</span> d <span class="operator">=</span> <span class="type">double</span>.<span class="func">Parse</span>(<span class="string">"3.14"</span>);
+
+<span class="comment">// Number to string</span>
+<span class="type">string</span> s1 <span class="operator">=</span> n.<span class="func">ToString</span>();          <span class="comment">// "42"</span>
+<span class="type">string</span> s2 <span class="operator">=</span> d.<span class="func">ToString</span>(<span class="string">"F2"</span>);    <span class="comment">// "3.14" (2 decimal places)</span>
+
+<span class="comment">// Rounding and Truncating</span>
+<span class="type">double</span> val <span class="operator">=</span> <span class="number">7.89</span>;
+<span class="type">int</span> rounded  <span class="operator">=</span> (<span class="type">int</span>)<span class="type">Math</span>.<span class="func">Round</span>(val);    <span class="comment">// 8</span>
+<span class="type">int</span> truncated <span class="operator">=</span> (<span class="type">int</span>)val;               <span class="comment">// 7  (drops decimal)</span>`
+                },
+                {
+                    subtitle: "4. Exception Handling (try / catch / finally)",
+                    text: "An exception is a runtime error — for example, trying to parse 'hello' as an integer. A try block lets you attempt risky code; the catch block handles the error gracefully instead of crashing; finally always runs whether or not an error occurred.",
+                    tip: "The spec requires you to understand the concept of exception handling and know how to use it in a language. Key exam point: exception handling improves robustness by preventing unexpected crashes.",
+                    code: `<span class="keyword">static int</span> <span class="func">GetNumberFromUser</span>()
+{
+    <span class="keyword">while</span> (<span class="keyword">true</span>)
+    {
+        <span class="type">Console</span>.<span class="func">Write</span>(<span class="string">"Enter a number: "</span>);
+        <span class="keyword">try</span>
+        {
+            <span class="type">int</span> value <span class="operator">=</span> <span class="type">int</span>.<span class="func">Parse</span>(<span class="type">Console</span>.<span class="func">ReadLine</span>());
+            <span class="keyword">return</span> value;   <span class="comment">// only reached if Parse succeeded</span>
+        }
+        <span class="keyword">catch</span> (<span class="type">FormatException</span>)
+        {
+            <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"That wasn't a valid number — try again."</span>);
+        }
+        <span class="keyword">finally</span>
+        {
+            <span class="comment">// Runs every time, error or not (e.g. close a file)</span>
+            <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"--- attempt complete ---"</span>);
+        }
+    }
+}`
+                }
+            ]
+        },
+
+        advanced: {
+            title: "Advanced Control Flow",
+            desc: "Random numbers, Boolean logic operators, and nested selection and iteration.",
+            badge: "AS",
+            sections: [
+                {
+                    subtitle: "1. Generating Random Numbers",
+                    text: "Use the Random class. The upper bound in Next(min, max) is exclusive — to get a number from 1 to 6, use Next(1, 7).",
+                    code: `<span class="type">Random</span> rng <span class="operator">=</span> <span class="keyword">new</span> <span class="type">Random</span>();
+
+<span class="comment">// Integer between 1 and 6 inclusive</span>
+<span class="type">int</span> dice <span class="operator">=</span> rng.<span class="func">Next</span>(<span class="number">1</span>, <span class="number">7</span>);
+
+<span class="comment">// Integer between 0 and 99 inclusive</span>
+<span class="type">int</span> percent <span class="operator">=</span> rng.<span class="func">Next</span>(<span class="number">0</span>, <span class="number">100</span>);
+
+<span class="comment">// Decimal between 0.0 and 1.0</span>
+<span class="type">double</span> chance <span class="operator">=</span> rng.<span class="func">NextDouble</span>();`
+                },
+                {
+                    subtitle: "2. Boolean (Logical) Operators",
+                    text: "Combine conditions using AND (&&), OR (||), NOT (!), and XOR (^). The spec requires all four.",
+                    code: `<span class="type">bool</span> hasKey  <span class="operator">=</span> <span class="keyword">true</span>;
+<span class="type">int</span>  level   <span class="operator">=</span> <span class="number">5</span>;
+
+<span class="comment">// AND — both must be true</span>
+<span class="keyword">if</span> (hasKey <span class="operator">&&</span> level <span class="operator">>=</span> <span class="number">3</span>)
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Door unlocked"</span>);
+
+<span class="comment">// OR — at least one must be true</span>
+<span class="keyword">if</span> (level <span class="operator">==</span> <span class="number">10</span> <span class="operator">||</span> hasKey)
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Access granted"</span>);
+
+<span class="comment">// NOT — invert a boolean</span>
+<span class="keyword">if</span> (<span class="operator">!</span>hasKey)
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Key required"</span>);
+
+<span class="comment">// XOR — true only when exactly one operand is true</span>
+<span class="type">bool</span> a <span class="operator">=</span> <span class="keyword">true</span>;
+<span class="type">bool</span> b <span class="operator">=</span> <span class="keyword">false</span>;
+<span class="type">Console</span>.<span class="func">WriteLine</span>(a <span class="operator">^</span> b);   <span class="comment">// True</span>`
+                },
+                {
+                    subtitle: "3. Nested Selection",
+                    text: "You can place an if-block inside another if-block to check multiple conditions in sequence. Keep nesting shallow where possible — deeply nested code is harder to read and test.",
+                    code: `<span class="type">int</span>  age    <span class="operator">=</span> <span class="number">17</span>;
+<span class="type">bool</span> hasId  <span class="operator">=</span> <span class="keyword">true</span>;
+
+<span class="keyword">if</span> (age <span class="operator">>=</span> <span class="number">16</span>)
+{
+    <span class="keyword">if</span> (hasId)
+    {
+        <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Entry permitted"</span>);
+    }
+    <span class="keyword">else</span>
+    {
+        <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"ID required"</span>);
+    }
+}
+<span class="keyword">else</span>
+{
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Too young"</span>);
+}`
+                },
+                {
+                    subtitle: "4. Nested Iteration",
+                    text: "A loop inside a loop. Useful for working through rows and columns — or any two-dimensional problem. The inner loop completes all its iterations for every single iteration of the outer loop.",
+                    code: `<span class="comment">// Multiplication table — outer loop = rows, inner = columns</span>
+<span class="keyword">for</span> (<span class="type">int</span> row <span class="operator">=</span> <span class="number">1</span>; row <span class="operator"><=</span> <span class="number">3</span>; row<span class="operator">++</span>)
+{
+    <span class="keyword">for</span> (<span class="type">int</span> col <span class="operator">=</span> <span class="number">1</span>; col <span class="operator"><=</span> <span class="number">3</span>; col<span class="operator">++</span>)
+    {
+        <span class="type">Console</span>.<span class="func">Write</span>(row <span class="operator">*</span> col <span class="operator">+</span> <span class="string">"\t"</span>);
+    }
+    <span class="type">Console</span>.<span class="func">WriteLine</span>();   <span class="comment">// new line after each row</span>
+}
+<span class="comment">// Output:
+// 1   2   3
+// 2   4   6
+// 3   6   9</span>`
+                }
+            ]
+        },
+
+        subroutines: {
+            title: "Methods & Recursion",
+            desc: "Procedures, functions, parameter passing, stack frames, and recursive algorithms.",
+            badge: "A-Level",
+            sections: [
+                {
+                    subtitle: "1. Procedures (void methods)",
+                    text: "A procedure performs a task but does not return a value. The void keyword signals this. Parameters let you pass data in without using global variables.",
+                    code: `<span class="keyword">static void</span> <span class="func">PrintDivider</span>(<span class="type">int</span> width)
+{
+    <span class="keyword">for</span> (<span class="type">int</span> i <span class="operator">=</span> <span class="number">0</span>; i <span class="operator"><</span> width; i<span class="operator">++</span>)
+        <span class="type">Console</span>.<span class="func">Write</span>(<span class="string">"-"</span>);
+    <span class="type">Console</span>.<span class="func">WriteLine</span>();
+}
+
+<span class="comment">// Call it</span>
+<span class="func">PrintDivider</span>(<span class="number">20</span>);   <span class="comment">// prints 20 dashes</span>`
+                },
+                {
+                    subtitle: "2. Functions (return a value)",
+                    text: "A function computes and returns a result to the caller. The return type replaces void in the declaration.",
+                    code: `<span class="keyword">static double</span> <span class="func">CalcAverage</span>(<span class="type">int</span> total, <span class="type">int</span> count)
+{
+    <span class="keyword">return</span> (<span class="type">double</span>)total <span class="operator">/</span> count;
+}
+
+<span class="comment">// Store the returned value</span>
+<span class="type">double</span> avg <span class="operator">=</span> <span class="func">CalcAverage</span>(<span class="number">240</span>, <span class="number">6</span>);
+<span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"Average: "</span> <span class="operator">+</span> avg);   <span class="comment">// 40.0</span>`
+                },
+                {
+                    subtitle: "3. Stack Frames & the Call Stack",
+                    text: "Every time a method is called, a stack frame is pushed onto the call stack. The frame stores the return address (where to go back to), the parameters passed in, and any local variables. When the method returns, its frame is popped off and those local variables are gone.",
+                    tip: "This is A-Level spec content (4.1.1.15). A common exam question: what does a stack frame contain? Answer: return address, parameters, local variables.",
+                    code: `<span class="comment">// Each call to Add() creates its own stack frame</span>
+<span class="keyword">static int</span> <span class="func">Add</span>(<span class="type">int</span> x, <span class="type">int</span> y)
+{
+    <span class="type">int</span> result <span class="operator">=</span> x <span class="operator">+</span> y;   <span class="comment">// 'result' lives in THIS frame only</span>
+    <span class="keyword">return</span> result;
+}   <span class="comment">// frame popped; 'result' gone</span>
+
+<span class="keyword">static void</span> <span class="func">Main</span>()
+{
+    <span class="type">int</span> a <span class="operator">=</span> <span class="func">Add</span>(<span class="number">3</span>, <span class="number">4</span>);   <span class="comment">// frame pushed, then popped — a = 7</span>
+    <span class="type">int</span> b <span class="operator">=</span> <span class="func">Add</span>(<span class="number">10</span>, <span class="number">5</span>);  <span class="comment">// new frame, independent of first call</span>
+}`
+                },
+                {
+                    subtitle: "4. Recursion — Base Case & General Case",
+                    text: "A recursive method calls itself. Every recursive solution must have: (1) a base case — the condition that stops the recursion, and (2) a general case — the step that moves closer to the base case. Without a correct base case the call stack overflows.",
+                    warn: "Recursion works because each call gets its own stack frame. When the base case is hit, each frame unwinds in order, returning values back up the chain.",
+                    code: `<span class="comment">// Factorial: n! = n × (n-1) × ... × 1</span>
+<span class="keyword">static int</span> <span class="func">Factorial</span>(<span class="type">int</span> n)
+{
+    <span class="comment">// BASE CASE — stop condition</span>
+    <span class="keyword">if</span> (n <span class="operator"><=</span> <span class="number">1</span>)
+        <span class="keyword">return</span> <span class="number">1</span>;
+
+    <span class="comment">// GENERAL CASE — call ourselves with a smaller problem</span>
+    <span class="keyword">return</span> n <span class="operator">*</span> <span class="func">Factorial</span>(n <span class="operator">-</span> <span class="number">1</span>);
+}
+
+<span class="comment">// Factorial(4) unfolds as:
+//   4 * Factorial(3)
+//       3 * Factorial(2)
+//           2 * Factorial(1)
+//               returns 1       ← base case
+//           returns 2 * 1 = 2
+//       returns 3 * 2 = 6
+//   returns 4 * 6 = 24</span>`
+                }
+            ]
+        },
+
+        structures: {
+            title: "Arrays, Lists & Dictionaries",
+            desc: "One-dimensional arrays, dynamic Lists, and Dictionary key-value lookup.",
+            badge: "AS",
+            sections: [
+                {
+                    subtitle: "1. Fixed Arrays (1D)",
+                    text: "An array has a fixed size set at declaration. Elements are accessed by index, starting at 0. Use arrays when the number of items is known in advance.",
+                    code: `<span class="comment">// Declare and populate</span>
+<span class="type">string</span>[] days <span class="operator">=</span> <span class="keyword">new</span> <span class="type">string</span>[<span class="number">7</span>];
+days[<span class="number">0</span>] <span class="operator">=</span> <span class="string">"Monday"</span>;
+days[<span class="number">1</span>] <span class="operator">=</span> <span class="string">"Tuesday"</span>;
+
+<span class="comment">// Inline initialisation</span>
+<span class="type">int</span>[] primes <span class="operator">=</span> { <span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">11</span> };
+
+<span class="comment">// Traverse with a for loop</span>
+<span class="keyword">for</span> (<span class="type">int</span> i <span class="operator">=</span> <span class="number">0</span>; i <span class="operator"><</span> primes.Length; i<span class="operator">++</span>)
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(primes[i]);`
+                },
+                {
+                    subtitle: "2. Dynamic Lists",
+                    text: "A List<T> can grow and shrink at runtime. Use it when you don't know the size in advance.",
+                    code: `<span class="type">List</span><<span class="type">string</span>> names <span class="operator">=</span> <span class="keyword">new</span> <span class="type">List</span><<span class="type">string</span>>();
+
+names.<span class="func">Add</span>(<span class="string">"Alice"</span>);
+names.<span class="func">Add</span>(<span class="string">"Bob"</span>);
+names.<span class="func">Add</span>(<span class="string">"Carol"</span>);
+
+names.<span class="func">Remove</span>(<span class="string">"Bob"</span>);            <span class="comment">// remove by value</span>
+names.<span class="func">RemoveAt</span>(<span class="number">0</span>);              <span class="comment">// remove by index</span>
+
+<span class="type">bool</span> found <span class="operator">=</span> names.<span class="func">Contains</span>(<span class="string">"Carol"</span>);  <span class="comment">// true</span>
+<span class="type">int</span>  count <span class="operator">=</span> names.Count;
+
+<span class="keyword">foreach</span> (<span class="type">string</span> n <span class="keyword">in</span> names)
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(n);`
+                },
+                {
+                    subtitle: "3. Dictionaries",
+                    text: "A Dictionary<TKey, TValue> maps unique keys to values. Lookup is fast regardless of dictionary size — this maps to the hash table concept in the spec.",
+                    tip: "The spec (4.2.7) defines a dictionary as 'a collection of key-value pairs where the value is accessed via the associated key'. C#'s Dictionary<> is the direct implementation of this.",
+                    code: `<span class="type">Dictionary</span><<span class="type">string</span>, <span class="type">int</span>> wordCount <span class="operator">=</span> <span class="keyword">new</span> <span class="type">Dictionary</span><<span class="type">string</span>, <span class="type">int</span>>();
+
+wordCount[<span class="string">"apple"</span>]  <span class="operator">=</span> <span class="number">3</span>;
+wordCount[<span class="string">"banana"</span>] <span class="operator">=</span> <span class="number">1</span>;
+
+<span class="comment">// Check before accessing to avoid KeyNotFoundException</span>
+<span class="keyword">if</span> (wordCount.<span class="func">ContainsKey</span>(<span class="string">"apple"</span>))
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(wordCount[<span class="string">"apple"</span>]);  <span class="comment">// 3</span>
+
+<span class="comment">// Iterate over all pairs</span>
+<span class="keyword">foreach</span> (<span class="type">var</span> pair <span class="keyword">in</span> wordCount)
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(pair.Key <span class="operator">+</span> <span class="string">": "</span> <span class="operator">+</span> pair.Value);`
+                }
+            ]
+        },
+
+        arrays2d: {
+            title: "2D Arrays & Records",
+            desc: "Grids and matrices using two-dimensional arrays, and custom data types using structs.",
+            badge: "AS",
+            sections: [
+                {
+                    subtitle: "1. 2D Arrays (Matrices)",
+                    text: "A 2D array stores data in rows and columns. The spec describes a 2D array as a matrix, indexed by a pair of integers [row, column]. These are essential whenever you need to model a grid — think spreadsheets, game boards, or seating plans.",
+                    tip: "The spec calls a 1D array a vector and a 2D array a matrix. In an exam you may be asked to describe how a 2D array stores data — each element is accessed by two indices.",
+                    code: `<span class="comment">// Declare a 3-row, 4-column grid</span>
+<span class="type">int</span>[,] grid <span class="operator">=</span> <span class="keyword">new</span> <span class="type">int</span>[<span class="number">3</span>, <span class="number">4</span>];
+
+<span class="comment">// Assign individual cells [row, column]</span>
+grid[<span class="number">0</span>, <span class="number">0</span>] <span class="operator">=</span> <span class="number">10</span>;
+grid[<span class="number">1</span>, <span class="number">2</span>] <span class="operator">=</span> <span class="number">99</span>;
+
+<span class="comment">// Inline initialisation</span>
+<span class="type">char</span>[,] board <span class="operator">=</span>
+{
+    { <span class="string">'.'</span>, <span class="string">'.'</span>, <span class="string">'.'</span> },
+    { <span class="string">'.'</span>, <span class="string">'X'</span>, <span class="string">'.'</span> },
+    { <span class="string">'.'</span>, <span class="string">'.'</span>, <span class="string">'O'</span> }
+};
+
+<span class="comment">// Traverse with nested loops</span>
+<span class="keyword">for</span> (<span class="type">int</span> r <span class="operator">=</span> <span class="number">0</span>; r <span class="operator"><</span> board.<span class="func">GetLength</span>(<span class="number">0</span>); r<span class="operator">++</span>)
+{
+    <span class="keyword">for</span> (<span class="type">int</span> c <span class="operator">=</span> <span class="number">0</span>; c <span class="operator"><</span> board.<span class="func">GetLength</span>(<span class="number">1</span>); c<span class="operator">++</span>)
+        <span class="type">Console</span>.<span class="func">Write</span>(board[r, c] <span class="operator">+</span> <span class="string">" "</span>);
+    <span class="type">Console</span>.<span class="func">WriteLine</span>();
+}`
+                },
+                {
+                    subtitle: "2. Records (Structs)",
+                    text: "A record (called a struct in C#) groups related fields of different types under one name. This is the spec's 'record' data type — think of a single row in a database table.",
+                    code: `<span class="comment">// Define the record structure</span>
+<span class="keyword">struct</span> <span class="type">Student</span>
+{
+    <span class="keyword">public</span> <span class="type">string</span> Name;
+    <span class="keyword">public</span> <span class="type">int</span>    Age;
+    <span class="keyword">public</span> <span class="type">double</span> Grade;
+}
+
+<span class="comment">// Create and populate a record</span>
+<span class="type">Student</span> s;
+s.Name  <span class="operator">=</span> <span class="string">"Alice"</span>;
+s.Age   <span class="operator">=</span> <span class="number">17</span>;
+s.Grade <span class="operator">=</span> <span class="number">88.5</span>;
+
+<span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">$"</span>{s.Name}<span class="string"> - Grade: </span>{s.Grade}<span class="string">"</span>);
+
+<span class="comment">// Array of records</span>
+<span class="type">Student</span>[] cohort <span class="operator">=</span> <span class="keyword">new</span> <span class="type">Student</span>[<span class="number">30</span>];
+cohort[<span class="number">0</span>] <span class="operator">=</span> s;`
+                },
+                {
+                    subtitle: "3. Combining 2D Arrays & Records",
+                    text: "Real programs often combine these — for example, storing a seating plan where each seat holds a Student record. This maps directly to the kind of data modelling you will need for your NEA project.",
+                    code: `<span class="keyword">struct</span> <span class="type">Seat</span>
+{
+    <span class="keyword">public</span> <span class="type">bool</span>   Occupied;
+    <span class="keyword">public</span> <span class="type">string</span> HolderName;
+}
+
+<span class="comment">// 5-row, 10-seat venue</span>
+<span class="type">Seat</span>[,] venue <span class="operator">=</span> <span class="keyword">new</span> <span class="type">Seat</span>[<span class="number">5</span>, <span class="number">10</span>];
+
+<span class="comment">// Book a seat</span>
+venue[<span class="number">2</span>, <span class="number">4</span>].Occupied   <span class="operator">=</span> <span class="keyword">true</span>;
+venue[<span class="number">2</span>, <span class="number">4</span>].HolderName <span class="operator">=</span> <span class="string">"Alice"</span>;
+
+<span class="comment">// Print occupied seats</span>
+<span class="keyword">for</span> (<span class="type">int</span> r <span class="operator">=</span> <span class="number">0</span>; r <span class="operator"><</span> <span class="number">5</span>; r<span class="operator">++</span>)
+    <span class="keyword">for</span> (<span class="type">int</span> c <span class="operator">=</span> <span class="number">0</span>; c <span class="operator"><</span> <span class="number">10</span>; c<span class="operator">++</span>)
+        <span class="keyword">if</span> (venue[r, c].Occupied)
+            <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">$"Row </span>{r}<span class="string"> Seat </span>{c}<span class="string">: </span>{venue[r, c].HolderName}<span class="string">"</span>);`
+                }
+            ]
+        },
+
+        files: {
+            title: "File Handling",
+            desc: "Reading and writing text files and binary files using System.IO.",
+            badge: "AS",
+            sections: [
+                {
+                    subtitle: "1. Writing a Text File",
+                    text: "Use StreamWriter to open a file and write to it. Always close the file when done — or use a using block which closes it automatically, even if an error occurs.",
+                    code: `<span class="comment">// 'using' ensures the file is closed automatically</span>
+<span class="keyword">using</span> (<span class="type">StreamWriter</span> sw <span class="operator">=</span> <span class="keyword">new</span> <span class="type">StreamWriter</span>(<span class="string">"scores.txt"</span>))
+{
+    sw.<span class="func">WriteLine</span>(<span class="string">"Alice,95"</span>);
+    sw.<span class="func">WriteLine</span>(<span class="string">"Bob,87"</span>);
+}   <span class="comment">// file automatically closed here</span>
+
+<span class="comment">// Append (add to existing file instead of overwriting)</span>
+<span class="keyword">using</span> (<span class="type">StreamWriter</span> sw <span class="operator">=</span> <span class="keyword">new</span> <span class="type">StreamWriter</span>(<span class="string">"scores.txt"</span>, <span class="keyword">true</span>))
+{
+    sw.<span class="func">WriteLine</span>(<span class="string">"Carol,91"</span>);
+}`
+                },
+                {
+                    subtitle: "2. Reading a Text File",
+                    text: "Use StreamReader to read line by line, or File.ReadAllLines() for a quick read into an array.",
+                    code: `<span class="comment">// Line by line</span>
+<span class="keyword">using</span> (<span class="type">StreamReader</span> sr <span class="operator">=</span> <span class="keyword">new</span> <span class="type">StreamReader</span>(<span class="string">"scores.txt"</span>))
+{
+    <span class="type">string</span> line;
+    <span class="keyword">while</span> ((line <span class="operator">=</span> sr.<span class="func">ReadLine</span>()) <span class="operator">!=</span> <span class="keyword">null</span>)
+    {
+        <span class="type">Console</span>.<span class="func">WriteLine</span>(line);
+    }
+}
+
+<span class="comment">// All lines at once into an array</span>
+<span class="type">string</span>[] lines <span class="operator">=</span> <span class="type">File</span>.<span class="func">ReadAllLines</span>(<span class="string">"scores.txt"</span>);
+<span class="keyword">foreach</span> (<span class="type">string</span> l <span class="keyword">in</span> lines)
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(l);`
+                },
+                {
+                    subtitle: "3. Binary (Non-Text) File Handling",
+                    text: "Binary files store data as raw bytes rather than readable text. They are more compact and faster to read, but cannot be opened in a text editor. Use BinaryWriter and BinaryReader.",
+                    tip: "The spec (3.2.1.3) requires you to read and write from a binary (non-text) file as well as a text file. Binary files are typically used for images, audio, or structured records where space matters.",
+                    code: `<span class="comment">// Writing binary data</span>
+<span class="keyword">using</span> (<span class="type">BinaryWriter</span> bw <span class="operator">=</span> <span class="keyword">new</span> <span class="type">BinaryWriter</span>(<span class="type">File</span>.<span class="func">Open</span>(<span class="string">"data.bin"</span>, <span class="type">FileMode</span>.Create)))
+{
+    bw.<span class="func">Write</span>(<span class="string">"Alice"</span>);   <span class="comment">// string</span>
+    bw.<span class="func">Write</span>(<span class="number">95</span>);        <span class="comment">// int</span>
+    bw.<span class="func">Write</span>(<span class="number">88.5</span>);      <span class="comment">// double</span>
+}
+
+<span class="comment">// Reading binary data — must read in the SAME ORDER it was written</span>
+<span class="keyword">using</span> (<span class="type">BinaryReader</span> br <span class="operator">=</span> <span class="keyword">new</span> <span class="type">BinaryReader</span>(<span class="type">File</span>.<span class="func">Open</span>(<span class="string">"data.bin"</span>, <span class="type">FileMode</span>.Open)))
+{
+    <span class="type">string</span> name  <span class="operator">=</span> br.<span class="func">ReadString</span>();
+    <span class="type">int</span>    score <span class="operator">=</span> br.<span class="func">ReadInt32</span>();
+    <span class="type">double</span> avg   <span class="operator">=</span> br.<span class="func">ReadDouble</span>();
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">$"</span>{name}<span class="string">: </span>{score}<span class="string">, </span>{avg}<span class="string">"</span>);
+}`
+                }
+            ]
+        },
+
+        oop: {
+            title: "OOP Concepts",
+            desc: "Classes, objects, encapsulation, inheritance and polymorphism — introduced through a card game context.",
+            badge: "A-Level",
+            sections: [
+                {
+                    subtitle: "1. Classes & Objects",
+                    text: "A class is a blueprint that defines what data (fields/properties) and behaviour (methods) objects of that type will have. An object is a specific instance created from that blueprint using the new keyword and a constructor.",
+                    tip: "Think of a class as a template (e.g. 'a playing card') and an object as a specific thing created from it (e.g. 'the Ace of Spades'). The spec requires you to know: class, object, instantiation, and constructor.",
+                    code: `<span class="keyword">class</span> <span class="type">Card</span>
+{
+    <span class="comment">// Fields — the data each Card object holds</span>
+    <span class="keyword">public</span> <span class="type">string</span> Suit;
+    <span class="keyword">public</span> <span class="type">int</span>    Value;
+
+    <span class="comment">// Constructor — called when 'new Card(...)' is used</span>
+    <span class="keyword">public</span> <span class="func">Card</span>(<span class="type">string</span> suit, <span class="type">int</span> value)
+    {
+        Suit  <span class="operator">=</span> suit;
+        Value <span class="operator">=</span> value;
+    }
+
+    <span class="comment">// Method — behaviour</span>
+    <span class="keyword">public</span> <span class="type">string</span> <span class="func">Describe</span>()
+    {
+        <span class="keyword">return</span> Value <span class="operator">+</span> <span class="string">" of "</span> <span class="operator">+</span> Suit;
+    }
+}
+
+<span class="comment">// Instantiation — creating objects from the class</span>
+<span class="type">Card</span> c1 <span class="operator">=</span> <span class="keyword">new</span> <span class="type">Card</span>(<span class="string">"Hearts"</span>, <span class="number">10</span>);
+<span class="type">Card</span> c2 <span class="operator">=</span> <span class="keyword">new</span> <span class="type">Card</span>(<span class="string">"Spades"</span>, <span class="number">1</span>);
+
+<span class="type">Console</span>.<span class="func">WriteLine</span>(c1.<span class="func">Describe</span>());  <span class="comment">// "10 of Hearts"</span>`
+                },
+                {
+                    subtitle: "2. Encapsulation & Access Modifiers",
+                    text: "Encapsulation means hiding the internal details of a class, exposing only what is necessary. Use private to restrict direct access to fields, and public properties (getters/setters) to control how they are read or modified.",
+                    warn: "Good OOP practice: make fields private by default. Only expose data through public methods or properties. This protects the object's internal state from being set to invalid values.",
+                    code: `<span class="keyword">class</span> <span class="type">Deck</span>
+{
+    <span class="comment">// private — cannot be accessed directly from outside this class</span>
+    <span class="keyword">private int</span> _cardsRemaining <span class="operator">=</span> <span class="number">52</span>;
+
+    <span class="comment">// public property — controlled read access</span>
+    <span class="keyword">public int</span> CardsRemaining
+    {
+        <span class="keyword">get</span> { <span class="keyword">return</span> _cardsRemaining; }
+    }
+
+    <span class="comment">// public method — controlled way to change internal state</span>
+    <span class="keyword">public void</span> <span class="func">Deal</span>()
+    {
+        <span class="keyword">if</span> (_cardsRemaining <span class="operator">></span> <span class="number">0</span>)
+            _cardsRemaining<span class="operator">--</span>;
+        <span class="keyword">else</span>
+            <span class="type">Console</span>.<span class="func">WriteLine</span>(<span class="string">"No cards left!"</span>);
+    }
+}
+
+<span class="type">Deck</span> d <span class="operator">=</span> <span class="keyword">new</span> <span class="type">Deck</span>();
+d.<span class="func">Deal</span>();
+<span class="type">Console</span>.<span class="func">WriteLine</span>(d.CardsRemaining);  <span class="comment">// 51</span>
+<span class="comment">// d._cardsRemaining = 999;  ← ERROR — private, cannot access directly</span>`
+                },
+                {
+                    subtitle: "3. Inheritance",
+                    text: "Inheritance lets a child class acquire the fields and methods of a parent class, then add or override behaviour. This models 'is-a' relationships — for example, a WildCard is-a Card.",
+                    code: `<span class="comment">// Parent (base) class</span>
+<span class="keyword">class</span> <span class="type">Card</span>
+{
+    <span class="keyword">public</span> <span class="type">string</span> Suit;
+    <span class="keyword">public</span> <span class="type">int</span>    Value;
+
+    <span class="keyword">public</span> <span class="keyword">virtual</span> <span class="type">string</span> <span class="func">Describe</span>()
+    {
+        <span class="keyword">return</span> Value <span class="operator">+</span> <span class="string">" of "</span> <span class="operator">+</span> Suit;
+    }
+}
+
+<span class="comment">// Child class — inherits from Card, adds new behaviour</span>
+<span class="keyword">class</span> <span class="type">WildCard</span> : <span class="type">Card</span>
+{
+    <span class="keyword">public</span> <span class="type">string</span> SpecialAbility;
+
+    <span class="comment">// override — replace the parent's version of Describe()</span>
+    <span class="keyword">public override</span> <span class="type">string</span> <span class="func">Describe</span>()
+    {
+        <span class="keyword">return</span> <span class="string">"WILD CARD — ability: "</span> <span class="operator">+</span> SpecialAbility;
+    }
+}
+
+<span class="type">WildCard</span> w <span class="operator">=</span> <span class="keyword">new</span> <span class="type">WildCard</span>();
+w.SpecialAbility <span class="operator">=</span> <span class="string">"Skip next turn"</span>;
+w.Value <span class="operator">=</span> <span class="number">0</span>;              <span class="comment">// inherited from Card</span>
+<span class="type">Console</span>.<span class="func">WriteLine</span>(w.<span class="func">Describe</span>());  <span class="comment">// "WILD CARD — ability: Skip next turn"</span>`
+                },
+                {
+                    subtitle: "4. Polymorphism",
+                    text: "Polymorphism means 'many forms'. Because WildCard overrides Describe(), calling Describe() on a Card reference produces different output depending on the actual type of the object at runtime. This lets you write general code that works correctly for any subtype.",
+                    code: `<span class="comment">// A list of Card references — but objects may be different subtypes</span>
+<span class="type">List</span><<span class="type">Card</span>> hand <span class="operator">=</span> <span class="keyword">new</span> <span class="type">List</span><<span class="type">Card</span>>();
+hand.<span class="func">Add</span>(<span class="keyword">new</span> <span class="type">Card</span>    { Suit <span class="operator">=</span> <span class="string">"Clubs"</span>,  Value <span class="operator">=</span> <span class="number">7</span>  });
+hand.<span class="func">Add</span>(<span class="keyword">new</span> <span class="type">WildCard</span>{ SpecialAbility <span class="operator">=</span> <span class="string">"Double score"</span> });
+hand.<span class="func">Add</span>(<span class="keyword">new</span> <span class="type">Card</span>    { Suit <span class="operator">=</span> <span class="string">"Diamonds"</span>, Value <span class="operator">=</span> <span class="number">3</span> });
+
+<span class="comment">// Polymorphism — the correct Describe() is called for each type</span>
+<span class="keyword">foreach</span> (<span class="type">Card</span> c <span class="keyword">in</span> hand)
+    <span class="type">Console</span>.<span class="func">WriteLine</span>(c.<span class="func">Describe</span>());
+
+<span class="comment">// Output:
+// 7 of Clubs
+// WILD CARD — ability: Double score
+// 3 of Diamonds</span>`
+                }
+            ]
+        }
+    };
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        sidebar.classList.toggle('hidden-mobile');
+        overlay.classList.toggle('hidden');
+    }
+
+    function showPage(pageId) {
+        document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+        document.getElementById('content-container').classList.add('hidden');
+
+        document.querySelectorAll('.nav-link').forEach(btn => {
+            const match = btn.getAttribute('onclick').match(/'([^']+)'/);
+            if (match) btn.classList.toggle('active', match[1] === pageId);
+        });
+
+        if (contentData[pageId]) {
+            const data = contentData[pageId];
+            document.getElementById('section-title').innerHTML =
+                data.title +
+                (data.badge === 'A-Level'
+                    ? ' <span class="spec-badge badge-alevel">A-Level</span>'
+                    : ' <span class="spec-badge badge-as">AS</span>');
+            document.getElementById('section-desc').innerText = data.desc;
+
+            const wrapper = document.getElementById('sections-wrapper');
+            wrapper.innerHTML = '';
+
+            data.sections.forEach(sec => {
+                const div = document.createElement('div');
+                div.className = 'topic-section space-y-4 mb-10';
+
+                let stepsHtml = '';
+                if (sec.steps) {
+                    stepsHtml += '<div class="space-y-3">';
+                    sec.steps.forEach((st, i) => {
+                        stepsHtml += `
+                        <div class="flex items-start space-x-4 p-5 bg-white rounded-2xl border border-slate-200">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-purple-100 text-purple-600 font-bold flex items-center justify-center">${i + 1}</div>
+                            <div>
+                                <h4 class="font-bold text-slate-800">${st.title}</h4>
+                                <p class="text-slate-500 text-sm mt-1 leading-relaxed">${st.body}</p>
+                            </div>
+                        </div>`;
+                    });
+                    stepsHtml += '</div>';
+                }
+
+                const codeHtml = sec.code ? `
+                    <div class="bg-slate-900 rounded-2xl p-6 shadow-lg border border-slate-800">
+                        <pre class="code-font text-slate-300 text-sm leading-relaxed overflow-x-auto"><code>${sec.code}</code></pre>
+                    </div>` : '';
+
+                div.innerHTML = `
+                    <h3 class="text-2xl font-bold text-slate-800">${sec.subtitle}</h3>
+                    <p class="text-slate-600 leading-relaxed">${sec.text}</p>
+                    ${sec.tip ? `<div class="tip-box">💡 <strong>Spec note:</strong> ${sec.tip}</div>` : ''}
+                    ${codeHtml}
+                    ${stepsHtml}
+                    ${sec.warn ? `<div class="warn-box">⚠️ ${sec.warn}</div>` : ''}
+                `;
+                wrapper.appendChild(div);
+            });
+
+            document.getElementById('content-container').classList.remove('hidden');
+        } else {
+            document.getElementById('page-home').classList.remove('hidden');
+        }
+
+        if (window.innerWidth < 768) {
+            const sidebar = document.getElementById('sidebar');
+            if (!sidebar.classList.contains('hidden-mobile')) toggleSidebar();
+        }
+        window.scrollTo(0, 0);
+    }
+
+    window.onload = () => showPage('home');
+    </script>
+</body>
+</html>
