@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Case Files: Healthy or Unhealthy?</title>
+<style>
+  :root{
+    --navy:#15131A; --teal:#E8792E; --deep:#1C7293; --ice:#DCEEF2;
+    --off:#F2F6F8; --dark:#1A1A1A; --good:#2E7D4F; --bad:#C4443A;
+  }
+  * { box-sizing: border-box; }
+  body{ margin:0; font-family: Calibri, Arial, sans-serif; background:var(--off); color:var(--dark); }
+  header{ background:var(--navy); color:#fff; padding:28px 32px; }
+  header h1{ margin:0 0 6px 0; font-size:28px; color:#F2EFEA; }
+  header p{ margin:0; color:#A9A2B0; font-size:15px; max-width:820px; }
+  .wrap{ max-width:1000px; margin:0 auto; padding:24px 20px 60px; }
+  .progress{ display:flex; gap:8px; margin:20px 0; }
+  .dot{ flex:1; height:8px; border-radius:4px; background:#D8E1E8; }
+  .dot.active{ background: var(--teal); }
+  .dot.done{ background: var(--navy); }
+  .case{ background:#fff; border-radius:14px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,0.06); display:none; }
+  .case.visible{ display:block; }
+  .case h2{ margin-top:0; color:var(--navy); font-size:21px; }
+  .chat{
+    background: var(--off); border-radius:10px; padding:16px 18px; margin:16px 0;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .bubble{ max-width:75%; padding:9px 14px; border-radius:14px; font-size:14px; line-height:1.4; }
+  .bubble.them{ background:#fff; border:1px solid #D8E1E8; align-self:flex-start; border-bottom-left-radius:2px; }
+  .bubble.you{ background:var(--ice); align-self:flex-end; border-bottom-right-radius:2px; }
+  .who{ font-size:11px; color:#7A8894; margin-bottom:2px; }
+  .task{ margin-top:18px; }
+  .task label{ display:block; font-weight:bold; margin-bottom:6px; color:var(--navy); }
+  .options{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+  .opt{ padding:9px 16px; border-radius:20px; border:2px solid #D8E1E8; background:#fff; cursor:pointer; font-size:14px; font-weight:bold; }
+  .opt.selected{ border-color: var(--teal); background: var(--ice); }
+  textarea{ width:100%; min-height:64px; border-radius:8px; border:1px solid #C7D2D9; padding:10px; font-family: Calibri, Arial, sans-serif; font-size:14px; resize:vertical; }
+  .feedback{ margin-top:14px; padding:12px 14px; border-radius:8px; display:none; font-size:14px; }
+  .feedback.show{ display:block; }
+  .feedback.good{ background:#E4F2E9; color:var(--good); border:1px solid #BFE3CC; }
+  .feedback.bad{ background:#FBEAE8; color:var(--bad); border:1px solid #F1C6C1; }
+  .navrow{ display:flex; justify-content:space-between; margin-top:22px; }
+  button.nav{ background: var(--teal); color:#fff; border:none; padding:10px 20px; border-radius:8px; font-size:14px; font-weight:bold; cursor:pointer; }
+  button.nav:disabled{ background:#B9C4CC; cursor:not-allowed; }
+  button.check{ background: var(--navy); color:#fff; border:none; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:bold; cursor:pointer; }
+  .challenge{ margin-top:20px; background: var(--navy); color:#fff; border-radius:10px; padding:14px 16px; font-size:13.5px; }
+  .summary{ display:none; text-align:center; padding:40px 20px; }
+  .summary.visible{ display:block; }
+  .summary h2{ color:var(--navy); }
+  .storybox{ background:var(--off); border-radius:10px; padding:16px 18px; margin:16px 0; font-size:14.5px; line-height:1.6; }
+  .choice-row{ display:flex; gap:12px; margin-top:14px; flex-wrap:wrap; }
+  .choice{ flex:1; min-width:220px; background:#fff; border:2px solid #D8E1E8; border-radius:10px; padding:12px 14px; cursor:pointer; font-size:13.5px; }
+  .choice:hover{ border-color: var(--teal); }
+  .choice.chosen{ border-color: var(--navy); background: var(--ice); }
+  .outcome{ margin-top:14px; padding:12px 14px; border-radius:8px; background:#fff; border:1px solid #D8E1E8; font-size:14px; display:none; }
+  .outcome.show{ display:block; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Case Files: Healthy or Unhealthy?</h1>
+  <p>Four real-style scenarios. For each: decide what's happening, explain the impact on the people involved, and say what should happen next. The final case is a branching story — the choices are Meera's, not yours to make "correctly."</p>
+</header>
+
+<div class="wrap">
+  <div class="progress" id="progress"></div>
+
+  <!-- Case 1: Insulting -->
+  <div class="case visible" data-case="0">
+    <h2>Case 1: The Group Chat</h2>
+    <div class="chat">
+      <div><div class="who">Dany</div><div class="bubble them">did anyone else see Filip's photo from the trip lol</div></div>
+      <div><div class="who">Joleesa</div><div class="bubble them">omg yes why does he dress like that 😂</div></div>
+      <div><div class="who">Dany</div><div class="bubble them">he's so weird, someone should tell him</div></div>
+    </div>
+    <div class="task">
+      <label>What behaviour is this?</label>
+      <div class="options" data-q="0-problem">
+        <div class="opt" data-val="insulting">Insulting</div>
+        <div class="opt" data-val="spamming">Spamming</div>
+        <div class="opt" data-val="flaming">Flaming</div>
+        <div class="opt" data-val="healthy">Healthy behaviour</div>
+      </div>
+      <label>How might Filip feel if he saw this, and why?</label>
+      <textarea placeholder="Type your explanation..." data-q="0-explain"></textarea>
+      <label>What should someone in this chat do?</label>
+      <textarea placeholder="Type your answer..." data-q="0-fix"></textarea>
+      <button class="check" onclick="checkCase(0)">Check my thinking</button>
+      <div class="feedback" id="fb-0"></div>
+    </div>
+  </div>
+
+  <!-- Case 2: Spamming -->
+  <div class="case" data-case="1">
+    <h2>Case 2: The Same Message, Again and Again</h2>
+    <div class="chat">
+      <div><div class="who">Unknown contact</div><div class="bubble them">hey check this out 👉 link</div></div>
+      <div><div class="who">Unknown contact</div><div class="bubble them">hey check this out 👉 link</div></div>
+      <div><div class="who">Unknown contact</div><div class="bubble them">why aren't you answering?? check this 👉 link</div></div>
+      <div><div class="who">You</div><div class="bubble you">please stop messaging me</div></div>
+      <div><div class="who">Unknown contact</div><div class="bubble them">just click it, it's not a big deal</div></div>
+    </div>
+    <div class="task">
+      <label>What behaviour is this?</label>
+      <div class="options" data-q="1-problem">
+        <div class="opt" data-val="insulting">Insulting</div>
+        <div class="opt" data-val="spamming">Spamming</div>
+        <div class="opt" data-val="flaming">Flaming</div>
+        <div class="opt" data-val="healthy">Healthy behaviour</div>
+      </div>
+      <label>Why could clicking that link be risky, beyond just being annoying?</label>
+      <textarea placeholder="Type your explanation..." data-q="1-explain"></textarea>
+      <label>What should you do in this situation?</label>
+      <textarea placeholder="Type your answer..." data-q="1-fix"></textarea>
+      <button class="check" onclick="checkCase(1)">Check my thinking</button>
+      <div class="feedback" id="fb-1"></div>
+    </div>
+  </div>
+
+  <!-- Case 3: Flaming vs Healthy comparison -->
+  <div class="case" data-case="2">
+    <h2>Case 3: Two Replies to the Same Comment</h2>
+    <div class="chat">
+      <div><div class="who">Post</div><div class="bubble them">I think the ending of that film was actually really clever.</div></div>
+      <div><div class="who">Reply A</div><div class="bubble them">that's such a stupid take, you clearly don't understand films at all</div></div>
+      <div><div class="who">Reply B</div><div class="bubble them">interesting, I saw it differently — what made you think that?</div></div>
+    </div>
+    <div class="task">
+      <label>Which reply is flaming, and which is healthy disagreement?</label>
+      <div class="options" data-q="2-problem">
+        <div class="opt" data-val="AflameBhealthy">A = flaming, B = healthy</div>
+        <div class="opt" data-val="AhealthyBflame">A = healthy, B = flaming</div>
+        <div class="opt" data-val="bothflame">Both are flaming</div>
+      </div>
+      <label>What's the key difference between the two replies?</label>
+      <textarea placeholder="Type your explanation..." data-q="2-explain"></textarea>
+      <label>Rewrite Reply A so it becomes healthy disagreement:</label>
+      <textarea placeholder="Type your rewrite..." data-q="2-fix"></textarea>
+      <button class="check" onclick="checkCase(2)">Check my thinking</button>
+      <div class="feedback" id="fb-2"></div>
+    </div>
+    <div class="challenge"><strong>Challenge yourself:</strong> Can disagreement ever be healthy online? What makes the difference between healthy disagreement and flaming?</div>
+  </div>
+
+  <!-- Case 4: Branching story -->
+  <div class="case" data-case="3">
+    <h2>Case 4: Meera's Choice</h2>
+    <div class="storybox" id="story-text">
+      Meera has been chatting to someone she met through a mutual friend's group chat. They seem friendly, but lately they've started asking her to keep their chats secret from her other friends, and get annoyed when she takes a while to reply.
+      <br><br>Today they've messaged: <em>"Why were you talking to your friends about our chat? I thought this was just between us. You're making me feel like I can't trust you."</em>
+    </div>
+    <div class="choice-row" id="choice-row-1">
+      <div class="choice" data-outcome="1a">Apologise and promise not to mention the chats to anyone else</div>
+      <div class="choice" data-outcome="1b">Tell a trusted friend or adult how this is making her feel</div>
+    </div>
+    <div class="outcome" id="outcome-1"></div>
+
+    <div class="task" style="margin-top:20px;">
+      <label>What's concerning about this situation, even before Meera chooses?</label>
+      <textarea placeholder="Type your explanation..." data-q="3-explain"></textarea>
+      <label>Why might secrecy be a warning sign in an online relationship?</label>
+      <textarea placeholder="Type your answer..." data-q="3-fix"></textarea>
+      <button class="check" onclick="checkCase(3)">Check my thinking</button>
+      <div class="feedback" id="fb-3"></div>
+    </div>
+  </div>
+
+  <div class="summary" id="summary">
+    <h2>Well done!</h2>
+    <p>You've classified behaviour, explained impact, and thought through a difficult scenario from Meera's perspective.</p>
+    <p>Now head to your OneNote Reflection sheet to complete today's Reflection questions.</p>
+  </div>
+
+  <div class="navrow">
+    <button class="nav" id="prevBtn" onclick="go(-1)" disabled>&larr; Back</button>
+    <button class="nav" id="nextBtn" onclick="go(1)">Next &rarr;</button>
+  </div>
+</div>
+
+<script>
+  const total = 4;
+  let current = 0;
+
+  function renderProgress(){
+    const p = document.getElementById('progress');
+    p.innerHTML = "";
+    for(let i=0;i<total;i++){
+      const d = document.createElement('div');
+      d.className = 'dot' + (i===current ? ' active' : (i<current ? ' done':''));
+      p.appendChild(d);
+    }
+  }
+
+  document.querySelectorAll('.options').forEach(group=>{
+    group.querySelectorAll('.opt').forEach(opt=>{
+      opt.addEventListener('click', ()=>{
+        group.querySelectorAll('.opt').forEach(o=>o.classList.remove('selected'));
+        opt.classList.add('selected');
+      });
+    });
+  });
+
+  function checkCase(i){
+    const group = document.querySelector('.options[data-q="'+i+'-problem"]');
+    const selected = group.querySelector('.opt.selected');
+    const fb = document.getElementById('fb-'+i);
+    if(!selected){
+      fb.className = 'feedback show bad';
+      fb.textContent = "Choose an option first, then check your thinking.";
+      return;
+    }
+    fb.className = 'feedback show good';
+    fb.textContent = "Good — talk it through with your group or teacher: does your explanation match why you picked that option?";
+  }
+
+  // Branching story logic
+  const outcomes = {
+    "1a": "Meera agrees to keep it secret. The messages become more frequent, and the person starts asking who she's spoken to that day. The secrecy that started small keeps growing.",
+    "1b": "Meera tells a trusted friend, who says the secrecy and guilt-tripping sound worrying. Together they think about what to do next, including telling a trusted adult."
+  };
+  document.querySelectorAll('#choice-row-1 .choice').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('#choice-row-1 .choice').forEach(o=>o.classList.remove('chosen'));
+      c.classList.add('chosen');
+      const out = document.getElementById('outcome-1');
+      out.textContent = outcomes[c.dataset.outcome];
+      out.className = 'outcome show';
+    });
+  });
+
+  function go(dir){
+    const cases = document.querySelectorAll('.case');
+    cases[current].classList.remove('visible');
+    current += dir;
+    if(current >= total){
+      document.getElementById('summary').classList.add('visible');
+      document.querySelector('.navrow').style.display = 'none';
+      renderProgress();
+      return;
+    }
+    cases[current].classList.add('visible');
+    document.getElementById('prevBtn').disabled = current === 0;
+    document.getElementById('nextBtn').textContent = (current === total-1) ? "Finish →" : "Next →";
+    renderProgress();
+  }
+
+  renderProgress();
+</script>
+
+</body>
+</html>

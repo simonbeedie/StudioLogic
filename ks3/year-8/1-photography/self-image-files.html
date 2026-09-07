@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Self-Image Files</title>
+<style>
+  :root{
+    --navy:#15131A; --teal:#1C7293; --deep:#1C7293; --ice:#DCEEF2;
+    --off:#F2F6F8; --dark:#1A1A1A; --good:#2E7D4F; --bad:#C4443A; --orange:#E8792E;
+  }
+  * { box-sizing: border-box; }
+  body{ margin:0; font-family: Calibri, Arial, sans-serif; background:var(--off); color:var(--dark); }
+  header{ background:var(--navy); color:#fff; padding:28px 32px; }
+  header h1{ margin:0 0 6px 0; font-size:28px; color:#F2EFEA; }
+  header p{ margin:0; color:#A9A2B0; font-size:15px; max-width:820px; }
+  .wrap{ max-width:1000px; margin:0 auto; padding:24px 20px 60px; }
+  .progress{ display:flex; gap:8px; margin:20px 0; }
+  .dot{ flex:1; height:8px; border-radius:4px; background:#D8E1E8; }
+  .dot.active{ background: var(--orange); }
+  .dot.done{ background: var(--navy); }
+  .case{ background:#fff; border-radius:14px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,0.06); display:none; }
+  .case.visible{ display:block; }
+  .case h2{ margin-top:0; color:var(--navy); font-size:21px; }
+  .post{
+    background: var(--off); border-radius:10px; padding:16px 18px; margin:16px 0; font-size:14px; line-height:1.5;
+  }
+  .post .handle{ font-weight:bold; color:var(--teal); margin-bottom:4px; }
+  .post .caption{ color:var(--dark); }
+  .task{ margin-top:18px; }
+  .task label{ display:block; font-weight:bold; margin-bottom:6px; color:var(--navy); }
+  .options{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+  .opt{ padding:9px 16px; border-radius:20px; border:2px solid #D8E1E8; background:#fff; cursor:pointer; font-size:14px; font-weight:bold; }
+  .opt.selected{ border-color: var(--orange); background: #FCE9DA; }
+  textarea{ width:100%; min-height:64px; border-radius:8px; border:1px solid #C7D2D9; padding:10px; font-family: Calibri, Arial, sans-serif; font-size:14px; resize:vertical; }
+  .feedback{ margin-top:14px; padding:12px 14px; border-radius:8px; display:none; font-size:14px; }
+  .feedback.show{ display:block; }
+  .feedback.good{ background:#E4F2E9; color:var(--good); border:1px solid #BFE3CC; }
+  .feedback.bad{ background:#FBEAE8; color:var(--bad); border:1px solid #F1C6C1; }
+  .navrow{ display:flex; justify-content:space-between; margin-top:22px; }
+  button.nav{ background: var(--orange); color:#fff; border:none; padding:10px 20px; border-radius:8px; font-size:14px; font-weight:bold; cursor:pointer; }
+  button.nav:disabled{ background:#B9C4CC; cursor:not-allowed; }
+  button.check{ background: var(--navy); color:#fff; border:none; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:bold; cursor:pointer; }
+  .challenge{ margin-top:20px; background: var(--navy); color:#fff; border-radius:10px; padding:14px 16px; font-size:13.5px; }
+  .summary{ display:none; text-align:center; padding:40px 20px; }
+  .summary.visible{ display:block; }
+  .summary h2{ color:var(--navy); }
+  .storybox{ background:var(--off); border-radius:10px; padding:16px 18px; margin:16px 0; font-size:14.5px; line-height:1.6; }
+  .choice-row{ display:flex; gap:12px; margin-top:14px; flex-wrap:wrap; }
+  .choice{ flex:1; min-width:220px; background:#fff; border:2px solid #D8E1E8; border-radius:10px; padding:12px 14px; cursor:pointer; font-size:13.5px; }
+  .choice:hover{ border-color: var(--orange); }
+  .choice.chosen{ border-color: var(--navy); background: #FCE9DA; }
+  .outcome{ margin-top:14px; padding:12px 14px; border-radius:8px; background:#fff; border:1px solid #D8E1E8; font-size:14px; display:none; }
+  .outcome.show{ display:block; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Self-Image Files</h1>
+  <p>Four real-style profiles and posts, plus one branching story. For each: decide what's happening (self-image, identity, or a stretched truth), explain why someone might present themselves that way, and think about the impact. The final case is Antoni's story — his choices, not yours to make "correctly."</p>
+</header>
+
+<div class="wrap">
+  <div class="progress" id="progress"></div>
+
+  <!-- Case 1 -->
+  <div class="case visible" data-case="0">
+    <h2>Case 1: The Highlight Reel</h2>
+    <div class="post">
+      <div class="handle">@sam_adventures</div>
+      <div class="caption">Every post: exotic holidays, new outfits, perfect group photos smiling. Never a bad day, never a quiet weekend at home.</div>
+    </div>
+    <div class="task">
+      <label>What's most likely happening here?</label>
+      <div class="options" data-q="0-problem">
+        <div class="opt" data-val="curated">A curated, one-sided self-image</div>
+        <div class="opt" data-val="fake">A completely fake identity</div>
+        <div class="opt" data-val="normal">An accurate, full picture of their life</div>
+      </div>
+      <label>How might seeing this affect someone scrolling their own feed after a normal day?</label>
+      <textarea placeholder="Type your explanation..." data-q="0-explain"></textarea>
+      <label>Why might @sam_adventures only post the highlights?</label>
+      <textarea placeholder="Type your answer..." data-q="0-fix"></textarea>
+      <button class="check" onclick="checkCase(0)">Check my thinking</button>
+      <div class="feedback" id="fb-0"></div>
+    </div>
+  </div>
+
+  <!-- Case 2 -->
+  <div class="case" data-case="1">
+    <h2>Case 2: The Gaming Streamer</h2>
+    <div class="post">
+      <div class="handle">@proplayer_zx</div>
+      <div class="caption">"Just hit Diamond rank solo, no help, first try 🏆" — comments later reveal the account was boosted by a paid service.</div>
+    </div>
+    <div class="task">
+      <label>What's happening here?</label>
+      <div class="options" data-q="1-problem">
+        <div class="opt" data-val="stretched">A stretched truth</div>
+        <div class="opt" data-val="honest">An honest achievement</div>
+        <div class="opt" data-val="identity">Just their normal identity</div>
+      </div>
+      <label>Why might someone stretch the truth about an achievement like this?</label>
+      <textarea placeholder="Type your explanation..." data-q="1-explain"></textarea>
+      <label>What could someone do if they're unsure whether a claim like this is truthful?</label>
+      <textarea placeholder="Type your answer..." data-q="1-fix"></textarea>
+      <button class="check" onclick="checkCase(1)">Check my thinking</button>
+      <div class="feedback" id="fb-1"></div>
+    </div>
+  </div>
+
+  <!-- Case 3 -->
+  <div class="case" data-case="2">
+    <h2>Case 3: Two Ways to Share the Same Day</h2>
+    <div class="post">
+      <div class="handle">Post A</div>
+      <div class="caption">"Best day ever!! Everything is perfect 😍" (photo shows a huge smile, no context)</div>
+    </div>
+    <div class="post">
+      <div class="handle">Post B</div>
+      <div class="caption">"Had a genuinely lovely afternoon with friends, even though today started rough. Small good moments help." (photo shows a relaxed, ordinary scene)</div>
+    </div>
+    <div class="task">
+      <label>Which post gives a more honest sense of identity?</label>
+      <div class="options" data-q="2-problem">
+        <div class="opt" data-val="B">Post B</div>
+        <div class="opt" data-val="A">Post A</div>
+        <div class="opt" data-val="same">Both are equally honest</div>
+      </div>
+      <label>What's the key difference between how the two posts present self-image?</label>
+      <textarea placeholder="Type your explanation..." data-q="2-explain"></textarea>
+      <label>Rewrite Post A so it reflects a more balanced self-image:</label>
+      <textarea placeholder="Type your rewrite..." data-q="2-fix"></textarea>
+      <button class="check" onclick="checkCase(2)">Check my thinking</button>
+      <div class="feedback" id="fb-2"></div>
+    </div>
+    <div class="challenge"><strong>Challenge yourself:</strong> Is it ever wrong to only share the good moments? Where's the line between positive self-image and a stretched truth?</div>
+  </div>
+
+  <!-- Case 4: Branching story -->
+  <div class="case" data-case="3">
+    <h2>Case 4: Antoni's Choice</h2>
+    <div class="storybox" id="story-text">
+      Antoni loves playing video games and posting clips, but lately he's noticed his clips get more likes when he acts more confident and "cooler" than he actually feels. He's started exaggerating his skills and pretending games don't frustrate him, even when they do.
+      <br><br>Today a friend messaged: <em>"You seem so different online than in real life lately \u2014 you good?"</em>
+    </div>
+    <div class="choice-row" id="choice-row-1">
+      <div class="choice" data-outcome="1a">Brush it off and keep posting the same confident, exaggerated version of himself</div>
+      <div class="choice" data-outcome="1b">Be honest with his friend about feeling pressure to seem a certain way online</div>
+    </div>
+    <div class="outcome" id="outcome-1"></div>
+
+    <div class="task" style="margin-top:20px;">
+      <label>What's driving Antoni's online identity to drift from how he actually feels?</label>
+      <textarea placeholder="Type your explanation..." data-q="3-explain"></textarea>
+      <label>What other options could Antoni have, beyond the two given?</label>
+      <textarea placeholder="Type your answer..." data-q="3-fix"></textarea>
+      <button class="check" onclick="checkCase(3)">Check my thinking</button>
+      <div class="feedback" id="fb-3"></div>
+    </div>
+  </div>
+
+  <div class="summary" id="summary">
+    <h2>Well done!</h2>
+    <p>You've spotted curated self-image, stretched truths, and thought through Antoni's pressure to present himself differently online.</p>
+    <p>Now head to your OneNote Reflection sheet to complete today's Reflection questions.</p>
+  </div>
+
+  <div class="navrow">
+    <button class="nav" id="prevBtn" onclick="go(-1)" disabled>&larr; Back</button>
+    <button class="nav" id="nextBtn" onclick="go(1)">Next &rarr;</button>
+  </div>
+</div>
+
+<script>
+  const total = 4;
+  let current = 0;
+
+  function renderProgress(){
+    const p = document.getElementById('progress');
+    p.innerHTML = "";
+    for(let i=0;i<total;i++){
+      const d = document.createElement('div');
+      d.className = 'dot' + (i===current ? ' active' : (i<current ? ' done':''));
+      p.appendChild(d);
+    }
+  }
+
+  document.querySelectorAll('.options').forEach(group=>{
+    group.querySelectorAll('.opt').forEach(opt=>{
+      opt.addEventListener('click', ()=>{
+        group.querySelectorAll('.opt').forEach(o=>o.classList.remove('selected'));
+        opt.classList.add('selected');
+      });
+    });
+  });
+
+  function checkCase(i){
+    const group = document.querySelector('.options[data-q="'+i+'-problem"]');
+    const selected = group.querySelector('.opt.selected');
+    const fb = document.getElementById('fb-'+i);
+    if(!selected){
+      fb.className = 'feedback show bad';
+      fb.textContent = "Choose an option first, then check your thinking.";
+      return;
+    }
+    fb.className = 'feedback show good';
+    fb.textContent = "Good — talk it through with your group or teacher: does your explanation match why you picked that option?";
+  }
+
+  const outcomes = {
+    "1a": "Antoni keeps up the confident persona. The gap between how he feels and what he posts keeps growing, and it gets harder to imagine posting anything more honest.",
+    "1b": "Antoni tells his friend the truth. His friend says a lot of people feel that pressure, and they talk about posting something more genuine next time."
+  };
+  document.querySelectorAll('#choice-row-1 .choice').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('#choice-row-1 .choice').forEach(o=>o.classList.remove('chosen'));
+      c.classList.add('chosen');
+      const out = document.getElementById('outcome-1');
+      out.textContent = outcomes[c.dataset.outcome];
+      out.className = 'outcome show';
+    });
+  });
+
+  function go(dir){
+    const cases = document.querySelectorAll('.case');
+    cases[current].classList.remove('visible');
+    current += dir;
+    if(current >= total){
+      document.getElementById('summary').classList.add('visible');
+      document.querySelector('.navrow').style.display = 'none';
+      renderProgress();
+      return;
+    }
+    cases[current].classList.add('visible');
+    document.getElementById('prevBtn').disabled = current === 0;
+    document.getElementById('nextBtn').textContent = (current === total-1) ? "Finish →" : "Next →";
+    renderProgress();
+  }
+
+  renderProgress();
+</script>
+
+</body>
+</html>
