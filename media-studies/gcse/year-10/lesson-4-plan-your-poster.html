@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 4: Plan Your Own Film Poster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0D0D0D;
+    --panel:#17140F;
+    --panel-2:#1E1A13;
+    --accent:#C9A84C;
+    --accent-dim:#8A7332;
+    --text:#ECE7DD;
+    --text-muted:#A79F8E;
+    --rule:#33301F;
+    --correct:#5E8B5A;
+    --incorrect:#8B3A3A;
+    --font-display: 'Oswald', 'Arial Narrow', Arial, sans-serif;
+    --font-body: 'Work Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+  :root:not([data-theme="light"]){ color-scheme: dark; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{ max-width:780px; margin:0 auto; padding:0 24px 80px; }
+  header.hero{
+    padding:56px 24px 40px;
+    text-align:center;
+    border-bottom:1px solid var(--rule);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.10), transparent 60%),
+      var(--bg);
+  }
+  .eyebrow{ font-family:var(--font-body); font-size:0.8rem; color:var(--accent); letter-spacing:0.04em; margin:0 0 10px; }
+  h1.title{
+    font-family:var(--font-display); font-weight:700; font-size:clamp(1.9rem, 5.6vw, 3rem);
+    line-height:1.05; margin:0 0 14px; color:var(--text); text-transform:uppercase; letter-spacing:0.01em;
+  }
+  h1.title span{color:var(--accent);}
+  .hero-sub{ color:var(--text-muted); font-size:1.05rem; max-width:540px; margin:0 auto; }
+  .lesson-meta{ display:flex; justify-content:center; gap:28px; margin-top:28px; flex-wrap:wrap; }
+  .meta-item{ text-align:center; }
+  .meta-num{ font-family:var(--font-display); color:var(--accent); font-size:1.4rem; display:block; }
+  .meta-label{ font-size:0.78rem; color:var(--text-muted); }
+
+  section{ padding:48px 0; border-bottom:1px solid var(--rule); }
+  section:last-of-type{border-bottom:none;}
+
+  .stage-tag{
+    display:inline-block; font-family:var(--font-display); font-size:0.78rem; color:var(--bg);
+    background:var(--accent); padding:4px 12px; border-radius:2px; margin-bottom:16px;
+    text-transform:uppercase; letter-spacing:0.03em;
+  }
+  h2.section-title{ font-family:var(--font-display); font-size:1.7rem; text-transform:uppercase; margin:0 0 6px; color:var(--text); }
+  .section-time{ color:var(--text-muted); font-size:0.9rem; margin:0 0 24px; }
+
+  .video-frame{ position:relative; width:100%; padding-top:56.25%; background:#000; border:1px solid var(--rule); margin-bottom:20px; }
+  .video-frame iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+
+  .callout{ background:var(--panel); border-left:3px solid var(--accent); padding:18px 20px; margin:20px 0; border-radius:2px; }
+  .callout p{margin:0;} .callout p + p{margin-top:10px;}
+
+  .enrichment{
+    background:var(--panel-2); border:1px dashed var(--accent-dim); padding:18px 20px; margin:20px 0; border-radius:2px;
+  }
+  .enrichment-tag{
+    display:inline-block; font-family:var(--font-display); font-size:0.72rem; color:var(--accent);
+    border:1px solid var(--accent-dim); padding:2px 10px; border-radius:10px; margin-bottom:10px; text-transform:uppercase; letter-spacing:0.03em;
+  }
+  .enrichment p{margin:0;} .enrichment p + p{margin-top:10px;}
+
+  .quiz-card{ background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:26px; margin-top:8px; }
+  .q-block{ margin-bottom:26px; padding-bottom:26px; border-bottom:1px solid var(--rule); }
+  .q-block:last-of-type{ border-bottom:none; margin-bottom:0; padding-bottom:0; }
+  .q-prompt{ font-weight:600; margin-bottom:12px; color:var(--text); }
+  .q-num{color:var(--accent); margin-right:6px;}
+  .options{ display:flex; flex-direction:column; gap:8px; }
+  .option{
+    display:flex; align-items:flex-start; gap:10px; padding:10px 12px; border:1px solid var(--rule);
+    border-radius:3px; cursor:pointer; background:var(--panel-2); transition:border-color .15s ease;
+  }
+  .option:hover{border-color:var(--accent-dim);}
+  .option input{margin-top:3px; accent-color:var(--accent);}
+  .option.correct-answer{border-color:var(--correct);}
+  .option.wrong-answer{border-color:var(--incorrect);}
+  .feedback{ display:none; margin-top:10px; font-size:0.92rem; padding:10px 12px; border-radius:3px; }
+  .feedback.show{display:block;}
+  .feedback.is-correct{background:rgba(94,139,90,0.15); color:#9CC79A;}
+  .feedback.is-incorrect{background:rgba(139,58,58,0.15); color:#E0A3A3;}
+
+  #quizForm{scroll-margin-top:20px;}
+  .btn{
+    font-family:var(--font-display); background:var(--accent); color:#141210; border:none; padding:14px 28px;
+    font-size:1rem; letter-spacing:0.02em; text-transform:uppercase; border-radius:3px; cursor:pointer; margin-top:8px;
+  }
+  .btn:hover{background:#DEB95F;}
+  .btn:focus-visible, .option input:focus-visible, a:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  #results{ display:none; margin-top:28px; padding:28px; background:var(--panel-2); border:2px solid var(--accent); border-radius:4px; text-align:center; }
+  #results.show{display:block;}
+  .score-big{ font-family:var(--font-display); font-size:3rem; color:var(--accent); margin:0; }
+  .screenshot-note{
+    margin-top:18px; padding:14px 16px; background:rgba(201,168,76,0.12); border:1px dashed var(--accent);
+    border-radius:3px; font-size:0.95rem; color:var(--text);
+  }
+
+  .poster-row{ display:flex; gap:24px; flex-wrap:wrap; justify-content:center; margin:24px 0; }
+  figure{margin:0;}
+  figure img{ width:100%; max-width:260px; height:auto; display:block; border:1px solid var(--rule); }
+  figcaption{ font-size:0.82rem; color:var(--text-muted); text-align:center; margin-top:8px; }
+
+  .worked-example{ display:flex; gap:28px; flex-wrap:wrap; align-items:flex-start; margin-top:20px; }
+  .worked-example figure{flex:0 0 220px;}
+  .worked-example .analysis{flex:1 1 320px; min-width:260px;}
+  .analysis-row{margin-bottom:16px;}
+  .analysis-label{
+    font-family:var(--font-display); font-size:0.8rem; color:var(--accent); text-transform:uppercase;
+    letter-spacing:0.03em; margin:0 0 4px;
+  }
+  .analysis-row p{margin:0; color:var(--text);}
+
+  .task-box{ background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:24px; margin-top:20px; }
+  .task-box h3{ font-family:var(--font-display); font-size:1.1rem; margin:0 0 14px; color:var(--accent); text-transform:uppercase; }
+  .task-box ol{ margin:0; padding-left:22px; }
+  .task-box li{margin-bottom:12px;} .task-box li:last-child{margin-bottom:0;}
+
+  .glossary{ display:grid; grid-template-columns:1fr; gap:14px; margin-top:8px; }
+  .glossary dt{ font-family:var(--font-display); color:var(--accent); font-size:1rem; }
+  .glossary dd{ margin:4px 0 0; color:var(--text-muted); }
+
+  .step-flow{ display:flex; flex-wrap:wrap; gap:12px; margin:20px 0; }
+  .step{ flex:1 1 140px; background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:16px; text-align:center; }
+  .step-label{ font-family:var(--font-display); color:var(--accent); font-size:0.85rem; text-transform:uppercase; }
+
+  footer{ text-align:center; padding:36px 24px 10px; color:var(--text-muted); font-size:0.85rem; }
+
+  @media (max-width:600px){
+    .worked-example{flex-direction:column;}
+    .worked-example figure{flex:none; margin:0 auto;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <p class="eyebrow">EDUQAS GCSE MEDIA STUDIES · FILM POSTERS PROJECT</p>
+  <h1 class="title">Lesson 4<br><span>Plan Your Own Poster</span></h1>
+  <p class="hero-sub">Bringing everything together to design a film poster concept of your own.</p>
+  <div class="lesson-meta">
+    <div class="meta-item"><span class="meta-num">10</span><span class="meta-label">Connect &amp; Prepare</span></div>
+    <div class="meta-item"><span class="meta-num">40</span><span class="meta-label">Teach &amp; Think</span></div>
+    <div class="meta-item"><span class="meta-num">10</span><span class="meta-label">Reflect &amp; Review</span></div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- CONNECT & PREPARE -->
+  <section id="connect">
+    <span class="stage-tag">Connect &amp; Prepare — 10 min</span>
+    <h2 class="section-title">Rapid recall: test yourself</h2>
+    <p class="section-time">No new video today. Before you start planning your own poster, complete this quick recall quiz covering everything from Lessons 1–3.</p>
+
+    <div class="callout">
+      <p><strong>Recap from Lessons 1–3:</strong> you've learned to read a poster's <strong>signs</strong> (denotation, connotation, myth), its <strong>props, characters and iconography</strong>, and its <strong>whole design system</strong> (typography, colour, tagline). Today you'll use all of it to plan a poster of your own.</p>
+    </div>
+
+    <form id="quizForm" class="quiz-card">
+      <div class="q-block" data-answer="a">
+        <p class="q-prompt"><span class="q-num">1.</span><em>(Lesson 1)</em> What term describes the literal, obvious meaning of an image?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q1" value="a"> Denotation</label>
+          <label class="option"><input type="radio" name="q1" value="b"> Connotation</label>
+          <label class="option"><input type="radio" name="q1" value="c"> Myth</label>
+          <label class="option"><input type="radio" name="q1" value="d"> Genre</label>
+        </div>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="q-block" data-answer="c">
+        <p class="q-prompt"><span class="q-num">2.</span><em>(Lesson 1)</em> A wider cultural belief that an image reinforces, so common it feels "natural," is called a:</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q2" value="a"> Signifier</label>
+          <label class="option"><input type="radio" name="q2" value="b"> Tagline</label>
+          <label class="option"><input type="radio" name="q2" value="c"> Myth</label>
+          <label class="option"><input type="radio" name="q2" value="d"> Binary opposition</label>
+        </div>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="q-block" data-answer="b">
+        <p class="q-prompt"><span class="q-num">3.</span><em>(Lesson 2)</em> Which term describes everything deliberately placed within the frame — props, costume, lighting, setting?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q3" value="a"> Iconography</label>
+          <label class="option"><input type="radio" name="q3" value="b"> Mise-en-scène</label>
+          <label class="option"><input type="radio" name="q3" value="c"> Anchorage</label>
+          <label class="option"><input type="radio" name="q3" value="d"> Typography</label>
+        </div>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="q-block" data-answer="d">
+        <p class="q-prompt"><span class="q-num">4.</span><em>(Lesson 2)</em> Recurring objects, settings and character types that instantly signal a genre are called:</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q4" value="a"> Denotations</label>
+          <label class="option"><input type="radio" name="q4" value="b"> Myths</label>
+          <label class="option"><input type="radio" name="q4" value="c"> Taglines</label>
+          <label class="option"><input type="radio" name="q4" value="d"> Iconography</label>
+        </div>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="q-block" data-answer="a">
+        <p class="q-prompt"><span class="q-num">5.</span><em>(Lesson 2)</em> Lévi-Strauss's term for pairs of opposite ideas or characters placed in tension (e.g. hero vs. villain) is:</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q5" value="a"> Binary oppositions</label>
+          <label class="option"><input type="radio" name="q5" value="b"> Genre conventions</label>
+          <label class="option"><input type="radio" name="q5" value="c"> Stereotypes</label>
+          <label class="option"><input type="radio" name="q5" value="d"> Connotations</label>
+        </div>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="q-block" data-answer="c">
+        <p class="q-prompt"><span class="q-num">6.</span><em>(Lesson 3)</em> The style, shape and size of the lettering used on a poster is called:</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q6" value="a"> Iconography</label>
+          <label class="option"><input type="radio" name="q6" value="b"> Mise-en-sc\u00e8ne</label>
+          <label class="option"><input type="radio" name="q6" value="c"> Typography</label>
+          <label class="option"><input type="radio" name="q6" value="d"> Denotation</label>
+        </div>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="q-block" data-answer="d">
+        <p class="q-prompt"><span class="q-num">7.</span><em>(Lesson 3)</em> A short, memorable phrase on a poster that hooks the audience and hints at tone is called a:</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q7" value="a"> Title</label>
+          <label class="option"><input type="radio" name="q7" value="b"> Credit block</label>
+          <label class="option"><input type="radio" name="q7" value="c"> Byline</label>
+          <label class="option"><input type="radio" name="q7" value="d"> Tagline</label>
+        </div>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="q-block" data-answer="b">
+        <p class="q-prompt"><span class="q-num">8.</span><em>(Lesson 3)</em> When films within the same genre repeatedly use similar fonts, colours and layouts, we call these shared patterns:</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q8" value="a"> Denotations</label>
+          <label class="option"><input type="radio" name="q8" value="b"> Genre conventions</label>
+          <label class="option"><input type="radio" name="q8" value="c"> Binary oppositions</label>
+          <label class="option"><input type="radio" name="q8" value="d"> Signifiers</label>
+        </div>
+        <div class="feedback"></div>
+      </div>
+
+      <button type="button" class="btn" id="submitQuiz">Check my answers</button>
+    </form>
+
+    <div id="results">
+      <p style="margin:0; color:var(--text-muted); font-family:var(--font-display); text-transform:uppercase; font-size:0.85rem;">Your score</p>
+      <p class="score-big" id="scoreText">0 / 8</p>
+      <p id="scoreComment" style="color:var(--text-muted);"></p>
+      <div class="screenshot-note">
+        <strong>Now: take a screenshot (print screen) of this results box</strong> showing your score, and paste it into your OneNote page for this lesson.
+      </div>
+    </div>
+  </section>
+
+  <!-- TEACH & THINK -->
+  <section id="teach">
+    <span class="stage-tag">Teach &amp; Think — 40 min</span>
+    <h2 class="section-title">Plan your own horror film poster</h2>
+    <p class="section-time">Read this section carefully, then start your own planning task below.</p>
+
+    <p>Over the last three lessons you've learned to read a poster like a Media Studies student. Today you flip it around: instead of analysing someone else's poster, you're going to <strong>plan your own</strong> — making the same kind of deliberate choices a real designer makes, and being ready to explain <em>why</em> you made them.</p>
+
+    <div class="callout">
+      <p><strong>This is a planning task, not a drawing test.</strong> You do not need to be a brilliant artist. What matters is that every choice you make can be justified using the theory and terminology from Lessons 1–3.</p>
+    </div>
+
+    <h3 style="font-family:var(--font-display); color:var(--text); text-transform:uppercase; margin-top:40px;">Worked example: planning "Hollow Marsh"</h3>
+    <p>Here's a planning template filled in for an imaginary film, modelled for you.</p>
+
+    <div class="task-box">
+      <h3>Hollow Marsh — a planning example</h3>
+      <ol>
+        <li><strong>Genre &amp; iconography:</strong> Survival horror. Iconography: a rusted lantern, wading boots, thick fog, a half-submerged wooden sign.</li>
+        <li><strong>Character/representation decision:</strong> A lone teenage girl carrying the lantern — a Final Girl convention, representing resilience rather than helplessness.</li>
+        <li><strong>Semiotic codes:</strong> Signifier: the lantern's single weak flame. Connotation: fragile hope in overwhelming darkness.</li>
+        <li><strong>Typography &amp; colour:</strong> Dripping, waterlogged-looking typography in murky green-grey, connoting decay and the wetland setting.</li>
+        <li><strong>Tagline:</strong> "Some places don't want to let you leave."</li>
+        <li><strong>Binary opposition:</strong> Light (the lantern, safety) vs. darkness (the marsh, danger).</li>
+      </ol>
+    </div>
+
+    <h3 style="font-family:var(--font-display); color:var(--text); text-transform:uppercase; margin-top:48px;">Your turn: plan your own poster</h3>
+    <p>Now it's your turn. Invent an original horror film — it doesn't need to be a real film, just a concept in your head. Answer the six planning questions below in your <strong>OneNote page</strong>.</p>
+
+    <div class="task-box">
+      <h3>Planning template</h3>
+      <ol>
+        <li><strong>Genre &amp; iconography:</strong> What sub-genre is your film (e.g. slasher, survival, supernatural)? What props, characters or settings will signal this?</li>
+        <li><strong>Character/representation decision:</strong> Describe one character choice in your poster, and justify why you made it.</li>
+        <li><strong>Semiotic codes:</strong> What signifier(s) will appear on your poster, and what will they connote to your audience?</li>
+        <li><strong>Typography &amp; colour:</strong> What font style and colour palette will you use, and why do they suit your genre?</li>
+        <li><strong>Tagline:</strong> Write a tagline for your film.</li>
+        <li><strong>Binary opposition:</strong> What binary opposition will structure your poster (e.g. hero vs. monster, safety vs. danger)?</li>
+      </ol>
+    </div>
+
+    <div class="enrichment">
+      <span class="enrichment-tag">This part is open to you</span>
+      <p>Once you've answered the six questions, choose <strong>one</strong> of the following:</p>
+      <p><strong>Option A — Draw it:</strong> Sketch your poster concept on paper. Label it with your genre, semiotic and typography choices from your plan.</p>
+      <p><strong>Option B — Write it:</strong> Write a short story or synopsis (150–300 words) for your film. Then explain underneath how you would translate your story into the poster choices from your plan.</p>
+    </div>
+  </section>
+
+  <!-- REFLECT & REVIEW -->
+  <section id="reflect">
+    <span class="stage-tag">Reflect &amp; Review — 10 min</span>
+    <h2 class="section-title">Pitch your poster</h2>
+    <p class="section-time">Get ready to share your idea with the class, or write a short pitch if you're presenting another day.</p>
+
+    <div class="task-box">
+      <h3>Prepare a 30-second pitch</h3>
+      <ol>
+        <li>What's your film called, and what sub-genre is it?</li>
+        <li>Describe your poster concept in one or two sentences.</li>
+        <li>Name <strong>one theory or term</strong> from Lessons 1–3 that you used to make a specific choice, and explain that choice.</li>
+      </ol>
+    </div>
+
+    <div class="callout">
+      <p><strong>Before you finish:</strong> check your OneNote page has (1) your quiz score screenshot, (2) your completed six-question planning template, and (3) your drawn poster concept or written synopsis. This is the evidence your teacher will look at when they return.</p>
+    </div>
+
+    <div class="callout">
+      <p><strong>Well done!</strong> You've completed the Film Posters unit — semiotics, props and iconography, genre conventions, and now your own original planning. When your teacher is back, they'll build on this using your set exam board texts.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Eduqas/WJEC GCSE Media Studies — Film Posters Project — Lesson 4 of 4
+</footer>
+
+<script>
+(function(){
+  var submitBtn = document.getElementById('submitQuiz');
+  var results = document.getElementById('results');
+  var scoreText = document.getElementById('scoreText');
+  var scoreComment = document.getElementById('scoreComment');
+  var blocks = document.querySelectorAll('.q-block');
+
+  submitBtn.addEventListener('click', function(){
+    var score = 0;
+    var allAnswered = true;
+
+    blocks.forEach(function(block){
+      var name = block.querySelector('input[type="radio"]').name;
+      var selected = block.querySelector('input[name="' + name + '"]:checked');
+      var feedback = block.querySelector('.feedback');
+      var correctVal = block.getAttribute('data-answer');
+      var options = block.querySelectorAll('.option');
+
+      options.forEach(function(opt){ opt.classList.remove('correct-answer','wrong-answer'); });
+
+      if(!selected){
+        allAnswered = false;
+        return;
+      }
+
+      var chosenOption = selected.closest('.option');
+      var isCorrect = selected.value === correctVal;
+
+      if(isCorrect){
+        score++;
+        chosenOption.classList.add('correct-answer');
+        feedback.textContent = 'Correct.';
+        feedback.className = 'feedback show is-correct';
+      } else {
+        chosenOption.classList.add('wrong-answer');
+        var correctOption = block.querySelector('input[value="' + correctVal + '"]').closest('.option');
+        correctOption.classList.add('correct-answer');
+        feedback.textContent = 'Not quite — the correct answer is highlighted above.';
+        feedback.className = 'feedback show is-incorrect';
+      }
+    });
+
+    if(!allAnswered){
+      alert('Please answer every question before checking your results.');
+      return;
+    }
+
+    scoreText.textContent = score + ' / 8';
+    if(score === 8){
+      scoreComment.textContent = 'Excellent — you\'ve got a full grip on Lessons 1–3. You\'re ready to plan your own poster.';
+    } else if(score >= 6){
+      scoreComment.textContent = 'Good work — re-read any question you got wrong before moving on.';
+    } else {
+      scoreComment.textContent = 'A few gaps — re-read the recap glossary below before continuing to the planning task.';
+    }
+    results.classList.add('show');
+    results.scrollIntoView({behavior:'smooth', block:'center'});
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Answers checked';
+  });
+})();
+</script>
+
+</body>
+</html>
