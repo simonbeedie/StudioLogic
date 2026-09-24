@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Music Video &amp; Advertising — Independent Study Hub</title>
+<style>
+  :root {
+    --purple: #2D1B69;
+    --purple-soft: #3d2680;
+    --lavender: #A78BFA;
+    --ink: #1b2430;
+    --paper: #ffffff;
+    --paper-alt: #f6f4fb;
+    --line: #e2ddf0;
+    --muted: #635f75;
+    --ad-red: #E63946;
+    --mv-amber: #F4A61F;
+    --mv-charcoal: #1A1A1A;
+    --theory-purple: #2D1B69;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--paper-alt);
+    color: var(--ink);
+    line-height: 1.55;
+  }
+
+  a { color: var(--purple-soft); text-decoration: none; border-bottom: 1px solid rgba(61,38,128,0.3); }
+  a:hover { border-bottom-color: var(--purple-soft); }
+
+  header.hero {
+    background: linear-gradient(135deg, var(--purple) 0%, #1A1030 100%);
+    color: #fff;
+    padding: 56px 24px 48px;
+    text-align: center;
+  }
+  header.hero .eyebrow {
+    color: var(--lavender);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+  header.hero h1 {
+    margin: 0 0 12px;
+    font-size: clamp(26px, 4vw, 40px);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  header.hero p.sub {
+    color: #d6cdee;
+    max-width: 640px;
+    margin: 0 auto;
+    font-size: 16px;
+  }
+
+  nav.progress {
+    max-width: 960px;
+    margin: -28px auto 0;
+    background: var(--paper);
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(45,27,105,0.16);
+    padding: 18px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+  }
+  nav.progress a {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--purple);
+    background: var(--paper-alt);
+  }
+  nav.progress a:hover { background: #eee9fb; border-color: var(--lavender); }
+
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 20px 80px;
+  }
+
+  section.block { margin-bottom: 40px; }
+
+  h2.section-title {
+    font-size: 22px;
+    color: var(--purple);
+    border-bottom: 2px solid var(--lavender);
+    padding-bottom: 8px;
+    margin: 0 0 16px;
+  }
+
+  .callout {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--lavender);
+    border-radius: 10px;
+    padding: 20px 22px;
+    box-shadow: 0 2px 8px rgba(45,27,105,0.05);
+  }
+  .callout h3 { margin-top: 0; font-size: 16px; color: var(--purple); }
+  .callout p:last-child { margin-bottom: 0; }
+
+  .setup-list {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px 24px;
+  }
+  .setup-list li { margin-bottom: 10px; }
+  .setup-list li:last-child { margin-bottom: 0; }
+  .caution {
+    display: inline-block;
+    background: #fff4f4;
+    border: 1px solid #f3c9c9;
+    color: #9a2b2b;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin-top: 6px;
+  }
+
+  details.week {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(45,27,105,0.06);
+  }
+  details.week[open] { box-shadow: 0 6px 18px rgba(45,27,105,0.12); }
+
+  summary.week-head {
+    list-style: none;
+    cursor: pointer;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--purple);
+    color: #fff;
+  }
+  summary.week-head::-webkit-details-marker { display: none; }
+  summary.week-head .badge {
+    color: var(--purple);
+    font-weight: 800;
+    font-size: 12px;
+    border-radius: 999px;
+    padding: 4px 12px;
+    white-space: nowrap;
+  }
+  .badge-ad { background: #ffd4d8; color: #7a1622; }
+  .badge-mv { background: #ffe6b8; color: #6b4400; }
+  .badge-theory { background: var(--lavender); color: #241553; }
+
+  summary.week-head .wk-meta { flex: 1; }
+  summary.week-head .wk-title { font-weight: 700; font-size: 16px; display: block; }
+  summary.week-head .wk-theory { font-size: 13px; color: #d6cdee; display: block; margin-top: 2px; }
+  summary.week-head .chev { transition: transform 0.2s ease; color: var(--lavender); font-size: 14px; }
+  details.week[open] summary.week-head .chev { transform: rotate(90deg); }
+
+  .week-body { padding: 20px 22px 24px; }
+
+  .subhead {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--purple-soft);
+    margin: 18px 0 8px;
+  }
+  .subhead:first-child { margin-top: 0; }
+
+  .text-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+  .text-tag {
+    background: var(--paper-alt);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .video-embed {
+    margin-bottom: 12px;
+  }
+  .video-embed .wrap {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+  }
+  .video-embed .wrap iframe {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;
+  }
+  .video-embed .caption { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+  .link-box {
+    display: block;
+    background: #f0ecfb;
+    border: 1px solid #d9cff0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .link-box, .link-box a { border-bottom: none; }
+  .link-box:last-child { margin-bottom: 0; }
+
+  .search-box {
+    margin-top: 6px;
+    font-size: 13px;
+    background: var(--paper-alt);
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    padding: 10px 14px;
+  }
+  .search-box strong { color: var(--purple); }
+
+  ul.plain, ol.plain { margin: 0; padding-left: 20px; }
+  ul.plain li, ol.plain li { margin-bottom: 6px; }
+
+  .wider-box {
+    background: var(--paper-alt);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--mv-amber);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .wider-box h4 { margin: 0 0 8px; font-size: 14px; color: var(--purple); }
+
+  .task-box {
+    background: #fbfaff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+
+  .theorist-line {
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .exam-block {
+    background: linear-gradient(135deg, var(--purple) 0%, #1A1030 100%);
+    color: #fff;
+    border-radius: 14px;
+    padding: 28px 26px;
+  }
+  .exam-block h2 { color: #fff; border-bottom-color: var(--lavender); }
+  .exam-block a { color: var(--lavender); border-bottom-color: rgba(167,139,250,0.4); }
+  .exam-block p, .exam-block li { color: #e2dbf5; }
+  .exam-block ul { padding-left: 20px; }
+
+  footer {
+    text-align: center;
+    padding: 30px 20px 50px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  @media (max-width: 600px) {
+    summary.week-head { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">Eduqas A-Level Media Studies · Component 1, Section A</div>
+  <h1>Music Video &amp; Advertising: Independent Study</h1>
+  <p class="sub">Six weeks of independent study applying the theoretical framework to music video and advertising, ahead of an in-class assessment. Work through one focus per week — watch, read, then apply.</p>
+</header>
+
+<nav class="progress">
+  <a href="#how-it-works">How it works</a>
+  <a href="#setup">Setup</a>
+  <a href="#week-1">Week 1</a>
+  <a href="#week-2">Week 2</a>
+  <a href="#week-3">Week 3</a>
+  <a href="#week-4">Week 4</a>
+  <a href="#week-5">Week 5</a>
+  <a href="#week-6">Week 6</a>
+  <a href="#week-7">Assessment</a>
+</nav>
+
+<main>
+
+  <section class="block" id="how-it-works">
+    <h2 class="section-title">How this hub works</h2>
+    <div class="callout">
+      <h3>Watch → Read → Apply, every week</h3>
+      <p>Each week has a theory focus and a set-text focus. <strong>Watch</strong> gives you the core explainer video(s) for that week. <strong>Read</strong> links to the official Eduqas fact sheets for the set texts. <strong>Wider comparison</strong> brings in an extra text — beyond your set texts — that echoes or challenges what you've just studied, to build the comparative range examiners reward. <strong>Apply</strong> is your independent task: a short piece of written analysis to complete and bring to the next lesson.</p>
+      <p>Weeks 1–3 focus on <strong>advertising</strong>, weeks 4–5 shift to <strong>music video</strong> (with week 5 linking both), and week 6 is <strong>synoptic</strong> — pulling every theory and text together ahead of the in-class assessment in week 7.</p>
+    </div>
+  </section>
+
+  <section class="block" id="setup">
+    <h2 class="section-title">Before You Start</h2>
+    <ul class="setup-list">
+      <li>Have your <strong>WJEC/Eduqas Media Studies for A Level Year 1 &amp; AS Student Book</strong> to hand, along with your class notes on each set text.</li>
+      <li>Mrs Fisher's YouTube channel (<a href="https://www.youtube.com/@mrsfisher8961" target="_blank" rel="noopener">@mrsfisher8961</a>) covers both GCSE and A-level content.
+        <div class="caution">⚠ Make sure you're watching her A-level videos, not the GCSE ones — search the exact set-text name plus "A Level" if a video isn't linked directly below.</div>
+      </li>
+      <li>The Media Insider (<a href="https://www.youtube.com/c/TheMediaInsider" target="_blank" rel="noopener">The Media Insider</a>) is used below for theory explainers. His <em>Insider Film School</em> series is being saved for the film project next term, so we're not drawing on that here.</li>
+      <li>Keep a running glossary of key terms (denotation, connotation, anchorage, myth, binary opposition, preferred reading) — you'll need precise terminology in the exam.</li>
+    </ul>
+  </section>
+
+  <!-- WEEK 1 -->
+  <details class="week" id="week-1" open>
+    <summary class="week-head">
+      <span class="badge badge-ad">Week 1 · Advertising</span>
+      <span class="wk-meta">
+        <span class="wk-title">Semiotics &amp; Myth</span>
+        <span class="wk-theory">Theory focus: Barthes</span>
+      </span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="week-body">
+      <div class="subhead">Set text</div>
+      <div class="text-tags">
+        <span class="text-tag">Tide (1950s print advert)</span>
+      </div>
+      <p style="margin:0 0 12px; font-size:14px; color:var(--muted);">A single-text deep dive this week — Tide is dense enough for a full semiotic reading on its own, and you'll revisit it through a different theory lens in Week 3.</p>
+
+      <div class="subhead">Watch</div>
+      <div class="video-embed">
+        <div class="wrap"><iframe src="https://www.youtube.com/embed/lTUicJNSID4" title="Mrs Fisher — Tide advert analysis" allowfullscreen></iframe></div>
+        <div class="caption">Mrs Fisher — Tide (1950s print advert), A-level analysis</div>
+      </div>
+      <div class="search-box"><strong>Theory primer:</strong> The Media Insider has covered Barthes' semiotics directly — <a href="https://www.youtube.com/c/TheMediaInsider/search?query=Barthes%20semiotics" target="_blank" rel="noopener">search "Barthes semiotics" on his channel</a> for the explainer before starting the set text.</div>
+
+      <div class="subhead">Read</div>
+      <a class="link-box" href="https://resource.download.wjec.co.uk/vtc/2016-17/16-17_1-28/tide.pdf" target="_blank" rel="noopener">Official Eduqas fact sheet — Tide</a>
+
+      <div class="subhead">Wider comparison</div>
+      <div class="wider-box">
+        <h4>Dove — "Evolution" (2006)</h4>
+        <div class="video-embed">
+          <div class="wrap"><iframe src="https://www.youtube.com/embed/gau-e61nmqs" title="Dove Evolution advert" allowfullscreen></iframe></div>
+          <div class="caption">Watch how this advert exposes and deconstructs the myth Tide's era of advertising relies on — useful contrast for a Barthesian reading.</div>
+        </div>
+      </div>
+
+      <div class="subhead">Apply — independent task</div>
+      <div class="task-box">
+        <p style="margin-top:0;">Write one paragraph identifying two signs (image or language) in the Tide advert, explaining their denotation and connotation, and the wider cultural myth Barthes would say the advert constructs (e.g. domesticity, the "ideal" housewife). Then write 2–3 sentences comparing this to how Dove's "Evolution" treats a comparable myth very differently.</p>
+      </div>
+      <div class="theorist-line">Key theorist: <strong>Barthes</strong> — semiotics, denotation/connotation, myth.</div>
+    </div>
+  </details>
+
+  <!-- WEEK 2 -->
+  <details class="week" id="week-2">
+    <summary class="week-head">
+      <span class="badge badge-ad">Week 2 · Advertising</span>
+      <span class="wk-meta">
+        <span class="wk-title">Binary Oppositions</span>
+        <span class="wk-theory">Theory focus: Lévi-Strauss</span>
+      </span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="week-body">
+      <div class="subhead">Set texts</div>
+      <div class="text-tags">
+        <span class="text-tag">SuperHumans (Channel 4, 2012)</span>
+        <span class="text-tag">Kiss of the Vampire (1963 film poster)</span>
+      </div>
+
+      <div class="subhead">Watch</div>
+      <div class="video-embed">
+        <div class="wrap"><iframe src="https://www.youtube.com/embed/fVAFTluCBgI" title="Mrs Fisher — SuperHumans analysis" allowfullscreen></iframe></div>
+        <div class="caption">Mrs Fisher — SuperHumans (Channel 4, 2012), A-level analysis</div>
+      </div>
+      <div class="video-embed">
+        <div class="wrap"><iframe src="https://www.youtube.com/embed/LI3iaK0yAPM" title="Mrs Fisher — Kiss of the Vampire analysis" allowfullscreen></iframe></div>
+        <div class="caption">Mrs Fisher — Kiss of the Vampire (1963 poster), A-level analysis</div>
+      </div>
+
+      <div class="subhead">Read</div>
+      <a class="link-box" href="https://resource.download.wjec.co.uk/vtc/2021-22/wjec21-22_10-8/super-human-tokyo-2020-paralympics-fact-sheet.pdf" target="_blank" rel="noopener">Official Eduqas fact sheet — SuperHumans</a>
+      <a class="link-box" href="https://resource.download.wjec.co.uk/vtc/2016-17/16-17_1-28/kiss-of-the-vampire.pdf" target="_blank" rel="noopener">Official Eduqas fact sheet — Kiss of the Vampire</a>
+
+      <div class="subhead">Wider comparison</div>
+      <div class="wider-box">
+        <h4>Sport England — "This Girl Can" (2015)</h4>
+        <div class="video-embed">
+          <div class="wrap"><iframe src="https://www.youtube.com/embed/1AHO8rMioSk" title="Mrs Fisher — This Girl Can analysis" allowfullscreen></iframe></div>
+          <div class="caption">Mrs Fisher — This Girl Can (2015). Note: this video is pitched at GCSE level, so use it for the campaign's binary-opposition logic (capable/incapable, judged/unjudged) rather than as an A-level model answer.</div>
+        </div>
+        <p style="margin:8px 0 0;">Like SuperHumans, this campaign sets up and then deliberately disrupts a binary — worth comparing how each text resolves the opposition it creates.</p>
+      </div>
+
+      <div class="subhead">Apply — independent task</div>
+      <div class="task-box">
+        <p style="margin-top:0;">Using SuperHumans or Kiss of the Vampire, identify one binary opposition the advert/poster sets up (e.g. able-bodied/disabled, human/monster, safe/threatening). Explain how media language (camera, editing, mise-en-scène, or layout) constructs each side of the opposition, and what ideological message this creates.</p>
+      </div>
+      <div class="theorist-line">Key theorist: <strong>Lévi-Strauss</strong> — binary oppositions.</div>
+    </div>
+  </details>
+
+  <!-- WEEK 3 -->
+  <details class="week" id="week-3">
+    <summary class="week-head">
+      <span class="badge badge-ad">Week 3 · Advertising</span>
+      <span class="wk-meta">
+        <span class="wk-title">Gender &amp; Disability Representation</span>
+        <span class="wk-theory">Theory focus: van Zoonen, bell hooks, Hall</span>
+      </span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="week-body">
+      <div class="subhead">Set texts</div>
+      <div class="text-tags">
+        <span class="text-tag">Tide</span>
+        <span class="text-tag">SuperHumans</span>
+      </div>
+      <p style="margin:0 0 12px; font-size:14px; color:var(--muted);">Revisit the Week 1 Tide video and Week 2 SuperHumans video, but this time read them through a representation lens rather than a semiotic or binary-opposition one.</p>
+
+      <div class="subhead">Wider comparison</div>
+      <div class="wider-box">
+        <h4>Gillette — "The Best Men Can Be" (2019)</h4>
+        <div class="search-box"><a href="https://www.youtube.com/results?search_query=Gillette+The+Best+Men+Can+Be+advert" target="_blank" rel="noopener">Search: Gillette "The Best Men Can Be"</a></div>
+        <p style="margin:8px 0 0;">A direct rewrite of the domestic gender codes Tide relies on nearly 70 years earlier — useful for tracking how gender representation has shifted (or been contested) over time.</p>
+      </div>
+
+      <div class="subhead">Apply — independent task</div>
+      <div class="task-box">
+        <p style="margin-top:0;">Write a short response applying <strong>van Zoonen's</strong> feminist theory to Tide — what version of womanhood does the advert construct as "normal" or desirable? Then apply <strong>bell hooks'</strong> concept of intersectionality or <strong>Hall's</strong> representation theory to SuperHumans — does the advert empower disabled athletes, or does it risk constructing them as "other" through the way it represents difference? Finish with 2–3 sentences linking the two: what do both adverts suggest about whose identity is treated as the default?</p>
+      </div>
+      <div class="theorist-line">Key theorists: <strong>van Zoonen</strong> — feminist theory, gender. <strong>bell hooks</strong> — intersectionality, patriarchal oppression. <strong>Hall</strong> — representation, preferred/oppositional readings.</div>
+    </div>
+  </details>
+
+  <!-- WEEK 4 -->
+  <details class="week" id="week-4">
+    <summary class="week-head">
+      <span class="badge badge-mv">Week 4 · Music Video</span>
+      <span class="wk-meta">
+        <span class="wk-title">Identity Construction</span>
+        <span class="wk-theory">Theory focus: Gauntlett, Hall</span>
+      </span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="week-body">
+      <div class="subhead">Set texts</div>
+      <div class="text-tags">
+        <span class="text-tag">Underdog — Alicia Keys (2020)</span>
+        <span class="text-tag">Seventeen Going Under — Sam Fender (2021)</span>
+      </div>
+
+      <div class="subhead">Watch</div>
+      <div class="video-embed">
+        <div class="wrap"><iframe src="https://www.youtube.com/embed/izyZLKIWGiA" title="Alicia Keys — Underdog (Official Video)" allowfullscreen></iframe></div>
+        <div class="caption">Alicia Keys — "Underdog" (Official Video), dir. Wendy Morgan</div>
+      </div>
+      <div class="video-embed">
+        <div class="wrap"><iframe src="https://www.youtube.com/embed/lviy-vZPvQM" title="Mrs Fisher — Seventeen Going Under analysis" allowfullscreen></iframe></div>
+        <div class="caption">Mrs Fisher — Seventeen Going Under (Sam Fender), A-level analysis</div>
+      </div>
+      <div class="search-box"><strong>Underdog analysis:</strong> Mrs Fisher's channel has an A-level video on Beyoncé's <em>Formation</em>, which was the set text in this slot on an earlier version of the spec — <a href="https://www.youtube.com/@mrsfisher8961/search?query=Underdog" target="_blank" rel="noopener">search her channel for "Underdog"</a> to check whether she's since covered Alicia Keys directly, and double-check with your teacher which text your current spec year requires.</div>
+
+      <div class="subhead">Read</div>
+      <a class="link-box" href="https://resource.download.wjec.co.uk/vtc/2021-22/wjec21-22_10-11/pdf/sam-fender-music-video-fact-sheet_.pdf" target="_blank" rel="noopener">Official Eduqas fact sheet — Sam Fender, Seventeen Going Under</a>
+
+      <div class="subhead">Wider comparison</div>
+      <div class="wider-box">
+        <h4>Billie Eilish — "bury a friend" (2019)</h4>
+        <div class="search-box"><a href="https://www.youtube.com/results?search_query=Billie+Eilish+bury+a+friend+official+video" target="_blank" rel="noopener">Search: Billie Eilish "bury a friend"</a></div>
+        <p style="margin:8px 0 0;">A deliberately constructed, image-driven persona — a useful contrast to the "authenticity" codes Sam Fender's video relies on.</p>
+      </div>
+
+      <div class="subhead">Apply — independent task</div>
+      <div class="task-box">
+        <p style="margin-top:0;">Using Gauntlett's "pick and mix" identity theory, write a paragraph on how Underdog or Seventeen Going Under constructs the artist's persona through media language choices (performance style, location, editing, colour). Then use Hall's representation theory to consider whose story is centred and how an audience might read the video's message about class, struggle, or belonging.</p>
+      </div>
+      <div class="theorist-line">Key theorists: <strong>Gauntlett</strong> — identity, pick and mix. <strong>Hall</strong> — representation, reception theory.</div>
+    </div>
+  </details>
+
+  <!-- WEEK 5 -->
+  <details class="week" id="week-5">
+    <summary class="week-head">
+      <span class="badge badge-theory">Week 5 · Cross-topic</span>
+      <span class="wk-meta">
+        <span class="wk-title">Postcolonialism &amp; Otherness</span>
+        <span class="wk-theory">Theory focus: Gilroy, bell hooks</span>
+      </span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="week-body">
+      <div class="subhead">Set texts</div>
+      <div class="text-tags">
+        <span class="text-tag">Kiss of the Vampire (1963 poster)</span>
+        <span class="text-tag">Underdog — Alicia Keys</span>
+      </div>
+      <p style="margin:0 0 12px; font-size:14px; color:var(--muted);">This week links back to Week 2's advertising text and Week 4's music video text, read now through a postcolonial lens — the deliberate cross-topic pairing the exam rewards.</p>
+
+      <div class="subhead">Wider comparison</div>
+      <div class="wider-box">
+        <h4>Beyoncé — "Formation" (2016)</h4>
+        <div class="video-embed">
+          <div class="wrap"><iframe src="https://www.youtube.com/embed/yMiUnvZ6JXo" title="Mrs Fisher — Formation analysis" allowfullscreen></iframe></div>
+          <div class="caption">Mrs Fisher — Formation (Beyoncé), A-level analysis</div>
+        </div>
+        <a class="link-box" href="https://resource.download.wjec.co.uk/vtc/2016-17/16-17_1-29/eng/Formation.pdf" target="_blank" rel="noopener">Official Eduqas fact sheet — Formation</a>
+      </div>
+      <div class="wider-box" style="margin-top:12px;">
+        <h4>Childish Gambino — "This Is America" (2018)</h4>
+        <div class="search-box"><a href="https://www.youtube.com/results?search_query=Childish+Gambino+This+Is+America+official+video" target="_blank" rel="noopener">Search: Childish Gambino "This Is America"</a></div>
+        <p style="margin:8px 0 0;">A high-stakes comparison point for binary oppositions (Week 2) and otherness — strong intersectional/postcolonial reading potential alongside Underdog.</p>
+      </div>
+
+      <div class="subhead">Apply — independent task</div>
+      <div class="task-box">
+        <p style="margin-top:0;">Apply Gilroy's concept of "otherness" to Kiss of the Vampire — how does the poster construct the vampire as culturally, racially, or sexually "other"? Then apply bell hooks' intersectionality to Underdog or Formation, considering how race, gender, and class intersect in the representation of the video's subjects. Write 2–3 sentences linking your two answers — what do both texts suggest about who is centred and who is "othered" in mainstream media?</p>
+      </div>
+      <div class="theorist-line">Key theorists: <strong>Gilroy</strong> — postcolonialism, otherness. <strong>bell hooks</strong> — intersectionality.</div>
+    </div>
+  </details>
+
+  <!-- WEEK 6 -->
+  <details class="week" id="week-6">
+    <summary class="week-head">
+      <span class="badge badge-theory">Week 6 · Synoptic</span>
+      <span class="wk-meta">
+        <span class="wk-title">Audiences &amp; Exam Practice</span>
+        <span class="wk-theory">Theory focus: Bandura, Gerbner, Jenkins, Shirky</span>
+      </span>
+      <span class="chev">▶</span>
+    </summary>
+    <div class="week-body">
+      <div class="subhead">Set texts</div>
+      <div class="text-tags">
+        <span class="text-tag">All Section A set texts</span>
+      </div>
+      <p style="margin:0 0 12px; font-size:14px; color:var(--muted);">No new text this week — the task is to draw everything from Weeks 1–5 together, in line with what the exam expects.</p>
+
+      <div class="subhead">Watch</div>
+      <div class="search-box">Audience theory isn't tied to one text, so search each theorist directly rather than following a single link: <a href="https://www.youtube.com/@mrsfisher8961/search?query=audience%20theory" target="_blank" rel="noopener">Mrs Fisher — "audience theory"</a> · <a href="https://www.youtube.com/c/TheMediaInsider/search?query=fandom%20participatory%20culture" target="_blank" rel="noopener">The Media Insider — "fandom, participatory culture"</a></div>
+
+      <div class="subhead">Wider comparison</div>
+      <div class="wider-box">
+        <h4>Fan and remix culture</h4>
+        <p style="margin:0;">Look at how fans have responded to, remixed, or reacted to any of your set texts online (YouTube reaction videos, TikTok edits, fan forums). This is your evidence base for Jenkins and Shirky.</p>
+      </div>
+
+      <div class="subhead">Apply — independent task: exam-style extended response</div>
+      <div class="task-box">
+        <p style="margin-top:0;">Write a plan (bullet points, not full prose) for the following question: <em>"Compare how audiences might respond differently to two of your set products, using relevant audience theory."</em> Your plan should reference at least two set texts across advertising and music video, and at least two audience theorists (Bandura, Gerbner, Jenkins, Shirky). Bring your plan to the in-class assessment as revision.</p>
+      </div>
+      <div class="theorist-line">Key theorists: <strong>Bandura</strong> — media effects. <strong>Gerbner</strong> — cultivation theory. <strong>Jenkins</strong> — fandom, participatory culture, textual poaching. <strong>Shirky</strong> — end of audience, prosumers.</div>
+    </div>
+  </details>
+
+  <!-- WEEK 7 / ASSESSMENT -->
+  <section class="block" id="week-7" style="margin-top:40px;">
+    <div class="exam-block">
+      <h2 class="section-title" style="margin-top:0;">In-Class Assessment</h2>
+      <p>Once all six weeks are complete, you'll sit an in-class assessment covering media language, representation, and the theorists applied across advertising and music video.</p>
+      <p>To prepare:</p>
+      <ul>
+        <li>Review your six weekly "Apply" tasks — these are your revision notes.</li>
+        <li>Make sure you can name and briefly define all ten theorists covered.</li>
+        <li>Practise moving between texts confidently: an exam question may ask you to compare an advert and a music video using the same theory.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  A-Level Media Studies (Eduqas) · Component 1, Section A · Music Video &amp; Advertising Independent Study
+</footer>
+
+</body>
+</html>
