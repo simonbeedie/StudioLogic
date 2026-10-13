@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>No Time to Die: Media Industries Quiz</title>
+<style>
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  --bg: #0D0D0D;
+  --card: #1a1a1a;
+  --card-2: #242424;
+  --text: #f2efe6;
+  --muted: #b5b0a2;
+  --gold: #C9A84C;
+  --gold-dim: #8f7733;
+  --line: #3a3a3a;
+  --good: #5fd08a;
+  --good-bg: #12301f;
+  --bad: #ff7b7b;
+  --bad-bg: #3a1515;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0D0D0D; } }
+:root[data-theme="dark"] { --bg: #0D0D0D; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font-family: Calibri, Carlito, "Segoe UI", Arial, sans-serif;
+  font-size: 17px; line-height: 1.45;
+}
+.wrap { max-width: 800px; margin: 0 auto; padding: 18px 16px 48px; }
+header.top { text-align: center; padding: 10px 0 14px; border-bottom: 2px solid var(--gold); margin-bottom: 16px; }
+header.top .kicker { color: var(--gold); letter-spacing: .18em; text-transform: uppercase; font-size: 13px; font-weight: 700; }
+header.top h1 { margin: 4px 0 2px; font-size: 28px; }
+header.top p { margin: 0; color: var(--muted); font-size: 15px; }
+
+.steps { display: flex; gap: 8px; margin-bottom: 16px; }
+.step { flex: 1; text-align: center; padding: 8px 4px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); font-size: 14px; background: var(--card); }
+.step.active { border-color: var(--gold); color: var(--gold); font-weight: 700; }
+.step.done { color: var(--text); }
+
+.page { display: none; }
+.page.show { display: block; }
+.page-title { color: var(--gold); font-size: 22px; margin: 0 0 4px; }
+.page-sub { color: var(--muted); margin: 0 0 14px; font-size: 15px; }
+
+.q { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: 10px; padding: 14px 14px 12px; margin-bottom: 14px; }
+.q .meta { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+.q .num { color: var(--gold); font-weight: 700; }
+.q .text { font-weight: 600; margin-bottom: 10px; }
+.opt { display: flex; gap: 10px; align-items: flex-start; padding: 9px 11px; margin-bottom: 7px; border: 1px solid var(--line); border-radius: 8px; background: var(--card-2); cursor: pointer; }
+.opt:hover { border-color: var(--gold-dim); }
+.opt input { margin-top: 4px; accent-color: var(--gold); }
+.opt.picked { border-color: var(--gold); }
+input[type=text] {
+  width: 100%; padding: 10px 12px; font: inherit; color: var(--text);
+  background: var(--card-2); border: 1px solid var(--line); border-radius: 8px;
+}
+input[type=text]:focus { outline: 2px solid var(--gold); border-color: var(--gold); }
+.q.locked .opt, .q.locked input[type=text] { cursor: default; }
+.q.right { border-left-color: var(--good); background: var(--good-bg); }
+.q.wrong { border-left-color: var(--bad); background: var(--bad-bg); }
+.fb { margin-top: 8px; font-size: 15px; }
+.fb strong.ok { color: var(--good); }
+.fb strong.no { color: var(--bad); }
+
+.nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 8px; }
+button {
+  font: inherit; font-weight: 700; padding: 11px 20px; border-radius: 8px; cursor: pointer;
+  border: 2px solid var(--gold); background: transparent; color: var(--gold);
+}
+button.primary { background: var(--gold); color: #0D0D0D; }
+button:hover { filter: brightness(1.12); }
+button[disabled] { opacity: .35; cursor: default; }
+.warn { color: var(--gold); font-size: 15px; margin-top: 10px; text-align: right; min-height: 1.2em; }
+
+/* Results panel */
+#results { display: none; margin-bottom: 28px; }
+.panel { border: 3px solid var(--gold); border-radius: 12px; background: var(--card); padding: 18px; }
+.panel h2 { margin: 0; color: var(--gold); font-size: 21px; }
+.panel .sub { color: var(--muted); font-size: 14px; margin-bottom: 12px; }
+.score { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; padding: 10px 0 14px; border-bottom: 1px solid var(--line); }
+.score .big { font-size: 46px; font-weight: 800; line-height: 1; }
+.score .pct { font-size: 28px; color: var(--gold); font-weight: 700; }
+.score .band { color: var(--muted); font-size: 15px; }
+table.grid { width: 100%; border-collapse: collapse; margin-top: 12px; }
+table.grid th, table.grid td { border: 1px solid var(--line); padding: 8px 9px; text-align: left; vertical-align: top; }
+table.grid th { color: var(--gold); font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { min-width: 46px; text-align: center; padding: 2px 7px; border-radius: 6px; font-weight: 700; font-size: 14px; border: 1px solid; }
+.chip.r { color: var(--good); border-color: var(--good); background: var(--good-bg); }
+.chip.w { color: var(--bad); border-color: var(--bad); background: var(--bad-bg); }
+.chip.b { color: var(--muted); border-color: var(--line); }
+.status-ok { color: var(--good); font-weight: 700; }
+.status-no { color: var(--bad); font-weight: 700; }
+.weak { margin-top: 14px; padding: 11px 13px; border: 1px solid var(--gold); border-radius: 8px; }
+.weak strong { color: var(--gold); }
+.review-head { color: var(--gold); font-size: 22px; margin: 6px 0 4px; }
+.review-note { color: var(--muted); margin: 0 0 14px; font-size: 15px; }
+@media (max-width: 520px) {
+  header.top h1 { font-size: 23px; }
+  .score .big { font-size: 38px; }
+  table.grid th, table.grid td { padding: 6px 5px; font-size: 14px; }
+  .chip { min-width: 40px; padding: 1px 4px; font-size: 13px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="kicker">Film · Media Industries</div>
+    <h1>No Time to Die: Knowledge Check</h1>
+    <p>21 questions · 3 pages · answers lock when you submit</p>
+  </header>
+
+  <div id="results"></div>
+
+  <div id="quiz">
+    <div class="steps" id="steps"></div>
+    <div id="pages"></div>
+    <div class="nav">
+      <button id="back" type="button">Back</button>
+      <button id="next" type="button" class="primary">Next</button>
+    </div>
+    <div class="warn" id="warn" role="status"></div>
+  </div>
+</div>
+
+<script>
+var SECTIONS = {
+  IC: "Industry Context",
+  ORG: "Organisation",
+  FR: "Franchise & Synergy",
+  CONV: "Convergence",
+  REG: "Regulation"
+};
+
+/* type: mc (options, answer index) or sa (accept: list of alternatives; each alternative = list of terms that must ALL appear) */
+var QUESTIONS = [
+  // PAGE 1
+  { page:0, sec:"IC", type:"mc", q:"Which British company produces the Bond films and keeps tight creative control of the franchise?",
+    options:["Universal Pictures","Eon Productions","Comcast","Heineken Films"], answer:1 },
+  { page:0, sec:"IC", type:"sa", q:"Name ONE of the producers who head Eon Productions (surname is fine).",
+    accept:[["broccoli"],["wilson"]], model:"Barbara Broccoli or Michael G. Wilson" },
+  { page:0, sec:"IC", type:"mc", q:"Which company handled the international theatrical distribution of No Time to Die (2021)?",
+    options:["MGM","Eon Productions","Universal Pictures","The BBFC"], answer:2 },
+  { page:0, sec:"IC", type:"sa", q:"What media industry term describes a major blockbuster designed to support a studio's annual revenue?",
+    accept:[["tentpole"],["tent pole"]], model:"A tentpole film" },
+  { page:0, sec:"ORG", type:"sa", q:"Universal Pictures is a division of NBCUniversal, which is owned by which giant US conglomerate?",
+    accept:[["comcast"]], model:"Comcast" },
+  { page:0, sec:"ORG", type:"mc", q:"What is a conglomerate?",
+    options:["A company that only makes films","A government body that rates films","A very large company that owns numerous smaller companies, often across different media sectors","A group of fans who promote a film online"], answer:2 },
+  { page:0, sec:"ORG", type:"mc", q:"Vertical integration is when a company...",
+    options:["Owns different stages of the same industry, such as production, distribution and exhibition","Owns lots of companies at the same stage of the industry","Is owned by a government","Only sells its films through one cinema"], answer:0 },
+  { page:0, sec:"ORG", type:"mc", q:"According to the booklet, which of these is an example of horizontal integration through synergy in the promotion of No Time to Die?",
+    options:["The BBFC awarding a 12A rating","Using the theme song (music industry) to advertise the film (film industry)","Eon Productions hiring a new director","The film being delayed twice"], answer:1 },
+
+  // PAGE 2
+  { page:1, sec:"FR", type:"sa", q:"What term describes content with a built-in audience because the brand is already well known, like Bond?",
+    accept:[["presold"],["pre sold"]], model:"Pre-sold content" },
+  { page:1, sec:"FR", type:"sa", q:"Name ONE brand that paid to partner with No Time to Die through product placement or a tie-in.",
+    accept:[["aston"],["land rover"],["rover"],["omega"],["heineken"]], model:"Aston Martin, Land Rover, Omega or Heineken" },
+  { page:1, sec:"FR", type:"mc", q:"How do brand tie-ins act as a form of risk reduction for the studios?",
+    options:["They make the film shorter","Brands pay large sums, which helps cover the £200 million+ budget","They stop the film being delayed","They guarantee a higher age rating"], answer:1 },
+  { page:1, sec:"FR", type:"mc", q:"Which of these brands is NOT named in the booklet as a partner of the film?",
+    options:["Aston Martin","Omega","Heineken","Coca-Cola"], answer:3 },
+  { page:1, sec:"CONV", type:"sa", q:"What term refers to the joining of different media platforms (cinema, television, internet, social media) to share or create content?",
+    accept:[["convergence"]], model:"Media convergence" },
+  { page:1, sec:"CONV", type:"mc", q:"What role does the Official James Bond 007 website play in the franchise's marketing?",
+    options:["It is a separate site with no links to other platforms","It is the central hub, linking out to social media, video platforms and e-commerce sites","It is only used to sell cinema tickets","It is run by the BBFC"], answer:1 },
+  { page:1, sec:"CONV", type:"mc", q:"Why was social media engagement so important for No Time to Die?",
+    options:["It replaced the need for a cinema release","It was used to rate the film","A drip-feed of content kept audiences engaged and excited throughout the two-year delay","It was the only way to watch the trailer"], answer:2 },
+
+  // PAGE 3
+  { page:2, sec:"REG", type:"sa", q:"What does BBFC stand for?",
+    accept:[["british","board","film","classification"]], model:"British Board of Film Classification" },
+  { page:2, sec:"REG", type:"mc", q:"What does the 12A rating mean?",
+    options:["Only people aged 12 and over may enter the cinema","Generally suitable for ages 12 and over, but younger children may see it if accompanied by an adult aged 18+","Suitable for all ages with no restrictions","Only adults aged 18 and over may watch"], answer:1 },
+  { page:2, sec:"REG", type:"sa", q:"Give ONE reason No Time to Die received a 12A rating.",
+    accept:[["violence"],["language"],["sexual"]], model:"Moderate violence, occasional strong language, or references to sexual violence" },
+  { page:2, sec:"REG", type:"mc", q:"What type of organisation is the BBFC?",
+    options:["A non-governmental organisation","A Hollywood studio","A film distributor","A UK cinema chain"], answer:0 },
+  { page:2, sec:"IC", type:"mc", q:"Mixed recall: What was the estimated production budget of No Time to Die?",
+    options:["Around £20 million","Around £75 million","Over £200 million (US$250 million+)","Over £2 billion"], answer:2 },
+  { page:2, sec:"IC", type:"sa", q:"Mixed recall: Which US studio historically holds the rights to Bond and plays a major role in financing the films?",
+    accept:[["mgm"],["metro","goldwyn","mayer"]], model:"MGM (Metro-Goldwyn-Mayer)" }
+];
+
+var PAGE_INFO = [
+  { title:"Page 1: Industry Context & Organisation", sub:"Who makes, finances and distributes the Bond films, and how big studios are structured." },
+  { title:"Page 2: Franchise, Synergy & Convergence", sub:"Pre-sold content, brand partnerships, the website and social media." },
+  { title:"Page 3: Regulation & Mixed Recall", sub:"The BBFC and 12A, plus two questions from earlier in the booklet." }
+];
+
+var current = 0, submitted = false, warned = false;
+var answers = {}; // index -> value
+
+/* ---------- helpers ---------- */
+function norm(s) {
+  return String(s).toLowerCase().replace(/[-\u2013\u2014_]/g, " ").replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim();
+}
+function lev(a, b) {
+  var m = a.length, n = b.length, i, j, d = [];
+  for (i = 0; i <= m; i++) { d[i] = [i]; }
+  for (j = 1; j <= n; j++) { d[0][j] = j; }
+  for (i = 1; i <= m; i++) for (j = 1; j <= n; j++) {
+    d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+  }
+  return d[m][n];
+}
+function termMatch(ans, term) {
+  var t = norm(term);
+  if (ans.indexOf(t) !== -1) return true;
+  var tNo = t.replace(/ /g, ""), aNo = ans.replace(/ /g, "");
+  if (aNo.indexOf(tNo) !== -1) return true;
+  var limit = tNo.length >= 9 ? 2 : (tNo.length >= 5 ? 1 : 0);
+  if (limit === 0) return false;
+  var toks = ans.split(" "), size = t.split(" ").length, k, g;
+  for (k = 0; k + size <= toks.length; k++) {
+    g = toks.slice(k, k + size).join("").replace(/ /g, "");
+    if (lev(g, tNo) <= limit) return true;
+  }
+  return false;
+}
+function markSA(q, raw) {
+  var ans = norm(raw);
+  if (!ans) return false;
+  return q.accept.some(function (alt) {
+    return alt.every(function (term) { return termMatch(ans, term); });
+  });
+}
+function isAnswered(i) {
+  var v = answers[i];
+  if (QUESTIONS[i].type === "mc") return typeof v === "number";
+  return typeof v === "string" && v.trim() !== "";
+}
+function isCorrect(i) {
+  var q = QUESTIONS[i], v = answers[i];
+  if (!isAnswered(i)) return false;
+  return q.type === "mc" ? v === q.answer : markSA(q, v);
+}
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/* ---------- build ---------- */
+function build() {
+  var steps = document.getElementById("steps"), pages = document.getElementById("pages"), html = "", p, i;
+  for (p = 0; p < 3; p++) {
+    html += '<section class="page" id="page' + p + '"><h2 class="page-title">' + PAGE_INFO[p].title + '</h2><p class="page-sub">' + PAGE_INFO[p].sub + '</p>';
+    for (i = 0; i < QUESTIONS.length; i++) {
+      if (QUESTIONS[i].page !== p) continue;
+      html += qHTML(i);
+    }
+    html += '</section>';
+  }
+  pages.innerHTML = html;
+  show(0);
+}
+function qHTML(i) {
+  var q = QUESTIONS[i], h = '<div class="q" id="q' + i + '"><div class="meta"><span><span class="num">Q' + (i + 1) + '</span> · ' + SECTIONS[q.sec] + '</span><span>' + (q.type === "mc" ? "Multiple choice" : "Short answer") + '</span></div>';
+  h += '<div class="text">' + esc(q.q) + '</div>';
+  if (q.type === "mc") {
+    q.options.forEach(function (o, k) {
+      h += '<label class="opt" id="o' + i + '_' + k + '"><input type="radio" name="q' + i + '" value="' + k + '"> <span>' + esc(o) + '</span></label>';
+    });
+  } else {
+    h += '<input type="text" id="t' + i + '" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type your answer">';
+  }
+  h += '<div class="fb" id="fb' + i + '"></div></div>';
+  return h;
+}
+
+/* ---------- navigation ---------- */
+function show(n) {
+  current = n;
+  for (var p = 0; p < 3; p++) {
+    document.getElementById("page" + p).classList.toggle("show", p === n || submitted);
+  }
+  var s = "";
+  for (var k = 0; k < 3; k++) {
+    s += '<div class="step' + (k === n ? " active" : "") + (k < n ? " done" : "") + '">Page ' + (k + 1) + '</div>';
+  }
+  document.getElementById("steps").innerHTML = s;
+  document.getElementById("back").disabled = n === 0;
+  var nx = document.getElementById("next");
+  nx.textContent = n === 2 ? "Submit for marking" : "Next";
+  document.getElementById("warn").textContent = "";
+  warned = false;
+  if (!submitted) window.scrollTo(0, 0);
+}
+
+document.addEventListener("change", function (e) {
+  if (submitted) return;
+  var t = e.target;
+  if (t.type === "radio") {
+    var i = parseInt(t.name.slice(1), 10);
+    answers[i] = parseInt(t.value, 10);
+    QUESTIONS[i].options.forEach(function (o, k) {
+      document.getElementById("o" + i + "_" + k).classList.toggle("picked", k === answers[i]);
+    });
+  }
+});
+document.addEventListener("input", function (e) {
+  if (submitted) return;
+  var t = e.target;
+  if (t.type === "text") {
+    answers[parseInt(t.id.slice(1), 10)] = t.value;
+  }
+});
+
+document.getElementById("back").onclick = function () { if (current > 0) show(current - 1); };
+document.getElementById("next").onclick = function () {
+  if (current < 2) { show(current + 1); return; }
+  var missing = 0;
+  for (var i = 0; i < QUESTIONS.length; i++) if (!isAnswered(i)) missing++;
+  if (missing > 0 && !warned) {
+    warned = true;
+    document.getElementById("warn").textContent = "You have " + missing + " unanswered question" + (missing === 1 ? "" : "s") + ". Press Submit again to mark anyway. You cannot change answers afterwards.";
+    return;
+  }
+  if (missing === 0 && !warned) {
+    warned = true;
+    document.getElementById("warn").textContent = "Final check: you cannot change answers after submitting. Press Submit again to confirm.";
+    return;
+  }
+  submit();
+};
+
+/* ---------- marking ---------- */
+function submit() {
+  submitted = true;
+  var i, q, ok, card, fb;
+  for (i = 0; i < QUESTIONS.length; i++) {
+    q = QUESTIONS[i]; ok = isCorrect(i);
+    card = document.getElementById("q" + i);
+    card.classList.add("locked", ok ? "right" : "wrong");
+    fb = document.getElementById("fb" + i);
+    var correctText = q.type === "mc" ? q.options[q.answer] : q.model;
+    fb.innerHTML = ok
+      ? '<strong class="ok">✓ Correct</strong>'
+      : '<strong class="no">✗ Incorrect' + (isAnswered(i) ? '' : ' (no answer)') + '</strong> Correct answer: ' + esc(correctText);
+    if (q.type === "mc") {
+      var radios = document.getElementsByName("q" + i);
+      for (var r = 0; r < radios.length; r++) radios[r].disabled = true;
+    } else {
+      document.getElementById("t" + i).disabled = true;
+    }
+  }
+  document.getElementById("steps").style.display = "none";
+  document.querySelector(".nav").style.display = "none";
+  document.getElementById("warn").style.display = "none";
+  for (var p = 0; p < 3; p++) document.getElementById("page" + p).classList.add("show");
+  buildResults();
+  var pagesEl = document.getElementById("pages");
+  pagesEl.insertAdjacentHTML("afterbegin", '<h2 class="review-head">Review your answers</h2><p class="review-note">Scroll down to see every question with the correct answer. Screenshot the results box at the top for your OneNote.</p>');
+  document.getElementById("results").scrollIntoView();
+}
+
+function buildResults() {
+  var total = QUESTIONS.length, score = 0, i, key;
+  var bySec = {};
+  Object.keys(SECTIONS).forEach(function (k) { bySec[k] = { got: 0, of: 0, chips: [] }; });
+  for (i = 0; i < total; i++) {
+    var ok = isCorrect(i), s = bySec[QUESTIONS[i].sec];
+    s.of++; if (ok) { s.got++; score++; }
+    s.chips.push('<span class="chip ' + (ok ? 'r' : 'w') + '">Q' + (i + 1) + ' ' + (ok ? '✓' : '✗') + '</span>');
+  }
+  var pct = Math.round(score / total * 100);
+  var band = pct >= 85 ? "Excellent: secure knowledge" : pct >= 65 ? "Good: a few gaps to close" : pct >= 45 ? "Developing: revisit the booklet" : "Needs support: re-read the booklet and try the comprehension checks";
+  var rows = "", weak = [];
+  Object.keys(SECTIONS).forEach(function (k) {
+    var s = bySec[k], low = s.got / s.of < 0.5;
+    if (low) weak.push(SECTIONS[k]);
+    rows += '<tr><td><strong>' + SECTIONS[k] + '</strong></td><td>' + s.got + ' / ' + s.of + '</td><td><div class="chips">' + s.chips.join("") + '</div></td><td class="' + (low ? 'status-no' : 'status-ok') + '">' + (low ? 'Revisit' : 'Secure') + '</td></tr>';
+  });
+  var weakText = weak.length
+    ? '<strong>Weak areas to revisit:</strong> ' + weak.join(", ")
+    : '<strong>Weak areas:</strong> none. You scored at least half in every section.';
+  document.getElementById("results").innerHTML =
+    '<div class="panel" id="panel"><h2>No Time to Die · Media Industries Quiz Results</h2>' +
+    '<div class="sub">Eduqas GCSE Media Studies · Film industry</div>' +
+    '<div class="score"><span class="big">' + score + ' / ' + total + '</span><span class="pct">' + pct + '%</span><span class="band">' + band + '</span></div>' +
+    '<table class="grid"><thead><tr><th>Section</th><th>Score</th><th>Questions</th><th>Status</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+    '<div class="weak">' + weakText + '</div></div>';
+  document.getElementById("results").style.display = "block";
+}
+
+build();
+</script>
+</body>
+</html>
