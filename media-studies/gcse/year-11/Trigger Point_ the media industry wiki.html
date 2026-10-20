@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trigger Point: the media industry wiki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  --bg: #F2F2F0;
+  --surface: #FFFFFF;
+  --surface2: #E8E7E3;
+  --text: #161616;
+  --muted: #55524A;
+  --accent: #7A5C0B;
+  --line: #CFCDC6;
+  --gold: #C9A84C;
+  --ink: #0D0D0D;
+  --focus: #1A56DB;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D0D0D; --surface: #181818; --surface2: #222222; --text: #EDEAE2;
+    --muted: #AFAA9E; --accent: #C9A84C; --line: #353535; --focus: #8AB4FF;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D0D0D; --surface: #181818; --surface2: #222222; --text: #EDEAE2;
+  --muted: #AFAA9E; --accent: #C9A84C; --line: #353535; --focus: #8AB4FF;
+}
+*, *::before, *::after { box-sizing: inherit; }
+html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 64px); scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font-family: "Work Sans", system-ui, -apple-system, "Segoe UI", Calibri, sans-serif;
+  font-size: 1.0625rem; line-height: 1.6;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); background: var(--bg); z-index: 10; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+a { color: var(--accent); text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+h1, h2 { font-family: "Bebas Neue", Impact, "Arial Narrow", sans-serif; font-weight: 400; letter-spacing: 0.02em; line-height: 1; margin: 0; }
+h3 { font-size: 1.15rem; margin: 2rem 0 0.75rem; }
+h4 { font-size: 1.02rem; margin: 0; }
+.wrap { max-width: 920px; margin: 0 auto; padding: 0 1.25rem; }
+
+/* hero: always dark */
+.hero { background: var(--ink); color: #EDEAE2; padding: 3rem 0 2.5rem; }
+.hero h1 { font-size: clamp(3rem, 11vw, 5.5rem); color: var(--gold); }
+.hero p { max-width: 60ch; color: #CFCBC0; }
+.hero .sub { font-size: 1.15rem; margin: 1rem 0 2rem; }
+.map { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 2px solid var(--gold); max-width: 640px; }
+.map a { display: block; padding: 1.1rem 1rem 1.25rem; color: #EDEAE2; text-decoration: none; min-height: 7.5rem; }
+.map a:nth-child(1) { border-right: 2px solid var(--gold); border-bottom: 2px solid var(--gold); }
+.map a:nth-child(2) { border-bottom: 2px solid var(--gold); }
+.map a:nth-child(3) { border-right: 2px solid var(--gold); }
+.map a:hover { background: #1c1c1c; }
+.map .n { display: block; font-family: "Bebas Neue", Impact, sans-serif; font-size: 1.5rem; color: var(--gold); line-height: 1; }
+.map .q { display: block; font-weight: 600; margin-top: 0.35rem; }
+.map-note { font-size: 0.9rem; margin-top: 0.75rem; }
+
+/* sticky nav */
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; gap: 0.5rem; align-items: center; overflow-x: auto; padding-top: 0.6rem; padding-bottom: 0.6rem; }
+.nav a { white-space: nowrap; padding: 0.35rem 0.8rem; border: 1px solid var(--line); border-radius: 999px; text-decoration: none; color: var(--text); font-size: 0.92rem; }
+.nav a:hover { border-color: var(--accent); }
+.nav .count { margin-left: auto; flex: none; white-space: nowrap; font-size: 0.9rem; color: var(--muted); padding-left: 0.75rem; }
+
+section { padding: 2.5rem 0; border-bottom: 1px solid var(--line); }
+section h2 { font-size: clamp(2.2rem, 7vw, 3.2rem); }
+.box-num { margin: 0 0 0.35rem; font-weight: 600; color: var(--accent); font-size: 0.95rem; }
+.lead { font-size: 1.12rem; max-width: 62ch; margin: 0.75rem 0 0; }
+
+.steps { counter-reset: s; list-style: none; padding: 0; margin: 1.25rem 0 0; display: grid; gap: 0.75rem; }
+.steps li { counter-increment: s; position: relative; padding-left: 2.6rem; max-width: 62ch; }
+.steps li::before { content: counter(s); position: absolute; left: 0; top: 0.05rem; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--gold); color: var(--ink); font-weight: 600; display: grid; place-items: center; font-size: 0.95rem; }
+
+.src-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); }
+.src { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--gold); padding: 1rem 1.1rem; border-radius: 4px; display: flex; flex-direction: column; }
+.src h4 a { color: var(--text); }
+.src-meta { margin: 0.3rem 0 0.7rem; font-size: 0.9rem; color: var(--muted); }
+.look-label { margin: 0 0 0.2rem; font-weight: 600; font-size: 0.95rem; }
+.src ul { margin: 0 0 0.9rem; padding-left: 1.15rem; font-size: 0.97rem; }
+.read { margin-top: auto; display: flex; gap: 0.5rem; align-items: center; font-size: 0.95rem; cursor: pointer; }
+.read input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent); }
+
+.tasks { padding-left: 1.3rem; max-width: 66ch; }
+.tasks li { margin-bottom: 0.7rem; }
+.check { margin-top: 1.25rem; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); }
+.check summary, .term summary, .qa summary { cursor: pointer; padding: 0.8rem 1rem; font-weight: 600; }
+.check-body { padding: 0 1.1rem 1rem; max-width: 70ch; }
+.check-body ul { padding-left: 1.2rem; margin: 0; }
+.check-body li { margin-bottom: 0.5rem; }
+.starter { margin-top: 1.25rem; border: 1px dashed var(--accent); padding: 0.8rem 1rem; border-radius: 4px; max-width: 70ch; }
+.starter p { margin: 0 0 0.3rem; }
+.starter p:last-child { margin: 0; color: var(--muted); }
+.note { margin: 1.25rem 0 0; padding: 0.8rem 1rem; background: var(--surface2); border-radius: 4px; max-width: 70ch; font-size: 0.97rem; }
+
+.theory-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.theory { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 1rem 1.1rem; }
+.theory p { margin: 0.5rem 0 0; font-size: 0.98rem; }
+.theory .apply { padding-top: 0.5rem; border-top: 1px solid var(--line); }
+
+.term, .qa { border: 1px solid var(--line); background: var(--surface); border-radius: 4px; margin-bottom: 0.5rem; }
+.term p, .qa p { margin: 0; padding: 0 1rem 0.9rem; }
+.terms-grid { display: grid; gap: 0 1rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); align-items: start; }
+
+.exam-q { background: var(--surface); border-left: 4px solid var(--accent); padding: 0.7rem 1rem; margin: 0 0 0.6rem; border-radius: 4px; }
+.model { border: 1px solid var(--line); background: var(--surface); border-radius: 4px; padding: 1rem 1.2rem; max-width: 70ch; }
+.model p { margin: 0 0 0.7rem; }
+.model p:last-child { margin: 0; }
+.peel { display: grid; gap: 0.5rem; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin: 0.75rem 0 0; padding: 0; list-style: none; }
+.peel li { background: var(--surface); border: 1px solid var(--line); padding: 0.7rem 0.9rem; border-radius: 4px; font-size: 0.97rem; }
+.peel strong { display: block; color: var(--accent); }
+
+footer { background: var(--ink); color: #BDB8AC; padding: 2rem 0; font-size: 0.92rem; }
+footer p { margin: 0 0 0.4rem; }
+@media (max-width: 480px) { .map a { min-height: 6.5rem; padding: 0.9rem 0.8rem; } body { font-size: 1rem; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>Trigger Point: the media industry</h1>
+    <p class="sub">GCSE Media Studies, Eduqas. Research how a hit ITV drama is made, paid for and delivered, then handwrite what you find on your A3 sheet.</p>
+    <nav class="map" aria-label="The four research boxes">
+      <a href="#box1"><span class="n">Box 1</span><span class="q">Who makes it?</span></a>
+      <a href="#box2"><span class="n">Box 2</span><span class="q">Who pays for it?</span></a>
+      <a href="#box3"><span class="n">Box 3</span><span class="q">How does it reach audiences?</span></a>
+      <a href="#box4"><span class="n">Box 4</span><span class="q">Why is it made this way?</span></a>
+    </nav>
+    <p class="map-note">These four boxes match the four boxes on your A3 sheet.</p>
+  </div>
+</header>
+
+<nav class="nav" aria-label="Page sections">
+  <div class="wrap">
+    <a href="#how">Start</a>
+    <a href="#box1">Box 1</a><a href="#box2">Box 2</a><a href="#box3">Box 3</a><a href="#box4">Box 4</a>
+    <a href="#exam">Exam</a><a href="#terms">Terms</a><a href="#quiz">Quiz</a>
+    <span class="count" aria-live="polite">Sources read: <span id="done">0</span> of <span id="total">0</span></span>
+  </div>
+</nav>
+
+<main>
+<section id="how">
+  <div class="wrap">
+    <h2>How to use this wiki</h2>
+    <ol class="steps">
+      <li>Pick a box. Open the articles in that box and read them with the “Look for” prompts in mind.</li>
+      <li>Answer the tasks by hand in the matching box on your A3 sheet. Use your own words rather than copying, and note which source each fact came from.</li>
+      <li>Open “Check your findings” only after you have written your answer, then add anything you missed in a different colour.</li>
+    </ol>
+    <div class="note">Some articles are about Series 1 (2022) rather than the Series 2 episode you have watched, and one contains spoilers for later episodes. Each article says which it is.</div>
+  </div>
+</section>
+
+<div class="wrap">
+<section id="box1" class="box">
+  <p class="box-num">Box 1 on your A3 sheet</p>
+  <h2>Who makes Trigger Point?</h2>
+  <p class="lead">A TV drama passes through several companies before it reaches your screen. Your job is to name the ones behind Trigger Point and explain what each one does.</p>
+  <h3>Read and research</h3>
+  <div class="src-grid">
+<article class="src">
+  <div class="src-head">
+    <h4><a href="https://itv.com/presscentre/node/12606" target="_blank" rel="noopener noreferrer">Filming is underway on second series of Trigger Point</a></h4>
+    <p class="src-meta">ITV Press Centre, March 2023. Official press release</p>
+  </div>
+  <p class="look-label">Look for:</p>
+  <ul><li>Who commissioned the series, and who produced it</li><li>Which company is named as the international distributor</li><li>How many viewers Series 1 attracted</li></ul>
+  <label class="read"><input type="checkbox" data-src="itv-filming"> I’ve read this</label>
+</article>
+<article class="src">
+  <div class="src-head">
+    <h4><a href="https://rts.org.uk/article/inside-jed-mercurios-new-itv-thriller-trigger-point" target="_blank" rel="noopener noreferrer">Inside Jed Mercurio’s new ITV thriller Trigger Point</a></h4>
+    <p class="src-meta">Royal Television Society, February 2022. About Series 1. Free to read.</p>
+  </div>
+  <p class="look-label">Look for:</p>
+  <ul><li>How HTM Television was set up and by whom</li><li>What the producer says about budget and where money is spent</li><li>Why the series was released weekly, with no box set until the end</li><li>How the writers and cast researched bomb disposal</li></ul>
+  <label class="read"><input type="checkbox" data-src="rts"> I’ve read this</label>
+</article></div>
+  <h3>Write in Box 1</h3>
+  <ol class="tasks"><li>Name the four links in the chain: the <strong>commissioner</strong>, the <strong>production company</strong>, the <strong>distributor</strong> and the <strong>broadcaster</strong>. Next to each, write who it is and one job it does.</li><li>Find out who owns the production company. Why might it matter that one of its owners also helped create Line of Duty?</li><li>Find one fact that shows how new writers get into TV.</li></ol>
+  <details class="check"><summary>Check your findings after you have researched</summary><div class="check-body"><ul>
+  <li><strong>Commissioner:</strong> ITV. Its drama chief decides which series to pay for.</li>
+  <li><strong>Production company:</strong> HTM Television, co-owned by Jed Mercurio and Hat Trick Productions. It hires the writers, directors, crew and cast and makes the programme.</li>
+  <li><strong>Distributor:</strong> All3Media International sells the series to broadcasters abroad.</li>
+  <li><strong>Broadcaster and platform:</strong> ITV1 and ITVX.</li>
+  <li><strong>Ownership link:</strong> Mercurio’s track record (Line of Duty, Bodyguard) is a selling point for ITV. A creator who also owns the company has real influence over what gets made.</li>
+  <li><strong>New writers:</strong> Daniel Brierley’s first TV job came through an industry bursary scheme, with Mercurio as his mentor.</li></ul></div></details>
+  <div class="starter"><p><strong>Sentence starters</strong></p><p>ITV commissions Trigger Point, which means… HTM Television produces it by… All3Media International distributes it, so…</p></div>
+</section></div>
+<div class="wrap">
+<section id="box2" class="box">
+  <p class="box-num">Box 2 on your A3 sheet</p>
+  <h2>Who pays for it?</h2>
+  <p class="lead">The BBC is paid for mainly by the licence fee. ITV is a commercial broadcaster. Your job is to explain how that changes what ITV wants from a drama like Trigger Point.</p>
+  <h3>Read and research</h3>
+  <div class="src-grid">
+<article class="src">
+  <div class="src-head">
+    <h4><a href="https://www.itv.com/presscentre/print/pdf/node/5837" target="_blank" rel="noopener noreferrer">Introducing ITVX: Britain’s freshest new free streaming service</a></h4>
+    <p class="src-meta">ITV Press Centre, March 2022. Official press release (PDF)</p>
+  </div>
+  <p class="look-label">Look for:</p>
+  <ul><li>What the free tier is paid for by</li><li>What a viewer gets if they upgrade</li><li>How this differs from the BBC’s funding</li></ul>
+  <label class="read"><input type="checkbox" data-src="itvx-launch"> I’ve read this</label>
+</article>
+<article class="src">
+  <div class="src-head">
+    <h4><a href="https://www.thedrum.com/news/2022/03/02/itv-launches-ad-and-subscription-funded-streamer-itvx-will-air-shows-linear" target="_blank" rel="noopener noreferrer">ITV launches ad and subscription-funded streamer ITVX</a></h4>
+    <p class="src-meta">The Drum, March 2022. Trade news</p>
+  </div>
+  <p class="look-label">Look for:</p>
+  <ul><li>How advertisers can use ITVX</li><li>What ITV says about changing viewing habits</li></ul>
+  <label class="read"><input type="checkbox" data-src="drum"> I’ve read this</label>
+</article>
+<article class="src">
+  <div class="src-head">
+    <h4><a href="https://uk.themedialeader.com/?p=251219" target="_blank" rel="noopener noreferrer">ITV to launch exclusive shows on streaming service ITVX</a></h4>
+    <p class="src-meta">The Media Leader, March 2022. Trade news</p>
+  </div>
+  <p class="look-label">Look for:</p>
+  <ul><li>ITV’s total advertising revenue for 2021</li><li>How much video-on-demand advertising grew</li></ul>
+  <label class="read"><input type="checkbox" data-src="media-leader"> I’ve read this</label>
+</article></div>
+  <h3>Write in Box 2</h3>
+  <ol class="tasks"><li>Explain in two sentences how ITV earns money from a programme shown on ITV1.</li><li>Explain how ITVX earns money. Find the difference between the free tier and the paid tier.</li><li>Compare this with the BBC’s funding of Luther. Why might an advertiser-funded broadcaster want a drama that millions of people watch?</li></ol>
+  <details class="check"><summary>Check your findings after you have researched</summary><div class="check-body"><ul>
+  <li><strong>ITV1:</strong> advertisers pay to show adverts around programmes. Bigger audiences mean ITV can charge more.</li>
+  <li><strong>ITVX:</strong> a free tier paid for by adverts, plus a premium subscription tier with no adverts.</li>
+  <li><strong>Scale:</strong> ITV’s total advertising revenue for 2021 was £2.1bn, and video-on-demand advertising grew by 41%.</li>
+  <li><strong>BBC comparison:</strong> the BBC is publicly funded through the licence fee, so it does not rely on selling advertising.</li>
+  <li><strong>Link to Trigger Point:</strong> both Trigger Point and The Sweeney are commercially funded, so large audiences matter to the broadcaster’s income.</li></ul></div></details>
+  <div class="starter"><p><strong>Sentence starters</strong></p><p>As a commercial broadcaster, ITV is funded by… This means ITV needs dramas that… In contrast, the BBC is funded by…</p></div>
+</section></div>
+<div class="wrap">
+<section id="box3" class="box">
+  <p class="box-num">Box 3 on your A3 sheet</p>
+  <h2>How does it reach audiences?</h2>
+  <p class="lead">Distribution is how a programme gets to its audience. Convergence is when older media, such as TV channels, join up with newer ones, such as streaming. Your job is to compare 1975 with 2024.</p>
+  <h3>Read and research</h3>
+  <div class="src-grid">
+<article class="src">
+  <div class="src-head">
+    <h4><a href="https://www.itv.com/presscentre/print/pdf/node/47031" target="_blank" rel="noopener noreferrer">ITV recommissions Trigger Point (series four)</a></h4>
+    <p class="src-meta">ITV Press Centre, June 2025. Official press release (PDF)</p>
+  </div>
+  <p class="look-label">Look for:</p>
+  <ul><li>Average viewers for Series 2 and how many ITVX streams it had</li><li>When series four was commissioned compared with when series three aired</li><li>Which company distributes the series abroad</li></ul>
+  <label class="read"><input type="checkbox" data-src="itv-recommission"> I’ve read this</label>
+</article>
+<article class="src">
+  <div class="src-head">
+    <h4><a href="https://rts.org.uk/article/inside-jed-mercurios-new-itv-thriller-trigger-point" target="_blank" rel="noopener noreferrer">Inside Jed Mercurio’s new ITV thriller Trigger Point</a></h4>
+    <p class="src-meta">Royal Television Society, February 2022. About Series 1. Free to read.</p>
+  </div>
+  <p class="look-label">Look for:</p>
+  <ul><li>How HTM Television was set up and by whom</li><li>What the producer says about budget and where money is spent</li><li>Why the series was released weekly, with no box set until the end</li><li>How the writers and cast researched bomb disposal</li></ul>
+  <label class="read"><input type="checkbox" data-src="rts"> I’ve read this</label>
+</article>
+<article class="src">
+  <div class="src-head">
+    <h4><a href="https://www.museum.tv/tv-encyclopedia-16/sweeney-the" target="_blank" rel="noopener noreferrer">The Sweeney (entry)</a></h4>
+    <p class="src-meta">Museum of Broadcast Communications TV Encyclopedia. Encyclopedia entry</p>
+  </div>
+  <p class="look-label">Look for:</p>
+  <ul><li>Who made The Sweeney and which company they belonged to</li><li>What it was filmed on, and why that mattered</li><li>How many countries it had been sold to by 1985</li></ul>
+  <label class="read"><input type="checkbox" data-src="museum"> I’ve read this</label>
+</article>
+<article class="src">
+  <div class="src-head">
+    <h4><a href="https://www.hebburn.net/wp-content/uploads/2022/04/The-Sweeney-Factsheet-2-Industry-Audience-Contexts.pdf" target="_blank" rel="noopener noreferrer">The Sweeney: Factsheet 2, Industry, Audience and Contexts</a></h4>
+    <p class="src-meta">GCSE Media Studies set product fact sheet (PDF). Revision fact sheet (PDF)</p>
+  </div>
+  <p class="look-label">Look for:</p>
+  <ul><li>How many ITV channels existed in 1974</li><li>Which company produced it and for which regional ITV franchise</li><li>What time slot it was broadcast in</li></ul>
+  <label class="read"><input type="checkbox" data-src="hebburn"> I’ve read this</label>
+</article></div>
+  <h3>Write in Box 3</h3>
+  <ol class="tasks"><li>Make a two-column comparison: <strong>The Sweeney (1975)</strong> and <strong>Trigger Point (2024)</strong>. Cover channels, how people watched, audience size and anything that happened to the programme afterwards.</li><li>Find the viewing figures for Trigger Point Series 1 and Series 2. What do they tell you?</li><li>Both are on ITV. Explain one way Trigger Point reaches audiences that The Sweeney could not.</li></ol>
+  <details class="check"><summary>Check your findings after you have researched</summary><div class="check-body"><ul>
+  <li><strong>The Sweeney (1975):</strong> made by Euston Films, part of Thames Television, for ITV. Only three channels existed, so a hit could reach a huge audience at a fixed time. It was shot on 16mm film on location and was sold to 51 countries by 1985. It also led to two cinema spin-off films.</li>
+  <li><strong>Trigger Point Series 1 (2022):</strong> broadcast weekly on ITV, with no box set until the series finished. Average audience 9.5 million per episode.</li>
+  <li><strong>Trigger Point Series 2 (2024):</strong> premiered on ITV1 and ITVX together. Average audience 8.1 million, and 30 million streams on ITVX.</li>
+  <li><strong>Convergence:</strong> one drama now reaches people on a TV channel, on demand and abroad through a distributor.</li>
+  <li><strong>Think about:</strong> why would ITV release a big drama on ITV1 and ITVX at the same time?</li></ul></div></details>
+  <div class="starter"><p><strong>Sentence starters</strong></p><p>In 1975, audiences could only watch The Sweeney by… In contrast, Trigger Point… This shows how convergence…</p></div>
+</section></div>
+<div class="wrap">
+<section id="box4" class="box">
+  <p class="box-num">Box 4 on your A3 sheet</p>
+  <h2>Why does ITV make it this way?</h2>
+  <p class="lead">Behind every programme are decisions about money, risk and realism. Your job is to find three of them and link at least one to a theory.</p>
+  <div class="note">We couldn’t find a “making of” video for Trigger Point on ITVX. Check the series page in the app for extras. These articles are the next best way to see behind the scenes.</div>
+  <h3>Two theories in plain language</h3>
+  <div class="theory-grid">
+    <div class="theory"><h4>Curran and Seaton: who owns and funds the media has power</h4>
+      <p>The people and companies that own and pay for media can shape what gets made. If a broadcaster earns money from advertisers, it needs programmes that bring in large audiences.</p>
+      <p class="apply"><strong>Apply it:</strong> ITV needs big audiences to sell advertising, so it commissions gripping, mass-appeal thrillers.</p></div>
+    <div class="theory"><h4>Hesmondhalgh: cultural industries try to reduce risk</h4>
+      <p>Making TV is expensive and nobody knows for certain whether audiences will like it. So companies reduce risk by using proven stars and creators, bringing series back, and selling programmes around the world.</p>
+      <p class="apply"><strong>Apply it:</strong> Vicky McClure and Jed Mercurio are proven names, and ITV commissioned a fourth series before the third had aired.</p></div>
+  </div>
+  <h3>Read and research</h3>
+  <div class="src-grid">
+<article class="src">
+  <div class="src-head">
+    <h4><a href="https://rts.org.uk/article/inside-jed-mercurios-new-itv-thriller-trigger-point" target="_blank" rel="noopener noreferrer">Inside Jed Mercurio’s new ITV thriller Trigger Point</a></h4>
+    <p class="src-meta">Royal Television Society, February 2022. About Series 1. Free to read.</p>
+  </div>
+  <p class="look-label">Look for:</p>
+  <ul><li>How HTM Television was set up and by whom</li><li>What the producer says about budget and where money is spent</li><li>Why the series was released weekly, with no box set until the end</li><li>How the writers and cast researched bomb disposal</li></ul>
+  <label class="read"><input type="checkbox" data-src="rts"> I’ve read this</label>
+</article>
+<article class="src">
+  <div class="src-head">
+    <h4><a href="https://artem.com/projects/trigger-point" target="_blank" rel="noopener noreferrer">Trigger Point: pyrotechnic FX and props</a></h4>
+    <p class="src-meta">Artem (special effects company). About Series 1. Photo captions mention prop injuries and blood effects.</p>
+  </div>
+  <p class="look-label">Look for:</p>
+  <ul><li>Which outside company supplied the effects</li><li>How an explosion was tested before filming</li><li>How many different specialist companies one drama might need</li></ul>
+  <label class="read"><input type="checkbox" data-src="artem"> I’ve read this</label>
+</article>
+<article class="src">
+  <div class="src-head">
+    <h4><a href="https://sg.news.yahoo.com/trigger-point-true-real-life-121400905.html" target="_blank" rel="noopener noreferrer">Trigger Point: how true is it to real-life bomb disposal?</a></h4>
+    <p class="src-meta">Sky News via Yahoo News. About Series 2. Contains spoilers for later episodes.</p>
+  </div>
+  <p class="look-label">Look for:</p>
+  <ul><li>What real bomb disposal experts say the show gets right</li><li>What it changes on purpose, and why</li><li>Why the show avoids being a how-to guide</li></ul>
+  <label class="read"><input type="checkbox" data-src="yahoo"> I’ve read this</label>
+</article>
+<article class="src">
+  <div class="src-head">
+    <h4><a href="https://www.itv.com/presscentre/print/pdf/node/47031" target="_blank" rel="noopener noreferrer">ITV recommissions Trigger Point (series four)</a></h4>
+    <p class="src-meta">ITV Press Centre, June 2025. Official press release (PDF)</p>
+  </div>
+  <p class="look-label">Look for:</p>
+  <ul><li>Average viewers for Series 2 and how many ITVX streams it had</li><li>When series four was commissioned compared with when series three aired</li><li>Which company distributes the series abroad</li></ul>
+  <label class="read"><input type="checkbox" data-src="itv-recommission"> I’ve read this</label>
+</article></div>
+  <h3>Write in Box 4</h3>
+  <ol class="tasks"><li>Find one decision that shows <strong>money</strong> shaping what we see on screen.</li><li>Find one decision that shows ITV <strong>reducing risk</strong>. Name the theorist it links to.</li><li>Find one decision about <strong>realism</strong>. Why might a drama change real bomb disposal on purpose?</li></ol>
+  <details class="check"><summary>Check your findings after you have researched</summary><div class="check-body"><ul>
+  <li><strong>Money:</strong> the producer says big explosions and a bombing campaign are normally film territory, so the team had to decide carefully where to spend a TV budget. Specialist outside companies supply effects.</li>
+  <li><strong>Reducing risk (Hesmondhalgh):</strong> a proven star and creator, a returning series, and ITV commissioning series four before series three had aired.</li>
+  <li><strong>Realism:</strong> experts advised the actors and the writer spent time with a real squad. Real experts also say some details are changed on purpose so the show is not mistaken for a documentary or used as a how-to guide.</li>
+  <li><strong>Power (Curran and Seaton):</strong> a commercial broadcaster needs large audiences, so it favours tense, fast-moving drama over the “very boring” reality of the job.</li>
+  <li><strong>Release pattern:</strong> Mercurio argues that weekly episodes keep people talking, which helps a series become a shared event.</li></ul></div></details>
+  <div class="starter"><p><strong>Sentence starters</strong></p><p>This decision suggests that ITV wanted to reduce risk because… According to Hesmondhalgh… This links to Curran and Seaton’s idea that…</p></div>
+</section></div>
+
+<section id="exam">
+  <div class="wrap">
+    <h2>Exam practice</h2>
+    <p class="lead">Section A, Question 2 is worth 10 marks and can test industries, audiences or contexts. Past papers have asked about convergence and distribution, how digital technology changes viewing, and historical context. Try these in the style of past papers.</p>
+    <h3>Practice questions</h3>
+    <p class="exam-q">Explain how Trigger Point shows the importance of media convergence and distribution. [10]</p>
+    <p class="exam-q">Explain how funding affects the way ITV makes crime dramas. Refer to Trigger Point. [10]</p>
+    <p class="exam-q">Explain how digital technologies change the way audiences watch television. Refer to The Sweeney and Trigger Point. [10]</p>
+    <h3>Build each paragraph in four steps</h3>
+    <ul class="peel">
+      <li><strong>Point</strong>Make a clear point that answers the question.</li>
+      <li><strong>Evidence</strong>Give a specific fact from Trigger Point or The Sweeney.</li>
+      <li><strong>Explain</strong>Say how the evidence proves your point.</li>
+      <li><strong>Link</strong>Connect to a theory, a context or the other programme.</li>
+    </ul>
+    <p>Examiners reward specific links to the set product. General points about television that could apply to any programme earn little credit.</p>
+    <h3>Model paragraph for question 1</h3>
+    <div class="model">
+      <p>Trigger Point shows the importance of convergence and distribution because ITV releases it on more than one platform at once. Series 2 premiered on ITV1 and ITVX together, so viewers could watch at a set time on a channel or stream it whenever they chose. This is convergence because traditional television and streaming work side by side.</p>
+      <p>It worked well for ITV: the series averaged 8.1 million viewers and was streamed 30 million times on ITVX. As a commercial broadcaster, ITV earns money from advertising on both ITV1 and the free tier of ITVX, so reaching people in more than one way helps it earn more. This contrasts with The Sweeney in 1975, which could only reach viewers on ITV at a fixed time.</p>
+    </div>
+  </div>
+</section>
+
+<section id="terms">
+  <div class="wrap">
+    <h2>Key terms</h2>
+    <div class="terms-grid"><details class="term"><summary>Commissioning</summary><p>When a broadcaster decides to pay for a programme to be made.</p></details><details class="term"><summary>Production company</summary><p>The company that makes the programme: it hires the writers, directors, cast and crew.</p></details><details class="term"><summary>Executive producer</summary><p>A senior producer who oversees the whole project, often involved in finance and creative decisions.</p></details><details class="term"><summary>Distributor</summary><p>A company that sells programmes to broadcasters and platforms, often in other countries.</p></details><details class="term"><summary>Broadcaster</summary><p>The organisation that shows the programme to the public, such as ITV.</p></details><details class="term"><summary>Public service broadcaster</summary><p>A broadcaster with a duty to inform, educate and entertain, such as the BBC, which is funded by the licence fee.</p></details><details class="term"><summary>Commercial broadcaster</summary><p>A broadcaster that earns money mainly from advertising or subscriptions, such as ITV.</p></details><details class="term"><summary>Licence fee</summary><p>A yearly payment by UK households that mainly funds the BBC.</p></details><details class="term"><summary>Linear TV</summary><p>Programmes shown at a set time on a set channel.</p></details><details class="term"><summary>Streaming (on demand)</summary><p>Programmes watched when the viewer chooses, online, for example on ITVX.</p></details><details class="term"><summary>Convergence</summary><p>Different media forms joining together, such as TV channels and streaming services working side by side.</p></details><details class="term"><summary>Appointment-to-view</summary><p>A programme people make a point of watching at its scheduled time.</p></details><details class="term"><summary>Regulation</summary><p>Rules a media industry must follow. In the UK, Ofcom regulates broadcasting.</p></details><details class="term"><summary>Cultural industries</summary><p>Industries that make media and culture, such as TV, film and music (Hesmondhalgh).</p></details></div>
+  </div>
+</section>
+
+<section id="quiz">
+  <div class="wrap">
+    <h2>Quick quiz</h2>
+    <p class="lead">Answer each question out loud or on paper first, then open it to check.</p>
+    <div style="margin-top:1rem"><details class="qa"><summary>1. Which company produced Trigger Point?</summary><p>HTM Television, co-owned by Jed Mercurio and Hat Trick Productions.</p></details><details class="qa"><summary>2. Who distributes Trigger Point to other countries?</summary><p>All3Media International.</p></details><details class="qa"><summary>3. Give two ways ITV earns money from ITVX.</summary><p>Adverts in the free tier, and subscriptions for the ad-free premium tier.</p></details><details class="qa"><summary>4. Which theorist says cultural industries try to reduce risk, and give one example from Trigger Point.</summary><p>Hesmondhalgh. For example: a proven star and creator, or recommissioning the series before the last one aired.</p></details><details class="qa"><summary>5. Give one change in distribution between The Sweeney (1975) and Trigger Point (2024).</summary><p>The Sweeney only reached audiences on ITV at a set time. Trigger Point also streams on ITVX, so viewers can watch on demand.</p></details></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Sources checked October 2026. Viewing figures come from ITV press releases.</p>
+    <p>Written for GCSE Media Studies, Component 2 Section A. Figures and links may change, so always check the original article.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var KEY = "tp-industry-wiki-read";
+  var read = {};
+  try { read = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { read = {}; }
+  var boxes = document.querySelectorAll("input[data-src]");
+  var ids = {};
+  boxes.forEach(function (b) { ids[b.getAttribute("data-src")] = true; });
+  var total = Object.keys(ids).length;
+  document.getElementById("total").textContent = total;
+  function refresh() {
+    var n = 0;
+    Object.keys(ids).forEach(function (k) { if (read[k]) n++; });
+    document.getElementById("done").textContent = n;
+  }
+  boxes.forEach(function (b) {
+    var id = b.getAttribute("data-src");
+    b.checked = !!read[id];
+    b.addEventListener("change", function () {
+      read[id] = b.checked;
+      boxes.forEach(function (o) { if (o.getAttribute("data-src") === id) o.checked = b.checked; });
+      try { localStorage.setItem(KEY, JSON.stringify(read)); } catch (e) {}
+      refresh();
+    });
+  });
+  refresh();
+})();
+</script>
+</body>
+</html>

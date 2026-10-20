@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<title>Lesson 1 — Validation: Range & Type Checks</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { font-family:'DM Sans',sans-serif; background:#f8fafc; }
+  .code-font { font-family:'Fira Code',monospace; }
+  .tab-btn.active { background:#2563eb; color:#fff; }
+  .part { display:none; }
+  .part.active { display:block; animation:fadein .25s ease; }
+  @keyframes fadein { from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+  .keyword{color:#c678dd;} .func{color:#61afef;} .string{color:#98c379;} .number{color:#d19a66;} .comment{color:#7f848e;font-style:italic;} .operator{color:#56b6c2;}
+  .option-row:hover{ background:#f8fafc; }
+  .feedback-box{ display:none; } .feedback-box.show{ display:block; }
+  .score-panel{ display:none; } .score-panel.show{ display:block; }
+  .msg-line{ animation:msgin .2s ease; }
+  @keyframes msgin{ from{opacity:0; transform:translateY(-4px);} to{opacity:1; transform:translateY(0);} }
+  details summary::-webkit-details-marker{ display:none; }
+  details summary{ list-style:none; }
+</style>
+</head>
+<body class="text-slate-800">
+
+<header class="bg-white border-b sticky top-0 z-40">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div>
+      <span class="inline-flex items-center text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded-full px-3 py-1 mb-1 code-font">AQA 8525 · §3.2.11</span>
+      <h1 class="text-xl font-bold text-slate-900">Lesson 1 — Validation: Range &amp; Type Checks</h1>
+    </div>
+    <i class="fas fa-shield-halved text-blue-500 text-2xl"></i>
+  </div>
+</header>
+
+<div class="max-w-5xl mx-auto px-6 pt-6">
+  <div class="flex gap-2 mb-6 flex-wrap">
+    <button onclick="showPart('part1')" class="tab-btn active px-5 py-2.5 rounded-xl font-semibold text-sm border border-blue-200 transition" data-part="part1"><i class="fas fa-shield mr-1"></i> Part 1 — Why Validate?</button>
+    <button onclick="showPart('part2')" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-sm border border-blue-200 transition" data-part="part2"><i class="fas fa-ruler mr-1"></i> Part 2 — Range Checks</button>
+    <button onclick="showPart('part3')" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-sm border border-blue-200 transition" data-part="part3"><i class="fas fa-laptop-code mr-1"></i> Part 3 — Code It: VS Code Tasks</button>
+    <button onclick="showPart('part4')" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-sm border border-blue-200 transition" data-part="part4"><i class="fas fa-laptop-code mr-1"></i> Part 4 — Higher: VS Code Task</button>
+  </div>
+</div>
+
+<main class="max-w-5xl mx-auto px-6 pb-20">
+
+  <!-- PART 1 -->
+  <section id="p-part1" class="part active">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 mb-6">
+      <h2 class="text-xl font-bold mb-3">The scenario</h2>
+      <p class="text-slate-700 leading-relaxed mb-4">A school office system, a farm sensor, a bank app — every one of them accepts data from a user or a device. If that data isn't checked, the system can crash, store nonsense, or worse — let something through that shouldn't be allowed. <b>Validation</b> is how a program protects itself from bad data before it ever gets used.</p>
+      <p class="text-slate-700 leading-relaxed">Validation doesn't check whether data is <i>true</i> — only whether it's <i>reasonable</i>. A validation check could let through a wrong-but-plausible value (like the wrong but valid PIN) — that's a different problem, solved by authentication, which comes later in this unit.</p>
+    </div>
+    <div id="quiz-part1"></div>
+    <div class="flex items-center gap-4 mt-6">
+      <button onclick="markQuiz('part1')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition">Mark my answers</button>
+      <button onclick="resetQuiz('part1')" class="border border-blue-600 text-blue-600 font-semibold px-6 py-3 rounded-xl hover:bg-blue-50 transition">Reset</button>
+    </div>
+    <div class="score-panel mt-6 p-6 rounded-2xl border border-slate-200 bg-slate-50" id="score-part1"></div>
+  </section>
+
+  <!-- PART 2 -->
+  <section id="p-part2" class="part">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 mb-6">
+      <h2 class="text-xl font-bold mb-4">Key vocabulary</h2>
+      <table class="w-full text-sm border border-slate-200 rounded-lg overflow-hidden mb-6"><tbody>
+        <tr class="bg-slate-50"><th class="border border-slate-200 px-3 py-2 text-left text-xs uppercase tracking-wide text-slate-500">Term</th><th class="border border-slate-200 px-3 py-2 text-left text-xs uppercase tracking-wide text-slate-500">Meaning</th></tr>
+        <tr><td class="border border-slate-200 px-3 py-2 font-semibold">Validation</td><td class="border border-slate-200 px-3 py-2">A check that data entered is reasonable and usable before a program acts on it.</td></tr>
+        <tr><td class="border border-slate-200 px-3 py-2 font-semibold">Range check</td><td class="border border-slate-200 px-3 py-2">Checks a numeric value falls between a minimum and maximum.</td></tr>
+        <tr><td class="border border-slate-200 px-3 py-2 font-semibold">Boundary</td><td class="border border-slate-200 px-3 py-2">The edge value of a range — e.g. if the allowed range is 1–10, the boundaries are 0, 1, 10 and 11.</td></tr>
+        <tr><td class="border border-slate-200 px-3 py-2 font-semibold">Re-prompt</td><td class="border border-slate-200 px-3 py-2">Asking the user again for input when their first entry fails validation.</td></tr>
+      </table>
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Worked example</p>
+      <pre class="code-font text-sm bg-slate-900 text-slate-100 rounded-xl p-5 overflow-x-auto mb-4" id="ex-p2"></pre>
+      <p class="text-slate-700 leading-relaxed">The <span class="code-font text-sm bg-slate-100 px-1 rounded">while</span> loop keeps re-prompting until the entered age is inside the allowed range — this is a range check combined with re-prompting.</p>
+    </div>
+    <div id="quiz-part2"></div>
+    <div class="flex items-center gap-4 mt-6">
+      <button onclick="markQuiz('part2')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition">Mark my answers</button>
+      <button onclick="resetQuiz('part2')" class="border border-blue-600 text-blue-600 font-semibold px-6 py-3 rounded-xl hover:bg-blue-50 transition">Reset</button>
+    </div>
+    <div class="score-panel mt-6 p-6 rounded-2xl border border-slate-200 bg-slate-50" id="score-part2"></div>
+  </section>
+
+  <!-- PART 3 -->
+  <section id="p-part3" class="part">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 mb-6">
+      <h2 class="text-lg font-bold">Code it — in VS Code</h2>
+      <p class="text-slate-500 text-sm mt-1">Three tasks to complete in your own Python environment. Try each one yourself first — the hint is there if you get stuck, but have a proper go before you open it.</p>
+    </div>
+
+    <div class="space-y-6">
+
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold text-sm">1</span>
+          <h3 class="font-bold text-slate-900">Range Check</h3>
+        </div>
+        <p class="text-slate-700 text-sm mb-4">Write a program that checks an account age is between 0 and 120 inclusive. Print <span class="code-font bg-slate-100 px-1 rounded">"Age accepted"</span> or <span class="code-font bg-slate-100 px-1 rounded">"Invalid age"</span> as appropriate.</p>
+        <details class="group">
+          <summary class="cursor-pointer select-none inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700">
+            <i class="fas fa-lightbulb"></i> Need a hint?
+          </summary>
+          <pre class="code-font text-sm bg-slate-900 text-slate-100 rounded-xl p-5 overflow-x-auto mt-3" id="hint-c1"></pre>
+        </details>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold text-sm">2</span>
+          <h3 class="font-bold text-slate-900">Type Check</h3>
+        </div>
+        <p class="text-slate-700 text-sm mb-4">Write a program that re-prompts the user until they enter a whole number for their age. Use <span class="code-font bg-slate-100 px-1 rounded">.isdigit()</span> to check before converting — don't use <span class="code-font bg-slate-100 px-1 rounded">int()</span> until you know it's safe.</p>
+        <details class="group">
+          <summary class="cursor-pointer select-none inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700">
+            <i class="fas fa-lightbulb"></i> Need a hint?
+          </summary>
+          <pre class="code-font text-sm bg-slate-900 text-slate-100 rounded-xl p-5 overflow-x-auto mt-3" id="hint-c2"></pre>
+        </details>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold text-sm">3</span>
+          <h3 class="font-bold text-slate-900">Combine Both</h3>
+        </div>
+        <p class="text-slate-700 text-sm mb-4">Combine a type check AND a range check into one reusable function that re-prompts until both pass, then returns the valid age.</p>
+        <details class="group">
+          <summary class="cursor-pointer select-none inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700">
+            <i class="fas fa-lightbulb"></i> Need a hint?
+          </summary>
+          <pre class="code-font text-sm bg-slate-900 text-slate-100 rounded-xl p-5 overflow-x-auto mt-3" id="hint-c3"></pre>
+        </details>
+        <div class="mt-4 border border-blue-200 bg-blue-50 rounded-xl p-4 text-sm text-blue-800">
+          <b>Extension (Challenge 4):</b> give each check its own meaningful error message — e.g. "Age must be a whole number" vs "Age must be between 0 and 120" — rather than one generic message for both.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PART 4 -->
+  <section id="p-part4" class="part">
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 flex items-start gap-3">
+      <i class="fas fa-laptop-code text-amber-500 mt-1"></i>
+      <p class="text-sm text-amber-800">This part is completed in <b>VS Code</b>, not on this page. Read the question below, then write and test your program in your own Python environment.</p>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 mb-6">
+      <span class="inline-flex items-center text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded-full px-3 py-1 mb-4 code-font">Higher Task · Exam-Style</span>
+      <h2 class="text-xl font-bold mb-4">Exam-Style Programming Question — Validation</h2>
+      <p class="text-slate-700 leading-relaxed mb-3">A school office is developing a system to register students. The program needs to validate the admission year entered by staff.</p>
+      <p class="text-slate-700 leading-relaxed mb-2 font-semibold">Write a Python program to check the admission year.</p>
+      <p class="text-slate-700 leading-relaxed mb-2">Your program should:</p>
+      <ul class="list-disc list-inside text-slate-700 leading-relaxed mb-2 space-y-1">
+        <li>get the admission year from the user</li>
+        <li>check that the year is a whole number and lies between 2015 and 2026 inclusive:
+          <ul class="list-[circle] list-inside ml-6">
+            <li>if it is valid, output the message <span class="code-font text-sm bg-slate-100 px-1 rounded">Year accepted</span></li>
+            <li>if it is not valid, output the message <span class="code-font text-sm bg-slate-100 px-1 rounded">Year not accepted</span></li>
+          </ul>
+        </li>
+        <li>repeat until a valid year is entered.</li>
+      </ul>
+      <p class="text-slate-700 leading-relaxed mb-2">You should use indentation as appropriate, meaningful variable name(s) and Python syntax in your answer.</p>
+      <p class="font-bold text-slate-900">(Total 6 marks)</p>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8">
+      <h3 class="text-lg font-bold mb-4">Extension suggestions</h3>
+      <div class="space-y-3">
+        <div class="border border-slate-200 rounded-xl p-4"><p class="font-semibold text-sm mb-1">Extension 1 — Handle non-numeric input gracefully</p><p class="text-sm text-slate-600">Research Python's try/except so typing "abc" doesn't crash your program — print a friendly message and re-ask instead.</p></div>
+        <div class="border border-slate-200 rounded-xl p-4"><p class="font-semibold text-sm mb-1">Extension 2 — Validate against a list, not just a range</p><p class="text-sm text-slate-600">The school only accepts specific intake years: 2018, 2020, 2022, 2024, 2026. Use a linear search over a list to check the entered year is one of these.</p></div>
+        <div class="border border-slate-200 rounded-xl p-4"><p class="font-semibold text-sm mb-1">Extension 3 — Combine with authentication</p><p class="text-sm text-slate-600">Extend into a small admissions system: staff log in with a username and password (stored in a dictionary) before validating a student's admission year.</p></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ---------------- Navigation ---------------- */
+function showPart(id){
+  document.querySelectorAll('.part').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.tab-btn[data-part="${id}"]`).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function highlight(codeStr){
+  let escaped = codeStr.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return escaped.split('\n').map(line=>{
+    const c = line.match(/(#.*)$/);
+    let codePart = line, commentPart = '';
+    if(c){ codePart = line.slice(0,c.index); commentPart = `<span class="comment">${c[1]}</span>`; }
+    codePart = codePart.replace(/(&quot;.*?&quot;|"[^"]*"|'[^']*')/g, m=>`<span class="string">${m}</span>`);
+    codePart = codePart.replace(/\b(def|if|elif|else|for|in|while|return|and|or|not|True|False)\b/g, m=>`<span class="keyword">${m}</span>`);
+    codePart = codePart.replace(/\b(\d+)\b/g, m=>`<span class="number">${m}</span>`);
+    return codePart + commentPart;
+  }).join('\n');
+}
+
+document.getElementById('ex-p2').innerHTML = highlight(`age = int(input("Enter age: "))
+while age < 0 or age > 120:
+    print("Invalid age")
+    age = int(input("Enter age: "))
+print("Age accepted")`);
+
+/* ================= PART 3 — HINT CODE (hidden until clicked) ================= */
+
+document.getElementById('hint-c1').innerHTML = highlight(`value = int(input("Enter a number: "))
+if value > 20:`);
+
+document.getElementById('hint-c2').innerHTML = highlight(`while ___:
+
+age.isdigit()`);
+
+document.getElementById('hint-c3').innerHTML = highlight(`def validate_age():
+    age = input("Enter age: ")`);
+
+/* ================= QUIZZES (Part 1 & 2) ================= */
+const QUIZZES = {
+  part1: [
+    {type:"mcq", q:"What is validation?", options:["A check that data entered is reasonable and usable before a program acts on it","A way to speed up a program","A method for storing passwords securely","A type of loop"], answer:0},
+    {type:"mcq", q:"Why does a system need validation?", options:["To make the code shorter","To stop bad or unreasonable data breaking the system", "To make input() run faster","To avoid using variables"], answer:1},
+    {type:"mcq", q:"Which of these is a validation check catching?", options:["Someone typing 250 for an age field","Someone entering the correct password","Someone logging in successfully","Someone closing the program"], answer:0},
+    {type:"mcq", q:"Does validation check whether data is TRUE, or whether it's REASONABLE?", options:["True","Reasonable","Neither","Both equally"], answer:1},
+    {type:"mcq", q:"A user enters the wrong (but validly-formatted) PIN. What catches this?", options:["A range check","A type check","Authentication, not validation","Nothing can catch this"], answer:2},
+  ],
+  part2: [
+    {type:"mcq", q:"What does a range check do?", options:["Checks a value falls between a minimum and maximum","Checks a value is the correct data type","Checks a password is correct","Checks a string's length"], answer:0},
+    {type:"mcq", q:"If the allowed range is 1 to 10, which of these is a boundary value?", options:["5","10","7","3"], answer:1},
+    {type:"mcq", q:"What is re-prompting?", options:["Asking the user again when their input fails validation","Ending the program immediately","Printing an error and continuing anyway","Changing the data type of the input"], answer:0},
+    {type:"code", q:"What does this code achieve?", code:"age = int(input(\"Enter age: \"))\nwhile age < 0 or age > 120:\n    print(\"Invalid age\")\n    age = int(input(\"Enter age: \"))\nprint(\"Age accepted\")", options:["Re-prompts until a valid age (0-120) is entered","Accepts any age without checking","Only accepts ages under 0","Crashes if age is over 120"], answer:0},
+    {type:"code", q:"What would this program do if the user typed 150 then 45?", code:"age = int(input(\"Enter age: \"))\nwhile age < 0 or age > 120:\n    print(\"Invalid age\")\n    age = int(input(\"Enter age: \"))\nprint(\"Age accepted\")", options:["Reject 150, re-prompt, accept 45 and print Age accepted","Accept 150 immediately","Crash on 150","Reject both values"], answer:0},
+    {type:"fib", q:"Complete: while age < 0 ___ age > 120: (Boolean operator meaning either condition can be true)", answer:["or"]},
+    {type:"fib", q:"A range check tests whether a value lies between a ___ and a maximum.", answer:["minimum"]},
+    {type:"fib", q:"The edge values of a range (e.g. 0, 1, 10, 11 for range 1-10) are called ___ values.", answer:["boundary"]},
+  ],
+};
+
+function renderQuiz(part){
+  const data = QUIZZES[part];
+  const container = document.getElementById('quiz-'+part);
+  let html = '';
+  data.forEach((item, idx)=>{
+    const qid = part+'_q'+idx;
+    html += `<div class="border border-slate-200 rounded-2xl p-5 mb-3 bg-white" id="${qid}">`;
+    html += `<p class="font-semibold text-sm mb-3 text-slate-800">${idx+1}. ${item.q}</p>`;
+    if(item.code){
+      html += `<pre class="code-font text-xs bg-slate-900 text-slate-100 rounded-lg p-4 overflow-x-auto mb-3">${highlight(item.code)}</pre>`;
+    }
+    if(item.type==='mcq' || item.type==='code'){
+      item.options.forEach((opt,oi)=>{
+        html += `<label class="option-row flex items-start gap-2 text-sm px-2 py-2 rounded-lg cursor-pointer"><input type="radio" name="${qid}" value="${oi}" class="mt-1"> <span>${opt}</span></label>`;
+      });
+    } else if(item.type==='fib'){
+      html += `<input type="text" id="${qid}_input" placeholder="Your answer" class="code-font text-sm border border-slate-300 rounded-lg px-3 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-blue-400">`;
+    }
+    html += `<div class="feedback-box text-xs font-semibold rounded-lg px-3 py-2 mt-3" id="${qid}_fb"></div>`;
+    html += `</div>`;
+  });
+  container.innerHTML = html;
+}
+
+function markQuiz(part){
+  const data = QUIZZES[part];
+  let correct = 0;
+  data.forEach((item, idx)=>{
+    const qid = part+'_q'+idx;
+    const fb = document.getElementById(qid+'_fb');
+    if(item.type==='mcq' || item.type==='code'){
+      const sel = document.querySelector(`input[name="${qid}"]:checked`);
+      if(!sel){ fb.className='feedback-box show text-xs font-semibold rounded-lg px-3 py-2 mt-3 bg-rose-50 text-rose-600'; fb.innerHTML='Not answered. Correct answer: '+item.options[item.answer]; return; }
+      if(parseInt(sel.value)===item.answer){ correct++; fb.className='feedback-box show text-xs font-semibold rounded-lg px-3 py-2 mt-3 bg-emerald-50 text-emerald-600'; fb.innerHTML='Correct.'; }
+      else { fb.className='feedback-box show text-xs font-semibold rounded-lg px-3 py-2 mt-3 bg-rose-50 text-rose-600'; fb.innerHTML='Not quite. Correct answer: '+item.options[item.answer]; }
+    } else if(item.type==='fib'){
+      const val=(document.getElementById(qid+'_input').value||'').trim().toLowerCase();
+      const ok = item.answer.some(a=>a.toLowerCase()===val);
+      if(ok){ correct++; fb.className='feedback-box show text-xs font-semibold rounded-lg px-3 py-2 mt-3 bg-emerald-50 text-emerald-600'; fb.innerHTML='Correct.'; }
+      else { fb.className='feedback-box show text-xs font-semibold rounded-lg px-3 py-2 mt-3 bg-rose-50 text-rose-600'; fb.innerHTML='Not quite. Accepted answer: '+item.answer[0]; }
+    }
+  });
+  const panel = document.getElementById('score-'+part);
+  panel.classList.add('show');
+  const total = data.length;
+  panel.innerHTML = `<p class="text-4xl font-bold text-blue-600 mb-1">${correct} / ${total}</p><p class="text-sm text-slate-500">Screenshot this panel for your evidence sheet.</p>`;
+  panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function resetQuiz(part){ renderQuiz(part); document.getElementById('score-'+part).classList.remove('show'); }
+
+Object.keys(QUIZZES).forEach(renderQuiz);
+</script>
+</body>
+</html>

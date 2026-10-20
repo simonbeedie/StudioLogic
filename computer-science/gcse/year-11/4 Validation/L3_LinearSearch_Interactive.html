@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<title>Lesson 3 — Linear Search for Pattern Validation</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { font-family:'DM Sans',sans-serif; background:#f8fafc; }
+  .code-font { font-family:'Fira Code',monospace; }
+  .tab-btn.active { background:#2563eb; color:#fff; }
+  .part { display:none; }
+  .part.active { display:block; animation:fadein .25s ease; }
+  @keyframes fadein { from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+  .keyword{color:#c678dd;} .func{color:#61afef;} .string{color:#98c379;} .number{color:#d19a66;} .comment{color:#7f848e;font-style:italic;} .operator{color:#56b6c2;}
+  .option-row:hover{ background:#f8fafc; }
+  .feedback-box{ display:none; } .feedback-box.show{ display:block; }
+  .score-panel{ display:none; } .score-panel.show{ display:block; }
+  details summary::-webkit-details-marker{ display:none; }
+  details summary{ list-style:none; }
+</style>
+</head>
+<body class="text-slate-800">
+
+<header class="bg-white border-b sticky top-0 z-40">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div>
+      <span class="inline-flex items-center text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded-full px-3 py-1 mb-1 code-font">AQA 8525 · §3.1.3 &amp; §3.2.11</span>
+      <h1 class="text-xl font-bold text-slate-900">Lesson 3 — Linear Search for Pattern Validation</h1>
+    </div>
+    <i class="fas fa-magnifying-glass text-blue-500 text-2xl"></i>
+  </div>
+</header>
+
+<div class="max-w-5xl mx-auto px-6 pt-6">
+  <div class="flex gap-2 mb-6 flex-wrap">
+    <button onclick="showPart('part1')" class="tab-btn active px-5 py-2.5 rounded-xl font-semibold text-sm border border-blue-200 transition" data-part="part1"><i class="fas fa-magnifying-glass mr-1"></i> Part 1 — Why Search?</button>
+    <button onclick="showPart('part2')" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-sm border border-blue-200 transition" data-part="part2"><i class="fas fa-list-ol mr-1"></i> Part 2 — Linear Search</button>
+    <button onclick="showPart('part3')" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-sm border border-blue-200 transition" data-part="part3"><i class="fas fa-laptop-code mr-1"></i> Part 3 — Code It: VS Code Tasks</button>
+    <button onclick="showPart('part4')" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-sm border border-blue-200 transition" data-part="part4"><i class="fas fa-laptop-code mr-1"></i> Part 4 — Higher: VS Code Task</button>
+  </div>
+</div>
+
+<main class="max-w-5xl mx-auto px-6 pb-20">
+
+  <!-- PART 1 -->
+  <section id="p-part1" class="part active">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 mb-6">
+      <h2 class="text-xl font-bold mb-3">The scenario</h2>
+      <p class="text-slate-700 leading-relaxed mb-4">Range checks and length checks work well for numbers and simple limits. But what if a value needs to match one of a specific set of allowed values — like a postcode area code that must be one of a handful the company actually delivers to?</p>
+      <p class="text-slate-700 leading-relaxed">A range check can't do this — there's no numeric "range" for "SW1A" or "M1". Instead, we need to <b>search</b> a list of allowed values to see if the entered one is there. That's exactly what <b>linear search</b> does.</p>
+    </div>
+    <div id="quiz-part1"></div>
+    <div class="flex items-center gap-4 mt-6">
+      <button onclick="markQuiz('part1')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition">Mark my answers</button>
+      <button onclick="resetQuiz('part1')" class="border border-blue-600 text-blue-600 font-semibold px-6 py-3 rounded-xl hover:bg-blue-50 transition">Reset</button>
+    </div>
+    <div class="score-panel mt-6 p-6 rounded-2xl border border-slate-200 bg-slate-50" id="score-part1"></div>
+  </section>
+
+  <!-- PART 2 -->
+  <section id="p-part2" class="part">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 mb-6">
+      <h2 class="text-xl font-bold mb-4">Key vocabulary</h2>
+      <table class="w-full text-sm border border-slate-200 rounded-lg overflow-hidden mb-6"><tbody>
+        <tr class="bg-slate-50"><th class="border border-slate-200 px-3 py-2 text-left text-xs uppercase tracking-wide text-slate-500">Term</th><th class="border border-slate-200 px-3 py-2 text-left text-xs uppercase tracking-wide text-slate-500">Meaning</th></tr>
+        <tr><td class="border border-slate-200 px-3 py-2 font-semibold">Linear search</td><td class="border border-slate-200 px-3 py-2">Checking each item in a list, one after another, until a match is found or the list ends.</td></tr>
+        <tr><td class="border border-slate-200 px-3 py-2 font-semibold">Target</td><td class="border border-slate-200 px-3 py-2">The value being searched for.</td></tr>
+        <tr><td class="border border-slate-200 px-3 py-2 font-semibold">Traversal</td><td class="border border-slate-200 px-3 py-2">Moving through each item of a list in turn.</td></tr>
+        <tr><td class="border border-slate-200 px-3 py-2 font-semibold">Allowed list</td><td class="border border-slate-200 px-3 py-2">The set of values considered valid — what the target is checked against.</td></tr>
+      </table>
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Worked example</p>
+      <pre class="code-font text-sm bg-slate-900 text-slate-100 rounded-xl p-5 overflow-x-auto mb-4" id="ex-p2"></pre>
+      <p class="text-slate-700 leading-relaxed">The loop traverses <span class="code-font text-sm bg-slate-100 px-1 rounded">area_codes</span> one item at a time. If any item matches <span class="code-font text-sm bg-slate-100 px-1 rounded">target</span>, <span class="code-font text-sm bg-slate-100 px-1 rounded">found</span> is set to <span class="code-font text-sm bg-slate-100 px-1 rounded">True</span> — this is linear search used as a validation check.</p>
+    </div>
+    <div id="quiz-part2"></div>
+    <div class="flex items-center gap-4 mt-6">
+      <button onclick="markQuiz('part2')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition">Mark my answers</button>
+      <button onclick="resetQuiz('part2')" class="border border-blue-600 text-blue-600 font-semibold px-6 py-3 rounded-xl hover:bg-blue-50 transition">Reset</button>
+    </div>
+    <div class="score-panel mt-6 p-6 rounded-2xl border border-slate-200 bg-slate-50" id="score-part2"></div>
+  </section>
+
+  <!-- PART 3 -->
+  <section id="p-part3" class="part">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 mb-6">
+      <h2 class="text-lg font-bold">Code it — in VS Code</h2>
+      <p class="text-slate-500 text-sm mt-1">Three tasks to complete in your own Python environment. Try each one yourself first — the hint is there if you get stuck, but have a proper go before you open it.</p>
+    </div>
+
+    <div class="space-y-6">
+
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold text-sm">1</span>
+          <h3 class="font-bold text-slate-900">Basic Linear Search</h3>
+        </div>
+        <p class="text-slate-700 text-sm mb-4">Write a program that searches a list of numbers <span class="code-font bg-slate-100 px-1 rounded">[4, 8, 15, 16, 23, 42]</span> for a target value the user enters, and prints whether it was found.</p>
+        <details class="group">
+          <summary class="cursor-pointer select-none inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700">
+            <i class="fas fa-lightbulb"></i> Need a hint?
+          </summary>
+          <pre class="code-font text-sm bg-slate-900 text-slate-100 rounded-xl p-5 overflow-x-auto mt-3" id="hint-c1"></pre>
+        </details>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold text-sm">2</span>
+          <h3 class="font-bold text-slate-900">Return Found or Not</h3>
+        </div>
+        <p class="text-slate-700 text-sm mb-4">Extend Task 1 to track whether the value was found using a Boolean flag, then print a clear "Accepted" or "Not found" message once the search finishes.</p>
+        <details class="group">
+          <summary class="cursor-pointer select-none inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700">
+            <i class="fas fa-lightbulb"></i> Need a hint?
+          </summary>
+          <pre class="code-font text-sm bg-slate-900 text-slate-100 rounded-xl p-5 overflow-x-auto mt-3" id="hint-c2"></pre>
+        </details>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold text-sm">3</span>
+          <h3 class="font-bold text-slate-900">Postcode Validation</h3>
+        </div>
+        <p class="text-slate-700 text-sm mb-4">Combine your search into a function that checks a postcode area code against an allowed list <span class="code-font bg-slate-100 px-1 rounded">["SW1A", "M1", "B1", "LS1", "EH1"]</span>, returning True or False.</p>
+        <details class="group">
+          <summary class="cursor-pointer select-none inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700">
+            <i class="fas fa-lightbulb"></i> Need a hint?
+          </summary>
+          <pre class="code-font text-sm bg-slate-900 text-slate-100 rounded-xl p-5 overflow-x-auto mt-3" id="hint-c3"></pre>
+        </details>
+        <div class="mt-4 border border-blue-200 bg-blue-50 rounded-xl p-4 text-sm text-blue-800">
+          <b>Extension (Challenge 4):</b> make your search case-insensitive, so "sw1a" and "SW1A" are both accepted. Look up <span class="code-font">.upper()</span> or <span class="code-font">.lower()</span>.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PART 4 -->
+  <section id="p-part4" class="part">
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 flex items-start gap-3">
+      <i class="fas fa-laptop-code text-amber-500 mt-1"></i>
+      <p class="text-sm text-amber-800">This part is completed in <b>VS Code</b>, not on this page. Read the question below, then write and test your program in your own Python environment.</p>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 mb-6">
+      <span class="inline-flex items-center text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded-full px-3 py-1 mb-4 code-font">Higher Task · Exam-Style</span>
+      <h2 class="text-xl font-bold mb-4">Exam-Style Programming Question — Linear Search Validation</h2>
+      <p class="text-slate-700 leading-relaxed mb-3">A delivery company only delivers to five specific postcode areas: SW1A, M1, B1, LS1, EH1.</p>
+      <p class="text-slate-700 leading-relaxed mb-2 font-semibold">Write a Python program to check if a customer's postcode area code is one the company delivers to.</p>
+      <p class="text-slate-700 leading-relaxed mb-2">Your program should:</p>
+      <ul class="list-disc list-inside text-slate-700 leading-relaxed mb-2 space-y-1">
+        <li>get the postcode area code from the user</li>
+        <li>use a linear search to check if the code is in the list of allowed areas:
+          <ul class="list-[circle] list-inside ml-6">
+            <li>if found, output the message <span class="code-font text-sm bg-slate-100 px-1 rounded">We deliver to this area</span></li>
+            <li>if not found, output the message <span class="code-font text-sm bg-slate-100 px-1 rounded">Sorry, we do not deliver here</span></li>
+          </ul>
+        </li>
+      </ul>
+      <p class="text-slate-700 leading-relaxed mb-2">You should use indentation as appropriate, meaningful variable name(s) and Python syntax in your answer.</p>
+      <p class="font-bold text-slate-900">(Total 6 marks)</p>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8">
+      <h3 class="text-lg font-bold mb-4">Extension suggestions</h3>
+      <div class="space-y-3">
+        <div class="border border-slate-200 rounded-xl p-4"><p class="font-semibold text-sm mb-1">Extension 1 — Case-insensitive search</p><p class="text-sm text-slate-600">Make the search accept the postcode area code regardless of upper or lower case.</p></div>
+        <div class="border border-slate-200 rounded-xl p-4"><p class="font-semibold text-sm mb-1">Extension 2 — Count comparisons</p><p class="text-sm text-slate-600">Count and display how many comparisons the search made before finding (or not finding) a match.</p></div>
+        <div class="border border-slate-200 rounded-xl p-4"><p class="font-semibold text-sm mb-1">Extension 3 — Validate several postcodes</p><p class="text-sm text-slate-600">Extend to accept a small list of postcodes in one run, and validate each one in turn.</p></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ---------------- Navigation ---------------- */
+function showPart(id){
+  document.querySelectorAll('.part').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.tab-btn[data-part="${id}"]`).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function highlight(codeStr){
+  let escaped = codeStr.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return escaped.split('\n').map(line=>{
+    const c = line.match(/(#.*)$/);
+    let codePart = line, commentPart = '';
+    if(c){ codePart = line.slice(0,c.index); commentPart = `<span class="comment">${c[1]}</span>`; }
+    codePart = codePart.replace(/(&quot;.*?&quot;|"[^"]*"|'[^']*')/g, m=>`<span class="string">${m}</span>`);
+    codePart = codePart.replace(/\b(def|if|elif|else|for|in|while|return|and|or|not|True|False|len)\b/g, m=>`<span class="keyword">${m}</span>`);
+    codePart = codePart.replace(/\b(\d+)\b/g, m=>`<span class="number">${m}</span>`);
+    return codePart + commentPart;
+  }).join('\n');
+}
+
+document.getElementById('ex-p2').innerHTML = highlight(`area_codes = ["SW1A", "M1", "B1", "LS1", "EH1"]
+target = input("Enter postcode area: ")
+
+found = False
+for code in area_codes:
+    if code == target:
+        found = True
+
+if found:
+    print("Accepted")
+else:
+    print("Rejected")`);
+
+/* ================= PART 3 — HINT CODE (hidden until clicked) ================= */
+
+document.getElementById('hint-c1').innerHTML = highlight(`numbers = [4, 8, 15, 16, 23, 42]
+target = int(input("Enter a number to find: "))`);
+
+document.getElementById('hint-c2').innerHTML = highlight(`found = False
+for n in numbers:`);
+
+document.getElementById('hint-c3').innerHTML = highlight(`def validate_postcode(area_code):
+    allowed = ["SW1A", "M1", "B1", "LS1", "EH1"]`);
+
+/* ================= QUIZZES (Part 1 & 2) ================= */
+const QUIZZES = {
+  part1: [
+    {type:"mcq", q:"What problem does linear search solve for validation?", options:["Checking if a value exists within a list of allowed values","Checking if a number is within a range","Checking if a string is empty","Sorting a list into order"], answer:0},
+    {type:"mcq", q:"Why can't a simple range check test if \"SW1A\" is a valid postcode area code?", options:["Because it's membership in a specific list of values, not a numeric range","Because Python doesn't support string comparison","Because postcodes are always invalid","Because range checks only work on Booleans"], answer:0},
+    {type:"mcq", q:"What does linear search check at each step?", options:["Whether the current item matches the target","Whether the list is empty","Whether the list is sorted","Whether the target is a number"], answer:0},
+    {type:"mcq", q:"When does a linear search stop?", options:["When a match is found, or the list ends","Only when a match is found","Only when the list ends, even if a match was found earlier","After exactly 10 comparisons"], answer:0},
+    {type:"mcq", q:"Is linear search itself a validation technique, or something else?", options:["An algorithm that can be used to implement a validation check","A type of data type","A programming language","A form of authentication"], answer:0},
+  ],
+  part2: [
+    {type:"mcq", q:"What is the \"target\" in a linear search?", options:["The value being searched for","The list being searched","The index of the first item","The number of items in the list"], answer:0},
+    {type:"mcq", q:"What does \"traversal\" mean?", options:["Moving through each item of a list in turn","Sorting a list","Deleting an item from a list","Converting a list to a string"], answer:0},
+    {type:"mcq", q:"In the worked example, what happens if the target isn't in the list?", options:["found stays False and the program prints Rejected","The program crashes","found becomes True anyway","The list is automatically updated"], answer:0},
+    {type:"code", q:"What would this program print for target = \"B1\"?", code:"area_codes = [\"SW1A\", \"M1\", \"B1\", \"LS1\", \"EH1\"]\ntarget = input(\"Enter postcode area: \")\n\nfound = False\nfor code in area_codes:\n    if code == target:\n        found = True\n\nif found:\n    print(\"Accepted\")\nelse:\n    print(\"Rejected\")", options:["Accepted","Rejected","An error","Nothing"], answer:0},
+    {type:"code", q:"What would this program print for target = \"Z9\"?", code:"area_codes = [\"SW1A\", \"M1\", \"B1\", \"LS1\", \"EH1\"]\ntarget = input(\"Enter postcode area: \")\n\nfound = False\nfor code in area_codes:\n    if code == target:\n        found = True\n\nif found:\n    print(\"Accepted\")\nelse:\n    print(\"Rejected\")", options:["Rejected","Accepted","An error","Nothing"], answer:0},
+    {type:"fib", q:"for code in area_codes: — this loop performs a ___ of the list.", answer:["traversal"]},
+    {type:"fib", q:"found = ___ (the Boolean value meaning nothing has matched yet, before the loop starts)", answer:["false"]},
+    {type:"fib", q:"if code == target: — this line checks whether the current item matches the ___.", answer:["target"]},
+  ],
+};
+
+function renderQuiz(part){
+  const data = QUIZZES[part];
+  const container = document.getElementById('quiz-'+part);
+  let html = '';
+  data.forEach((item, idx)=>{
+    const qid = part+'_q'+idx;
+    html += `<div class="border border-slate-200 rounded-2xl p-5 mb-3 bg-white" id="${qid}">`;
+    html += `<p class="font-semibold text-sm mb-3 text-slate-800">${idx+1}. ${item.q}</p>`;
+    if(item.code){
+      html += `<pre class="code-font text-xs bg-slate-900 text-slate-100 rounded-lg p-4 overflow-x-auto mb-3">${highlight(item.code)}</pre>`;
+    }
+    if(item.type==='mcq' || item.type==='code'){
+      item.options.forEach((opt,oi)=>{
+        html += `<label class="option-row flex items-start gap-2 text-sm px-2 py-2 rounded-lg cursor-pointer"><input type="radio" name="${qid}" value="${oi}" class="mt-1"> <span>${opt}</span></label>`;
+      });
+    } else if(item.type==='fib'){
+      html += `<input type="text" id="${qid}_input" placeholder="Your answer" class="code-font text-sm border border-slate-300 rounded-lg px-3 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-blue-400">`;
+    }
+    html += `<div class="feedback-box text-xs font-semibold rounded-lg px-3 py-2 mt-3" id="${qid}_fb"></div>`;
+    html += `</div>`;
+  });
+  container.innerHTML = html;
+}
+
+function markQuiz(part){
+  const data = QUIZZES[part];
+  let correct = 0;
+  data.forEach((item, idx)=>{
+    const qid = part+'_q'+idx;
+    const fb = document.getElementById(qid+'_fb');
+    if(item.type==='mcq' || item.type==='code'){
+      const sel = document.querySelector(`input[name="${qid}"]:checked`);
+      if(!sel){ fb.className='feedback-box show text-xs font-semibold rounded-lg px-3 py-2 mt-3 bg-rose-50 text-rose-600'; fb.innerHTML='Not answered. Correct answer: '+item.options[item.answer]; return; }
+      if(parseInt(sel.value)===item.answer){ correct++; fb.className='feedback-box show text-xs font-semibold rounded-lg px-3 py-2 mt-3 bg-emerald-50 text-emerald-600'; fb.innerHTML='Correct.'; }
+      else { fb.className='feedback-box show text-xs font-semibold rounded-lg px-3 py-2 mt-3 bg-rose-50 text-rose-600'; fb.innerHTML='Not quite. Correct answer: '+item.options[item.answer]; }
+    } else if(item.type==='fib'){
+      const val=(document.getElementById(qid+'_input').value||'').trim().toLowerCase();
+      const ok = item.answer.some(a=>a.toLowerCase()===val);
+      if(ok){ correct++; fb.className='feedback-box show text-xs font-semibold rounded-lg px-3 py-2 mt-3 bg-emerald-50 text-emerald-600'; fb.innerHTML='Correct.'; }
+      else { fb.className='feedback-box show text-xs font-semibold rounded-lg px-3 py-2 mt-3 bg-rose-50 text-rose-600'; fb.innerHTML='Not quite. Accepted answer: '+item.answer[0]; }
+    }
+  });
+  const panel = document.getElementById('score-'+part);
+  panel.classList.add('show');
+  const total = data.length;
+  panel.innerHTML = `<p class="text-4xl font-bold text-blue-600 mb-1">${correct} / ${total}</p><p class="text-sm text-slate-500">Screenshot this panel for your evidence sheet.</p>`;
+  panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function resetQuiz(part){ renderQuiz(part); document.getElementById('score-'+part).classList.remove('show'); }
+
+Object.keys(QUIZZES).forEach(renderQuiz);
+</script>
+</body>
+</html>

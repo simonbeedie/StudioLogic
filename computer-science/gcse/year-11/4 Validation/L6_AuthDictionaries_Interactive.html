@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<title>Lesson 6 — Authentication with Dictionaries</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { font-family:'DM Sans',sans-serif; background:#f8fafc; }
+  .code-font { font-family:'Fira Code',monospace; }
+  .tab-btn.active { background:#2563eb; color:#fff; }
+  .part { display:none; }
+  .part.active { display:block; animation:fadein .25s ease; }
+  @keyframes fadein { from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+  .keyword{color:#c678dd;} .func{color:#61afef;} .string{color:#98c379;} .number{color:#d19a66;} .comment{color:#7f848e;font-style:italic;} .operator{color:#56b6c2;}
+  .option-row:hover{ background:#f8fafc; }
+  .feedback-box{ display:none; } .feedback-box.show{ display:block; }
+  .score-panel{ display:none; } .score-panel.show{ display:block; }
+  details summary::-webkit-details-marker{ display:none; }
+  details summary{ list-style:none; }
+</style>
+</head>
+<body class="text-slate-800">
+
+<header class="bg-white border-b sticky top-0 z-40">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div>
+      <span class="inline-flex items-center text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded-full px-3 py-1 mb-1 code-font">AQA 8525 · §3.2.11 &amp; §3.2.6</span>
+      <h1 class="text-xl font-bold text-slate-900">Lesson 6 — Authentication with Dictionaries</h1>
+    </div>
+    <i class="fas fa-users text-blue-500 text-2xl"></i>
+  </div>
+</header>
+
+<div class="max-w-5xl mx-auto px-6 pt-6">
+  <div class="flex gap-2 mb-6 flex-wrap">
+    <button onclick="showPart('part1')" class="tab-btn active px-5 py-2.5 rounded-xl font-semibold text-sm border border-blue-200 transition" data-part="part1"><i class="fas fa-users mr-1"></i> Part 1 — Why Dictionaries?</button>
+    <button onclick="showPart('part2')" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-sm border border-blue-200 transition" data-part="part2"><i class="fas fa-book mr-1"></i> Part 2 — Dictionary Lookup</button>
+    <button onclick="showPart('part3')" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-sm border border-blue-200 transition" data-part="part3"><i class="fas fa-laptop-code mr-1"></i> Part 3 — Code It: VS Code Tasks</button>
+    <button onclick="showPart('part4')" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-sm border border-blue-200 transition" data-part="part4"><i class="fas fa-laptop-code mr-1"></i> Part 4 — Higher: VS Code Task</button>
+  </div>
+</div>
+
+<main class="max-w-5xl mx-auto px-6 pb-20">
+
+  <!-- PART 1 -->
+  <section id="p-part1" class="part active">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 mb-6">
+      <h2 class="text-xl font-bold mb-3">The scenario</h2>
+      <p class="text-slate-700 leading-relaxed mb-4">Last lesson's login system worked — but only for a single, hard-coded username and password. A real system needs to authenticate <b>many different people</b>, each with their own login details.</p>
+      <p class="text-slate-700 leading-relaxed">You already know dictionaries from earlier this year. A dictionary is the natural way to store many username-password pairs together, with each username directly linked to its correct password.</p>
+    </div>
+    <div id="quiz-part1"></div>
+    <div class="flex items-center gap-4 mt-6">
+      <button onclick="markQuiz('part1')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition">Mark my answers</button>
+      <button onclick="resetQuiz('part1')" class="border border-blue-600 text-blue-600 font-semibold px-6 py-3 rounded-xl hover:bg-blue-50 transition">Reset</button>
+    </div>
+    <div class="score-panel mt-6 p-6 rounded-2xl border border-slate-200 bg-slate-50" id="score-part1"></div>
+  </section>
+
+  <!-- PART 2 -->
+  <section id="p-part2" class="part">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 mb-6">
+      <h2 class="text-xl font-bold mb-4">Key vocabulary</h2>
+      <table class="w-full text-sm border border-slate-200 rounded-lg overflow-hidden mb-6"><tbody>
+        <tr class="bg-slate-50"><th class="border border-slate-200 px-3 py-2 text-left text-xs uppercase tracking-wide text-slate-500">Term</th><th class="border border-slate-200 px-3 py-2 text-left text-xs uppercase tracking-wide text-slate-500">Meaning</th></tr>
+        <tr><td class="border border-slate-200 px-3 py-2 font-semibold">Dictionary</td><td class="border border-slate-200 px-3 py-2">A data structure that stores pairs of keys and values, e.g. a username linked to its password.</td></tr>
+        <tr><td class="border border-slate-200 px-3 py-2 font-semibold">Key</td><td class="border border-slate-200 px-3 py-2">The value used to look something up — here, the username.</td></tr>
+        <tr><td class="border border-slate-200 px-3 py-2 font-semibold">Value</td><td class="border border-slate-200 px-3 py-2">The data stored against a key — here, the password.</td></tr>
+        <tr><td class="border border-slate-200 px-3 py-2 font-semibold">Lookup</td><td class="border border-slate-200 px-3 py-2">Retrieving the value stored for a given key.</td></tr>
+      </table>
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Worked example</p>
+      <pre class="code-font text-sm bg-slate-900 text-slate-100 rounded-xl p-5 overflow-x-auto mb-4" id="ex-p2"></pre>
+      <p class="text-slate-700 leading-relaxed"><span class="code-font text-sm bg-slate-100 px-1 rounded">username in users</span> checks the username exists as a key; <span class="code-font text-sm bg-slate-100 px-1 rounded">users[username]</span> looks up its stored password to compare.</p>
+    </div>
+    <div id="quiz-part2"></div>
+    <div class="flex items-center gap-4 mt-6">
+      <button onclick="markQuiz('part2')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition">Mark my answers</button>
+      <button onclick="resetQuiz('part2')" class="border border-blue-600 text-blue-600 font-semibold px-6 py-3 rounded-xl hover:bg-blue-50 transition">Reset</button>
+    </div>
+    <div class="score-panel mt-6 p-6 rounded-2xl border border-slate-200 bg-slate-50" id="score-part2"></div>
+  </section>
+
+  <!-- PART 3 -->
+  <section id="p-part3" class="part">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 mb-6">
+      <h2 class="text-lg font-bold">Code it — in VS Code</h2>
+      <p class="text-slate-500 text-sm mt-1">Three tasks to complete in your own Python environment. Try each one yourself first — the hint is there if you get stuck, but have a proper go before you open it.</p>
+    </div>
+
+    <div class="space-y-6">
+
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold text-sm">1</span>
+          <h3 class="font-bold text-slate-900">Dictionary Lookup</h3>
+        </div>
+        <p class="text-slate-700 text-sm mb-4">Given a dictionary of users <span class="code-font bg-slate-100 px-1 rounded">{"admin": "Secure123", "jsmith": "Farm2024"}</span>, write a program that checks whether an entered username exists — don't check the password yet.</p>
+        <details class="group">
+          <summary class="cursor-pointer select-none inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700">
+            <i class="fas fa-lightbulb"></i> Need a hint?
+          </summary>
+          <pre class="code-font text-sm bg-slate-900 text-slate-100 rounded-xl p-5 overflow-x-auto mt-3" id="hint-c1"></pre>
+        </details>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold text-sm">2</span>
+          <h3 class="font-bold text-slate-900">Check Password Match</h3>
+        </div>
+        <p class="text-slate-700 text-sm mb-4">Extend Task 1 to also check that the entered password matches the one stored for that username.</p>
+        <details class="group">
+          <summary class="cursor-pointer select-none inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700">
+            <i class="fas fa-lightbulb"></i> Need a hint?
+          </summary>
+          <pre class="code-font text-sm bg-slate-900 text-slate-100 rounded-xl p-5 overflow-x-auto mt-3" id="hint-c2"></pre>
+        </details>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold text-sm">3</span>
+          <h3 class="font-bold text-slate-900">Full Login System</h3>
+        </div>
+        <p class="text-slate-700 text-sm mb-4">Combine Tasks 1–2 into a function with 3 limited attempts and a lock-out message, using your dictionary of users.</p>
+        <details class="group">
+          <summary class="cursor-pointer select-none inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700">
+            <i class="fas fa-lightbulb"></i> Need a hint?
+          </summary>
+          <pre class="code-font text-sm bg-slate-900 text-slate-100 rounded-xl p-5 overflow-x-auto mt-3" id="hint-c3"></pre>
+        </details>
+        <div class="mt-4 border border-blue-200 bg-blue-50 rounded-xl p-4 text-sm text-blue-800">
+          <b>Extension (Challenge 4):</b> add an access-level field per user (e.g. store <span class="code-font">"admin"</span> or <span class="code-font">"standard"</span> alongside each password) and print a different welcome message depending on the level.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PART 4 -->
+  <section id="p-part4" class="part">
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 flex items-start gap-3">
+      <i class="fas fa-laptop-code text-amber-500 mt-1"></i>
+      <p class="text-sm text-amber-800">This part is completed in <b>VS Code</b>, not on this page. Read the question below, then write and test your program in your own Python environment.</p>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 mb-6">
+      <span class="inline-flex items-center text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded-full px-3 py-1 mb-4 code-font">Higher Task · Exam-Style</span>
+      <h2 class="text-xl font-bold mb-4">Exam-Style Programming Question — Multi-User Authentication</h2>
+      <p class="text-slate-700 leading-relaxed mb-3">A company stores staff usernames and passwords in a dictionary.</p>
+      <p class="text-slate-700 leading-relaxed mb-2 font-semibold">Write a Python program to authenticate a member of staff using the dictionary.</p>
+      <p class="text-slate-700 leading-relaxed mb-2">Your program should:</p>
+      <ul class="list-disc list-inside text-slate-700 leading-relaxed mb-2 space-y-1">
+        <li>get a username and password from the user</li>
+        <li>check the username exists in the dictionary and the password matches</li>
+        <li>allow a maximum of 3 attempts:
+          <ul class="list-[circle] list-inside ml-6">
+            <li>if login succeeds, output the message <span class="code-font text-sm bg-slate-100 px-1 rounded">Login successful</span></li>
+            <li>if all 3 attempts fail, output the message <span class="code-font text-sm bg-slate-100 px-1 rounded">Account locked</span></li>
+          </ul>
+        </li>
+      </ul>
+      <p class="text-slate-700 leading-relaxed mb-2">You should use indentation as appropriate, meaningful variable name(s) and Python syntax in your answer.</p>
+      <p class="font-bold text-slate-900">(Total 6 marks)</p>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8">
+      <h3 class="text-lg font-bold mb-4">Extension suggestions</h3>
+      <div class="space-y-3">
+        <div class="border border-slate-200 rounded-xl p-4"><p class="font-semibold text-sm mb-1">Extension 1 — Add a third user</p><p class="text-sm text-slate-600">Add a third user to the dictionary and test your program with all three.</p></div>
+        <div class="border border-slate-200 rounded-xl p-4"><p class="font-semibold text-sm mb-1">Extension 2 — Separate error messages</p><p class="text-sm text-slate-600">Give a different message if the username doesn't exist at all, versus the password being wrong.</p></div>
+        <div class="border border-slate-200 rounded-xl p-4"><p class="font-semibold text-sm mb-1">Extension 3 — Access levels</p><p class="text-sm text-slate-600">Add an access-level field ("admin" or "standard") per user and print a different welcome message based on it.</p></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ---------------- Navigation ---------------- */
+function showPart(id){
+  document.querySelectorAll('.part').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.tab-btn[data-part="${id}"]`).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function highlight(codeStr){
+  let escaped = codeStr.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return escaped.split('\n').map(line=>{
+    const c = line.match(/(#.*)$/);
+    let codePart = line, commentPart = '';
+    if(c){ codePart = line.slice(0,c.index); commentPart = `<span class="comment">${c[1]}</span>`; }
+    codePart = codePart.replace(/(&quot;.*?&quot;|"[^"]*"|'[^']*')/g, m=>`<span class="string">${m}</span>`);
+    codePart = codePart.replace(/\b(def|if|elif|else|for|in|while|return|and|or|not|True|False|break|len)\b/g, m=>`<span class="keyword">${m}</span>`);
+    codePart = codePart.replace(/\b(\d+)\b/g, m=>`<span class="number">${m}</span>`);
+    return codePart + commentPart;
+  }).join('\n');
+}
+
+document.getElementById('ex-p2').innerHTML = highlight(`users = {"admin": "Secure123", "jsmith": "Farm2024"}
+
+username = input("Username: ")
+password = input("Password: ")
+
+if username in users and users[username] == password:
+    print("Login successful")
+else:
+    print("Incorrect login")`);
+
+/* ================= PART 3 — HINT CODE (hidden until clicked) ================= */
+
+document.getElementById('hint-c1').innerHTML = highlight(`users = {"admin": "Secure123", "jsmith": "Farm2024"}
+if username in users:`);
+
+document.getElementById('hint-c2').innerHTML = highlight(`if username in users and users[username] == password:`);
+
+document.getElementById('hint-c3').innerHTML = highlight(`def login():
+    users = {"admin": "Secure123", "jsmith": "Farm2024"}
+    attempts = 0`);
+
+/* ================= QUIZZES (Part 1 & 2) ================= */
+const QUIZZES = {
+  part1: [
+    {type:"mcq", q:"What problem does a single hard-coded username/password not solve?", options:["It only works for one person; a real system needs many users","It runs too slowly","It cannot be typed correctly","It doesn't use enough variables"], answer:0},
+    {type:"mcq", q:"What is a dictionary used for here?", options:["Storing multiple username-password pairs together","Storing a single number","Repeating a block of code","Sorting a list of values"], answer:0},
+    {type:"mcq", q:"What is a \"key\" in a dictionary?", options:["The value used to look something up, e.g. the username","The password itself","A type of loop","An error message"], answer:0},
+    {type:"mcq", q:"What is a \"value\" in a dictionary?", options:["The data stored against a key, e.g. the password","The username itself","A Boolean result","The number of users"], answer:0},
+    {type:"mcq", q:"Why is a dictionary better than two separate lists (usernames, passwords)?", options:["It keeps each username directly linked to its correct password, avoiding mismatched indexes","It uses less memory in every case","Lists cannot store strings","Dictionaries are the only structure Python supports"], answer:0},
+  ],
+  part2: [
+    {type:"mcq", q:"What does username in users check?", options:["Whether username is a key in the dictionary","Whether username is a value in the dictionary","Whether the dictionary is empty","Whether username is a number"], answer:0},
+    {type:"mcq", q:"What does users[username] return?", options:["The password stored against that username","The username itself","A list of all users","True or False only"], answer:0},
+    {type:"mcq", q:"Why check username in users before users[username] == password?", options:["To avoid a crash if the username doesn't exist as a key","To make the program run faster","Because Python requires it in every dictionary","To automatically add the user if missing"], answer:0},
+    {type:"code", q:"What would this program print for username=\"jsmith\", password=\"Farm2024\"?", code:"users = {\"admin\": \"Secure123\", \"jsmith\": \"Farm2024\"}\n\nusername = input(\"Username: \")\npassword = input(\"Password: \")\n\nif username in users and users[username] == password:\n    print(\"Login successful\")\nelse:\n    print(\"Incorrect login\")", options:["Login successful","Incorrect login","An error","Nothing"], answer:0},
+    {type:"code", q:"What would this program print for username=\"unknown\", password=\"x\"?", code:"users = {\"admin\": \"Secure123\", \"jsmith\": \"Farm2024\"}\n\nusername = input(\"Username: \")\npassword = input(\"Password: \")\n\nif username in users and users[username] == password:\n    print(\"Login successful\")\nelse:\n    print(\"Incorrect login\")", options:["Incorrect login","Login successful","A crash","Nothing"], answer:0},
+    {type:"fib", q:"users = {\"admin\": \"Secure123\"} — \"admin\" is the ___", answer:["key"]},
+    {type:"fib", q:"users[\"admin\"] returns the ___ stored against that key.", answer:["value"]},
+    {type:"fib", q:"username ___ users (checks if username exists as a key)", answer:["in"]},
+  ],
+};
+
+function renderQuiz(part){
+  const data = QUIZZES[part];
+  const container = document.getElementById('quiz-'+part);
+  let html = '';
+  data.forEach((item, idx)=>{
+    const qid = part+'_q'+idx;
+    html += `<div class="border border-slate-200 rounded-2xl p-5 mb-3 bg-white" id="${qid}">`;
+    html += `<p class="font-semibold text-sm mb-3 text-slate-800">${idx+1}. ${item.q}</p>`;
+    if(item.code){
+      html += `<pre class="code-font text-xs bg-slate-900 text-slate-100 rounded-lg p-4 overflow-x-auto mb-3">${highlight(item.code)}</pre>`;
+    }
+    if(item.type==='mcq' || item.type==='code'){
+      item.options.forEach((opt,oi)=>{
+        html += `<label class="option-row flex items-start gap-2 text-sm px-2 py-2 rounded-lg cursor-pointer"><input type="radio" name="${qid}" value="${oi}" class="mt-1"> <span>${opt}</span></label>`;
+      });
+    } else if(item.type==='fib'){
+      html += `<input type="text" id="${qid}_input" placeholder="Your answer" class="code-font text-sm border border-slate-300 rounded-lg px-3 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-blue-400">`;
+    }
+    html += `<div class="feedback-box text-xs font-semibold rounded-lg px-3 py-2 mt-3" id="${qid}_fb"></div>`;
+    html += `</div>`;
+  });
+  container.innerHTML = html;
+}
+
+function markQuiz(part){
+  const data = QUIZZES[part];
+  let correct = 0;
+  data.forEach((item, idx)=>{
+    const qid = part+'_q'+idx;
+    const fb = document.getElementById(qid+'_fb');
+    if(item.type==='mcq' || item.type==='code'){
+      const sel = document.querySelector(`input[name="${qid}"]:checked`);
+      if(!sel){ fb.className='feedback-box show text-xs font-semibold rounded-lg px-3 py-2 mt-3 bg-rose-50 text-rose-600'; fb.innerHTML='Not answered. Correct answer: '+item.options[item.answer]; return; }
+      if(parseInt(sel.value)===item.answer){ correct++; fb.className='feedback-box show text-xs font-semibold rounded-lg px-3 py-2 mt-3 bg-emerald-50 text-emerald-600'; fb.innerHTML='Correct.'; }
+      else { fb.className='feedback-box show text-xs font-semibold rounded-lg px-3 py-2 mt-3 bg-rose-50 text-rose-600'; fb.innerHTML='Not quite. Correct answer: '+item.options[item.answer]; }
+    } else if(item.type==='fib'){
+      const val=(document.getElementById(qid+'_input').value||'').trim().toLowerCase();
+      const ok = item.answer.some(a=>a.toLowerCase()===val);
+      if(ok){ correct++; fb.className='feedback-box show text-xs font-semibold rounded-lg px-3 py-2 mt-3 bg-emerald-50 text-emerald-600'; fb.innerHTML='Correct.'; }
+      else { fb.className='feedback-box show text-xs font-semibold rounded-lg px-3 py-2 mt-3 bg-rose-50 text-rose-600'; fb.innerHTML='Not quite. Accepted answer: '+item.answer[0]; }
+    }
+  });
+  const panel = document.getElementById('score-'+part);
+  panel.classList.add('show');
+  const total = data.length;
+  panel.innerHTML = `<p class="text-4xl font-bold text-blue-600 mb-1">${correct} / ${total}</p><p class="text-sm text-slate-500">Screenshot this panel for your evidence sheet.</p>`;
+  panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function resetQuiz(part){ renderQuiz(part); document.getElementById('score-'+part).classList.remove('show'); }
+
+Object.keys(QUIZZES).forEach(renderQuiz);
+</script>
+</body>
+</html>
