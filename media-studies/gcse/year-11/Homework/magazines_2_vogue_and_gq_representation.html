@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vogue and GQ: Representation Knowledge Check</title>
+<style>
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+  --bg: #FFFFFF; --card: #F7F7F7; --card-2: #FFFFFF; --text: #1D1D1F; --muted: #5C5C63;
+  --accent: #E63946; --accent-text: #C62D3A; --accent-dim: #F19AA1; --on-accent: #FFFFFF; --line: #DADADA;
+  --good: #1B6E3C; --good-bg: #E4F3EA; --bad: #8C1D2C; --bad-bg: #F9E3E6;
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font-family: Calibri, Carlito, "Segoe UI", Arial, sans-serif;
+  font-size: 17px; line-height: 1.45;
+}
+.wrap { max-width: 800px; margin: 0 auto; padding: 18px 16px 48px; }
+header.top { text-align: center; padding: 10px 0 14px; border-bottom: 2px solid var(--accent); margin-bottom: 16px; }
+header.top .kicker { color: var(--accent-text); letter-spacing: .18em; text-transform: uppercase; font-size: 13px; font-weight: 700; }
+header.top h1 { margin: 4px 0 2px; font-size: 28px; }
+header.top p { margin: 0; color: var(--muted); font-size: 15px; }
+
+.steps { display: flex; gap: 8px; margin-bottom: 16px; }
+.step { flex: 1; text-align: center; padding: 8px 4px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); font-size: 14px; background: var(--card); }
+.step.active { border-color: var(--accent); color: var(--accent-text); font-weight: 700; }
+.step.done { color: var(--text); }
+
+.page { display: none; }
+.page.show { display: block; }
+.page-title { color: var(--accent-text); font-size: 22px; margin: 0 0 4px; }
+.page-sub { color: var(--muted); margin: 0 0 14px; font-size: 15px; }
+
+.q { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px 14px 12px; margin-bottom: 14px; }
+.q .meta { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+.q .num { color: var(--accent-text); font-weight: 700; }
+.q .text { font-weight: 600; margin-bottom: 10px; }
+.opt { display: flex; gap: 10px; align-items: flex-start; padding: 9px 11px; margin-bottom: 7px; border: 1px solid var(--line); border-radius: 8px; background: var(--card-2); cursor: pointer; }
+.opt:hover { border-color: var(--accent-dim); }
+.opt input { margin-top: 4px; accent-color: var(--accent); }
+.opt.picked { border-color: var(--accent); }
+input[type=text] {
+  width: 100%; padding: 10px 12px; font: inherit; color: var(--text);
+  background: var(--card-2); border: 1px solid var(--line); border-radius: 8px;
+}
+input[type=text]:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+.q.locked .opt, .q.locked input[type=text] { cursor: default; }
+.q.right { border-left-color: var(--good); background: var(--good-bg); }
+.q.wrong { border-left-color: var(--bad); background: var(--bad-bg); }
+.fb { margin-top: 8px; font-size: 15px; }
+.fb strong.ok { color: var(--good); }
+.fb strong.no { color: var(--bad); }
+
+.nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 8px; }
+button {
+  font: inherit; font-weight: 700; padding: 11px 20px; border-radius: 8px; cursor: pointer;
+  border: 2px solid var(--accent-text); background: transparent; color: var(--accent-text);
+}
+button.primary { background: var(--accent-text); color: var(--on-accent); }
+button:hover { filter: brightness(1.12); }
+button[disabled] { opacity: .35; cursor: default; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.warn { color: var(--accent-text); font-size: 15px; margin-top: 10px; text-align: right; min-height: 1.2em; }
+
+#results { display: none; margin-bottom: 28px; }
+.panel { border: 3px solid var(--accent); border-radius: 12px; background: var(--card); padding: 18px; }
+.panel h2 { margin: 0; color: var(--accent-text); font-size: 21px; }
+.panel .sub { color: var(--muted); font-size: 14px; margin-bottom: 12px; }
+.score { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; padding: 10px 0 14px; border-bottom: 1px solid var(--line); }
+.score .big { font-size: 46px; font-weight: 800; line-height: 1; }
+.score .pct { font-size: 28px; color: var(--accent-text); font-weight: 700; }
+.score .band { color: var(--muted); font-size: 15px; }
+table.grid { width: 100%; border-collapse: collapse; margin-top: 12px; }
+table.grid th, table.grid td { border: 1px solid var(--line); padding: 8px 9px; text-align: left; vertical-align: top; }
+table.grid th { color: var(--accent-text); font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { min-width: 46px; text-align: center; padding: 2px 7px; border-radius: 6px; font-weight: 700; font-size: 14px; border: 1px solid; }
+.chip.r { color: var(--good); border-color: var(--good); background: var(--good-bg); }
+.chip.w { color: var(--bad); border-color: var(--bad); background: var(--bad-bg); }
+.status-ok { color: var(--good); font-weight: 700; }
+.status-no { color: var(--bad); font-weight: 700; }
+.weak { margin-top: 14px; padding: 11px 13px; border: 1px solid var(--accent); border-radius: 8px; }
+.weak strong { color: var(--accent-text); }
+.review-head { color: var(--accent-text); font-size: 22px; margin: 6px 0 4px; }
+.review-note { color: var(--muted); margin: 0 0 14px; font-size: 15px; }
+@media (max-width: 520px) {
+  header.top h1 { font-size: 23px; }
+  .score .big { font-size: 38px; }
+  table.grid th, table.grid td { padding: 6px 5px; font-size: 14px; }
+  .chip { min-width: 40px; padding: 1px 4px; font-size: 13px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="kicker">Magazines · Section A</div>
+    <h1>Vogue and GQ: Representation Knowledge Check</h1>
+    <p id="subline"></p>
+  </header>
+
+  <div id="results"></div>
+
+  <div id="quiz">
+    <div class="steps" id="steps"></div>
+    <div id="pages"></div>
+    <div class="nav">
+      <button id="back" type="button">Back</button>
+      <button id="next" type="button" class="primary">Next</button>
+    </div>
+    <div class="warn" id="warn" role="status"></div>
+  </div>
+</div>
+
+<script>
+var RESULTS_TITLE = "Magazines Representation Quiz Results";
+var RESULTS_SUB = "Eduqas GCSE Media Studies · Vogue (July 2021) and GQ (August 2019)";
+var SECTIONS = {"VOG": "Vogue representation", "GQ": "GQ representation", "MIX": "Mixed recall", "TERM": "Terminology"};
+
+/* type: mc (options, answer index) or sa (accept: list of alternatives; each alternative = list of terms that must ALL appear) */
+var QUESTIONS = [
+ {
+  "page": 0,
+  "sec": "VOG",
+  "type": "mc",
+  "q": "How is Malala represented on the Vogue cover?",
+  "options": [
+   "As a traditional fashion model",
+   "As a celebrity chef",
+   "As a victim in need of help",
+   "As a global icon: “Survivor, activist, legend”"
+  ],
+  "answer": 3
+ },
+ {
+  "page": 0,
+  "sec": "VOG",
+  "type": "sa",
+  "q": "Complete the Vogue cover line: “Survivor, ___, legend”.",
+  "accept": [
+   [
+    "activist"
+   ]
+  ],
+  "model": "Activist"
+ },
+ {
+  "page": 0,
+  "sec": "VOG",
+  "type": "mc",
+  "q": "How is Malala’s headscarf represented?",
+  "options": [
+   "As a political slogan only",
+   "As both a fashion accessory and a symbol of her faith",
+   "As a disguise",
+   "As a costume"
+  ],
+  "answer": 1
+ },
+ {
+  "page": 0,
+  "sec": "VOG",
+  "type": "mc",
+  "q": "Which stereotype does the Vogue cover challenge?",
+  "options": [
+   "That women from her background are only victims",
+   "That fashion magazines never feature women",
+   "That activists are always old",
+   "That footballers are greedy"
+  ],
+  "answer": 0
+ },
+ {
+  "page": 0,
+  "sec": "GQ",
+  "type": "mc",
+  "q": "How do tabloids often stereotype Raheem Sterling, according to the booklet?",
+  "options": [
+   "As flashy or greedy",
+   "As a political candidate",
+   "As a moral leader",
+   "As shy and quiet"
+  ],
+  "answer": 0
+ },
+ {
+  "page": 0,
+  "sec": "GQ",
+  "type": "mc",
+  "q": "How does the GQ cover provide a countertype?",
+  "options": [
+   "It portrays him as a calm, dignified moral leader and an “angel” for the community",
+   "It shows him as flashy and rich",
+   "It does not show his face",
+   "It shows him as angry and aggressive"
+  ],
+  "answer": 0
+ },
+ {
+  "page": 0,
+  "sec": "GQ",
+  "type": "mc",
+  "q": "How does GQ show Sterling as an active subject rather than a passive object?",
+  "options": [
+   "He is hidden behind text",
+   "He is shown sitting down",
+   "His facial expression is one of defiance and strength",
+   "He is not looking at the camera"
+  ],
+  "answer": 2
+ },
+ {
+  "page": 1,
+  "sec": "MIX",
+  "type": "mc",
+  "q": "What is notable about Edward Enninful’s role at British Vogue?",
+  "options": [
+   "He owns the magazine",
+   "He also edits GQ",
+   "He was a famous footballer first",
+   "He was the first Black man to lead the magazine"
+  ],
+  "answer": 3
+ },
+ {
+  "page": 1,
+  "sec": "MIX",
+  "type": "mc",
+  "q": "Why was the timing of the Malala cover politically significant?",
+  "options": [
+   "It was printed after a change of owner",
+   "It came during conversation about women’s rights in the Middle East and the withdrawal of Western troops from Afghanistan",
+   "It coincided with the launch of Vogue’s website",
+   "It coincided with a UK general election"
+  ],
+  "answer": 1
+ },
+ {
+  "page": 1,
+  "sec": "MIX",
+  "type": "mc",
+  "q": "What does the colour red connote on the Vogue cover?",
+  "options": [
+   "Wealth and luxury",
+   "Calm and peace",
+   "Sadness and loss",
+   "Passion, power and courage"
+  ],
+  "answer": 3
+ },
+ {
+  "page": 1,
+  "sec": "MIX",
+  "type": "mc",
+  "q": "What is the difference between how a tabloid and a premium magazine might represent an athlete?",
+  "options": [
+   "Premium magazines only use black and white photos",
+   "There is no difference",
+   "Tabloids never write about athletes",
+   "Tabloids often cast athletes as villains or stereotypes, while premium magazines can present them as dignified role models"
+  ],
+  "answer": 3
+ },
+ {
+  "page": 1,
+  "sec": "MIX",
+  "type": "mc",
+  "q": "Why might Vogue choose an activist rather than a traditional fashion model for its cover?",
+  "options": [
+   "To signal inclusivity and that “intelligence is the new beauty”",
+   "Because models refused to appear",
+   "To save money",
+   "Because activists sell more adverts"
+  ],
+  "answer": 0
+ },
+ {
+  "page": 1,
+  "sec": "MIX",
+  "type": "mc",
+  "q": "What do the angel wings on the GQ cover do?",
+  "options": [
+   "Show he is a dangerous player",
+   "Advertise a clothing brand",
+   "Hide the masthead",
+   "Subvert his tabloid reputation and frame him as innocent and protective"
+  ],
+  "answer": 3
+ },
+ {
+  "page": 2,
+  "sec": "TERM",
+  "type": "mc",
+  "q": "What does “representation” mean?",
+  "options": [
+   "The price of a magazine",
+   "A direct, unedited copy of reality",
+   "How groups of people are “re-presented” to the audience",
+   "A magazine’s circulation figures"
+  ],
+  "answer": 2
+ },
+ {
+  "page": 2,
+  "sec": "TERM",
+  "type": "mc",
+  "q": "What is a stereotype?",
+  "options": [
+   "A completely new way of showing a group",
+   "A cover line",
+   "A type of font",
+   "An oversimplified, familiar way of showing a group of people"
+  ],
+  "answer": 3
+ },
+ {
+  "page": 2,
+  "sec": "TERM",
+  "type": "sa",
+  "q": "What term describes a representation that goes against a common stereotype?",
+  "accept": [
+   [
+    "counter",
+    "type"
+   ]
+  ],
+  "model": "Countertype"
+ },
+ {
+  "page": 2,
+  "sec": "TERM",
+  "type": "mc",
+  "q": "“Malala is wearing a red headscarf.” Is this denotation or connotation?",
+  "options": [
+   "Denotation: it describes literally what is in the image",
+   "Connotation: it describes the deeper meaning",
+   "Anchorage: it pins down the meaning",
+   "Masthead: it names the magazine"
+  ],
+  "answer": 0
+ },
+ {
+  "page": 2,
+  "sec": "TERM",
+  "type": "sa",
+  "q": "What term describes the deeper, hidden meaning or association of a sign?",
+  "accept": [
+   [
+    "connotation"
+   ]
+  ],
+  "model": "Connotation"
+ },
+ {
+  "page": 2,
+  "sec": "TERM",
+  "type": "mc",
+  "q": "The “Guardian Angel” headline fixes the meaning of the wings image on GQ. This is an example of…",
+  "options": [
+   "Anchorage",
+   "A masthead",
+   "A byline",
+   "A plug"
+  ],
+  "answer": 0
+ },
+ {
+  "page": 2,
+  "sec": "TERM",
+  "type": "sa",
+  "q": "What term describes the consistent look (colours, fonts, layout) that a magazine uses?",
+  "accept": [
+   [
+    "house",
+    "style"
+   ]
+  ],
+  "model": "House style"
+ },
+ {
+  "page": 2,
+  "sec": "TERM",
+  "type": "mc",
+  "q": "Edward Enninful pushed for diversity at Vogue. Diversity is an example of which area of the theoretical framework?",
+  "options": [
+   "Representation",
+   "Audience theory",
+   "Industry context",
+   "Media language"
+  ],
+  "answer": 0
+ }
+];
+
+var PAGE_INFO = [{"title": "Page 1: Representation", "sub": "How Vogue represents Malala and how GQ represents Raheem Sterling."}, {"title": "Page 2: Mixed Recall", "sub": "Questions from earlier in the booklet to keep it fresh."}, {"title": "Page 3: Terminology", "sub": "The key representation and media language terms."}];
+
+var NPAGES = PAGE_INFO.length;
+var current = 0, submitted = false, warned = false;
+var answers = {};
+
+function norm(s) {
+  return String(s).toLowerCase().replace(/[-\u2013\u2014_]/g, " ").replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim();
+}
+function lev(a, b) {
+  var m = a.length, n = b.length, i, j, d = [];
+  for (i = 0; i <= m; i++) { d[i] = [i]; }
+  for (j = 1; j <= n; j++) { d[0][j] = j; }
+  for (i = 1; i <= m; i++) for (j = 1; j <= n; j++) {
+    d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+  }
+  return d[m][n];
+}
+function termMatch(ans, term) {
+  var t = norm(term);
+  if (ans.indexOf(t) !== -1) return true;
+  var tNo = t.replace(/ /g, ""), aNo = ans.replace(/ /g, "");
+  if (aNo.indexOf(tNo) !== -1) return true;
+  var limit = tNo.length >= 9 ? 2 : (tNo.length >= 5 ? 1 : 0);
+  if (limit === 0) return false;
+  var toks = ans.split(" "), size = t.split(" ").length, k, g;
+  for (k = 0; k + size <= toks.length; k++) {
+    g = toks.slice(k, k + size).join("").replace(/ /g, "");
+    if (lev(g, tNo) <= limit) return true;
+  }
+  return false;
+}
+function markSA(q, raw) {
+  var ans = norm(raw);
+  if (!ans) return false;
+  return q.accept.some(function (alt) {
+    return alt.every(function (term) { return termMatch(ans, term); });
+  });
+}
+function isAnswered(i) {
+  var v = answers[i];
+  if (QUESTIONS[i].type === "mc") return typeof v === "number";
+  return typeof v === "string" && v.trim() !== "";
+}
+function isCorrect(i) {
+  var q = QUESTIONS[i], v = answers[i];
+  if (!isAnswered(i)) return false;
+  return q.type === "mc" ? v === q.answer : markSA(q, v);
+}
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function build() {
+  var pages = document.getElementById("pages"), html = "", p, i;
+  document.getElementById("subline").textContent = QUESTIONS.length + " questions \u00b7 " + NPAGES + " pages \u00b7 answers lock when you submit";
+  for (p = 0; p < NPAGES; p++) {
+    html += '<section class="page" id="page' + p + '"><h2 class="page-title">' + esc(PAGE_INFO[p].title) + '</h2><p class="page-sub">' + esc(PAGE_INFO[p].sub) + '</p>';
+    for (i = 0; i < QUESTIONS.length; i++) {
+      if (QUESTIONS[i].page !== p) continue;
+      html += qHTML(i);
+    }
+    html += '</section>';
+  }
+  pages.innerHTML = html;
+  show(0);
+}
+function qHTML(i) {
+  var q = QUESTIONS[i], h = '<div class="q" id="q' + i + '"><div class="meta"><span><span class="num">Q' + (i + 1) + '</span> \u00b7 ' + esc(SECTIONS[q.sec]) + '</span><span>' + (q.type === "mc" ? "Multiple choice" : "Short answer") + '</span></div>';
+  h += '<div class="text">' + esc(q.q) + '</div>';
+  if (q.type === "mc") {
+    q.options.forEach(function (o, k) {
+      h += '<label class="opt" id="o' + i + '_' + k + '"><input type="radio" name="q' + i + '" value="' + k + '"> <span>' + esc(o) + '</span></label>';
+    });
+  } else {
+    h += '<input type="text" id="t' + i + '" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type your answer">';
+  }
+  h += '<div class="fb" id="fb' + i + '"></div></div>';
+  return h;
+}
+
+function show(n) {
+  current = n;
+  for (var p = 0; p < NPAGES; p++) {
+    document.getElementById("page" + p).classList.toggle("show", p === n || submitted);
+  }
+  var s = "";
+  for (var k = 0; k < NPAGES; k++) {
+    s += '<div class="step' + (k === n ? " active" : "") + (k < n ? " done" : "") + '">Page ' + (k + 1) + '</div>';
+  }
+  document.getElementById("steps").innerHTML = s;
+  document.getElementById("back").disabled = n === 0;
+  document.getElementById("next").textContent = n === NPAGES - 1 ? "Submit for marking" : "Next";
+  document.getElementById("warn").textContent = "";
+  warned = false;
+  if (!submitted) window.scrollTo(0, 0);
+}
+
+document.addEventListener("change", function (e) {
+  if (submitted) return;
+  var t = e.target;
+  if (t.type === "radio") {
+    var i = parseInt(t.name.slice(1), 10);
+    answers[i] = parseInt(t.value, 10);
+    QUESTIONS[i].options.forEach(function (o, k) {
+      document.getElementById("o" + i + "_" + k).classList.toggle("picked", k === answers[i]);
+    });
+  }
+});
+document.addEventListener("input", function (e) {
+  if (submitted) return;
+  var t = e.target;
+  if (t.type === "text") {
+    answers[parseInt(t.id.slice(1), 10)] = t.value;
+  }
+});
+
+document.getElementById("back").onclick = function () { if (current > 0) show(current - 1); };
+document.getElementById("next").onclick = function () {
+  if (current < NPAGES - 1) { show(current + 1); return; }
+  var missing = 0;
+  for (var i = 0; i < QUESTIONS.length; i++) if (!isAnswered(i)) missing++;
+  if (missing > 0 && !warned) {
+    warned = true;
+    document.getElementById("warn").textContent = "You have " + missing + " unanswered question" + (missing === 1 ? "" : "s") + ". Press Submit again to mark anyway. You cannot change answers afterwards.";
+    return;
+  }
+  if (missing === 0 && !warned) {
+    warned = true;
+    document.getElementById("warn").textContent = "Final check: you cannot change answers after submitting. Press Submit again to confirm.";
+    return;
+  }
+  submit();
+};
+
+function submit() {
+  submitted = true;
+  var i, q, ok, card, fb;
+  for (i = 0; i < QUESTIONS.length; i++) {
+    q = QUESTIONS[i]; ok = isCorrect(i);
+    card = document.getElementById("q" + i);
+    card.classList.add("locked", ok ? "right" : "wrong");
+    fb = document.getElementById("fb" + i);
+    var correctText = q.type === "mc" ? q.options[q.answer] : q.model;
+    fb.innerHTML = ok
+      ? '<strong class="ok">\u2713 Correct</strong>'
+      : '<strong class="no">\u2717 Incorrect' + (isAnswered(i) ? '' : ' (no answer)') + '</strong> Correct answer: ' + esc(correctText);
+    if (q.type === "mc") {
+      var radios = document.getElementsByName("q" + i);
+      for (var r = 0; r < radios.length; r++) radios[r].disabled = true;
+    } else {
+      document.getElementById("t" + i).disabled = true;
+    }
+  }
+  document.getElementById("steps").style.display = "none";
+  document.querySelector(".nav").style.display = "none";
+  document.getElementById("warn").style.display = "none";
+  for (var p = 0; p < NPAGES; p++) document.getElementById("page" + p).classList.add("show");
+  buildResults();
+  var pagesEl = document.getElementById("pages");
+  pagesEl.insertAdjacentHTML("afterbegin", '<h2 class="review-head">Review your answers</h2><p class="review-note">Scroll down to see every question with the correct answer. Screenshot the results box at the top for your OneNote.</p>');
+  document.getElementById("results").scrollIntoView();
+}
+
+function buildResults() {
+  var total = QUESTIONS.length, score = 0, i;
+  var bySec = {};
+  Object.keys(SECTIONS).forEach(function (k) { bySec[k] = { got: 0, of: 0, chips: [] }; });
+  for (i = 0; i < total; i++) {
+    var ok = isCorrect(i), s = bySec[QUESTIONS[i].sec];
+    s.of++; if (ok) { s.got++; score++; }
+    s.chips.push('<span class="chip ' + (ok ? 'r' : 'w') + '">Q' + (i + 1) + ' ' + (ok ? '\u2713' : '\u2717') + '</span>');
+  }
+  var pct = Math.round(score / total * 100);
+  var band = pct >= 85 ? "Excellent: secure knowledge" : pct >= 65 ? "Good: a few gaps to close" : pct >= 45 ? "Developing: revisit the booklet" : "Needs support: re-read the booklet and try again";
+  var rows = "", weak = [];
+  Object.keys(SECTIONS).forEach(function (k) {
+    var s = bySec[k], low = s.got / s.of < 0.5;
+    if (low) weak.push(SECTIONS[k]);
+    rows += '<tr><td><strong>' + esc(SECTIONS[k]) + '</strong></td><td>' + s.got + ' / ' + s.of + '</td><td><div class="chips">' + s.chips.join("") + '</div></td><td class="' + (low ? 'status-no' : 'status-ok') + '">' + (low ? 'Revisit' : 'Secure') + '</td></tr>';
+  });
+  var weakText = weak.length
+    ? '<strong>Weak areas to revisit:</strong> ' + weak.map(esc).join(", ")
+    : '<strong>Weak areas:</strong> none. You scored at least half in every section.';
+  document.getElementById("results").innerHTML =
+    '<div class="panel" id="panel"><h2>' + esc(RESULTS_TITLE) + '</h2>' +
+    '<div class="sub">' + esc(RESULTS_SUB) + '</div>' +
+    '<div class="score"><span class="big">' + score + ' / ' + total + '</span><span class="pct">' + pct + '%</span><span class="band">' + band + '</span></div>' +
+    '<table class="grid"><thead><tr><th>Section</th><th>Score</th><th>Questions</th><th>Status</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+    '<div class="weak">' + weakText + '</div></div>';
+  document.getElementById("results").style.display = "block";
+}
+
+build();
+</script>
+</body>
+</html>

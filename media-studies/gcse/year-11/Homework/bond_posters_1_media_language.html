@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bond Posters: Media Language Knowledge Check</title>
+<style>
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  color-scheme: dark;
+  --bg: #0D0D0D; --card: #1a1a1a; --card-2: #242424; --text: #f2efe6; --muted: #b5b0a2;
+  --accent: #C9A84C; --accent-text: #C9A84C; --accent-dim: #8f7733; --on-accent: #0D0D0D; --line: #3a3a3a;
+  --good: #5fd08a; --good-bg: #12301f; --bad: #ff7b7b; --bad-bg: #3a1515;
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font-family: Calibri, Carlito, "Segoe UI", Arial, sans-serif;
+  font-size: 17px; line-height: 1.45;
+}
+.wrap { max-width: 800px; margin: 0 auto; padding: 18px 16px 48px; }
+header.top { text-align: center; padding: 10px 0 14px; border-bottom: 2px solid var(--accent); margin-bottom: 16px; }
+header.top .kicker { color: var(--accent-text); letter-spacing: .18em; text-transform: uppercase; font-size: 13px; font-weight: 700; }
+header.top h1 { margin: 4px 0 2px; font-size: 28px; }
+header.top p { margin: 0; color: var(--muted); font-size: 15px; }
+
+.steps { display: flex; gap: 8px; margin-bottom: 16px; }
+.step { flex: 1; text-align: center; padding: 8px 4px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); font-size: 14px; background: var(--card); }
+.step.active { border-color: var(--accent); color: var(--accent-text); font-weight: 700; }
+.step.done { color: var(--text); }
+
+.page { display: none; }
+.page.show { display: block; }
+.page-title { color: var(--accent-text); font-size: 22px; margin: 0 0 4px; }
+.page-sub { color: var(--muted); margin: 0 0 14px; font-size: 15px; }
+
+.q { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px 14px 12px; margin-bottom: 14px; }
+.q .meta { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+.q .num { color: var(--accent-text); font-weight: 700; }
+.q .text { font-weight: 600; margin-bottom: 10px; }
+.opt { display: flex; gap: 10px; align-items: flex-start; padding: 9px 11px; margin-bottom: 7px; border: 1px solid var(--line); border-radius: 8px; background: var(--card-2); cursor: pointer; }
+.opt:hover { border-color: var(--accent-dim); }
+.opt input { margin-top: 4px; accent-color: var(--accent); }
+.opt.picked { border-color: var(--accent); }
+input[type=text] {
+  width: 100%; padding: 10px 12px; font: inherit; color: var(--text);
+  background: var(--card-2); border: 1px solid var(--line); border-radius: 8px;
+}
+input[type=text]:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+.q.locked .opt, .q.locked input[type=text] { cursor: default; }
+.q.right { border-left-color: var(--good); background: var(--good-bg); }
+.q.wrong { border-left-color: var(--bad); background: var(--bad-bg); }
+.fb { margin-top: 8px; font-size: 15px; }
+.fb strong.ok { color: var(--good); }
+.fb strong.no { color: var(--bad); }
+
+.nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 8px; }
+button {
+  font: inherit; font-weight: 700; padding: 11px 20px; border-radius: 8px; cursor: pointer;
+  border: 2px solid var(--accent-text); background: transparent; color: var(--accent-text);
+}
+button.primary { background: var(--accent-text); color: var(--on-accent); }
+button:hover { filter: brightness(1.12); }
+button[disabled] { opacity: .35; cursor: default; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.warn { color: var(--accent-text); font-size: 15px; margin-top: 10px; text-align: right; min-height: 1.2em; }
+
+#results { display: none; margin-bottom: 28px; }
+.panel { border: 3px solid var(--accent); border-radius: 12px; background: var(--card); padding: 18px; }
+.panel h2 { margin: 0; color: var(--accent-text); font-size: 21px; }
+.panel .sub { color: var(--muted); font-size: 14px; margin-bottom: 12px; }
+.score { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; padding: 10px 0 14px; border-bottom: 1px solid var(--line); }
+.score .big { font-size: 46px; font-weight: 800; line-height: 1; }
+.score .pct { font-size: 28px; color: var(--accent-text); font-weight: 700; }
+.score .band { color: var(--muted); font-size: 15px; }
+table.grid { width: 100%; border-collapse: collapse; margin-top: 12px; }
+table.grid th, table.grid td { border: 1px solid var(--line); padding: 8px 9px; text-align: left; vertical-align: top; }
+table.grid th { color: var(--accent-text); font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { min-width: 46px; text-align: center; padding: 2px 7px; border-radius: 6px; font-weight: 700; font-size: 14px; border: 1px solid; }
+.chip.r { color: var(--good); border-color: var(--good); background: var(--good-bg); }
+.chip.w { color: var(--bad); border-color: var(--bad); background: var(--bad-bg); }
+.status-ok { color: var(--good); font-weight: 700; }
+.status-no { color: var(--bad); font-weight: 700; }
+.weak { margin-top: 14px; padding: 11px 13px; border: 1px solid var(--accent); border-radius: 8px; }
+.weak strong { color: var(--accent-text); }
+.review-head { color: var(--accent-text); font-size: 22px; margin: 6px 0 4px; }
+.review-note { color: var(--muted); margin: 0 0 14px; font-size: 15px; }
+@media (max-width: 520px) {
+  header.top h1 { font-size: 23px; }
+  .score .big { font-size: 38px; }
+  table.grid th, table.grid td { padding: 6px 5px; font-size: 14px; }
+  .chip { min-width: 40px; padding: 1px 4px; font-size: 13px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="kicker">Film · Bond Posters</div>
+    <h1>Bond Posters: Media Language Knowledge Check</h1>
+    <p id="subline"></p>
+  </header>
+
+  <div id="results"></div>
+
+  <div id="quiz">
+    <div class="steps" id="steps"></div>
+    <div id="pages"></div>
+    <div class="nav">
+      <button id="back" type="button">Back</button>
+      <button id="next" type="button" class="primary">Next</button>
+    </div>
+    <div class="warn" id="warn" role="status"></div>
+  </div>
+</div>
+
+<script>
+var RESULTS_TITLE = "Bond Posters Media Language Quiz Results";
+var RESULTS_SUB = "Eduqas GCSE Media Studies · The Man with the Golden Gun (1974) and No Time to Die (2021)";
+var SECTIONS = {"PROD": "Product facts", "ML": "Media language", "KEY": "Genre, narrative and context"};
+
+/* type: mc (options, answer index) or sa (accept: list of alternatives; each alternative = list of terms that must ALL appear) */
+var QUESTIONS = [
+ {
+  "page": 0,
+  "sec": "PROD",
+  "type": "mc",
+  "q": "When was The Man with the Golden Gun released?",
+  "options": [
+   "19 December 1974",
+   "5 October 2019",
+   "1 January 1962",
+   "30 September 2021"
+  ],
+  "answer": 0
+ },
+ {
+  "page": 0,
+  "sec": "PROD",
+  "type": "sa",
+  "q": "Which actor played James Bond in The Man with the Golden Gun?",
+  "accept": [
+   [
+    "moore"
+   ]
+  ],
+  "model": "Roger Moore"
+ },
+ {
+  "page": 0,
+  "sec": "PROD",
+  "type": "mc",
+  "q": "Where was the global premiere of No Time to Die held?",
+  "options": [
+   "Odeon Leicester Square",
+   "The Royal Albert Hall",
+   "The Cannes Film Festival",
+   "Pinewood Studios"
+  ],
+  "answer": 1
+ },
+ {
+  "page": 0,
+  "sec": "PROD",
+  "type": "sa",
+  "q": "Which British company produced both films?",
+  "accept": [
+   [
+    "eon"
+   ]
+  ],
+  "model": "Eon (Everything or Nothing) Productions"
+ },
+ {
+  "page": 0,
+  "sec": "PROD",
+  "type": "mc",
+  "q": "Who designed the No Time to Die poster?",
+  "options": [
+   "Robert McGinnis",
+   "United Artists",
+   "Empire Designs, a British film promotion agency",
+   "Universal Pictures"
+  ],
+  "answer": 2
+ },
+ {
+  "page": 0,
+  "sec": "PROD",
+  "type": "sa",
+  "q": "Which artist and illustrator produced the artwork for The Man with the Golden Gun poster?",
+  "accept": [
+   [
+    "mcginnis"
+   ]
+  ],
+  "model": "Robert McGinnis"
+ },
+ {
+  "page": 0,
+  "sec": "PROD",
+  "type": "mc",
+  "q": "Why does The Man with the Golden Gun include several kung fu scenes?",
+  "options": [
+   "To copy the 007 logo",
+   "Because Roger Moore was a martial artist",
+   "Because it was filmed entirely in Japan",
+   "To reflect the popularity of martial arts films and stars such as Bruce Lee and Jackie Chan"
+  ],
+  "answer": 3
+ },
+ {
+  "page": 1,
+  "sec": "ML",
+  "type": "mc",
+  "q": "What does the large 007 logo, in aged blue tones, reflect on the No Time to Die poster?",
+  "options": [
+   "A low budget",
+   "The film’s romance",
+   "Bond’s youth and energy",
+   "Bond’s experience and maturity"
+  ],
+  "answer": 3
+ },
+ {
+  "page": 1,
+  "sec": "ML",
+  "type": "mc",
+  "q": "Why is the absence of actor names on the No Time to Die poster unusual but effective?",
+  "options": [
+   "It shows the film has no stars",
+   "It shows Craig refused credit",
+   "It suggests confidence in Daniel Craig’s recognisable image",
+   "It is a printing error"
+  ],
+  "answer": 2
+ },
+ {
+  "page": 1,
+  "sec": "ML",
+  "type": "mc",
+  "q": "What does Nomi’s costume on the No Time to Die poster connote?",
+  "options": [
+   "That she is a villain",
+   "Her active role as a 00 agent",
+   "That she is Q’s assistant",
+   "Glamour and a night out"
+  ],
+  "answer": 1
+ },
+ {
+  "page": 1,
+  "sec": "ML",
+  "type": "sa",
+  "q": "Which term describes the montage design that references earlier Bond films?",
+  "accept": [
+   [
+    "intertext"
+   ]
+  ],
+  "model": "Intertextuality"
+ },
+ {
+  "page": 1,
+  "sec": "ML",
+  "type": "sa",
+  "q": "Which object in the foreground of The Man with the Golden Gun poster is being loaded with a bullet engraved with Bond’s name?",
+  "accept": [
+   [
+    "golden",
+    "gun"
+   ]
+  ],
+  "model": "The golden gun"
+ },
+ {
+  "page": 1,
+  "sec": "ML",
+  "type": "mc",
+  "q": "The shooter’s hand is the only part of them we can see on The Man with the Golden Gun poster. What does this create?",
+  "options": [
+   "A credit block",
+   "An enigma code: the audience wants to find out who is trying to kill Bond",
+   "An example of anchorage",
+   "A binary opposition between Bond and the audience"
+  ],
+  "answer": 1
+ },
+ {
+  "page": 1,
+  "sec": "ML",
+  "type": "mc",
+  "q": "Why is the credit block small on The Man with the Golden Gun poster?",
+  "options": [
+   "So it doesn’t divert the audience from the main image",
+   "Because posters never list directors",
+   "Because the cast were unknown",
+   "Because it was printed in colour"
+  ],
+  "answer": 0
+ },
+ {
+  "page": 2,
+  "sec": "KEY",
+  "type": "mc",
+  "q": "In Propp’s idea of character roles, what is the hero?",
+  "options": [
+   "The character who gives the hero a magical object",
+   "The villain’s assistant",
+   "The main character who goes on a quest to restore order and defeat the villain",
+   "The character who needs rescuing"
+  ],
+  "answer": 2
+ },
+ {
+  "page": 2,
+  "sec": "KEY",
+  "type": "sa",
+  "q": "Which Propp role does the golden gun assassin play?",
+  "accept": [
+   [
+    "villain"
+   ]
+  ],
+  "model": "Villain"
+ },
+ {
+  "page": 2,
+  "sec": "KEY",
+  "type": "sa",
+  "q": "Complete Neale’s idea: genres are based on repetition and ___.",
+  "accept": [
+   [
+    "difference"
+   ],
+   [
+    "variation"
+   ]
+  ],
+  "model": "Difference (variation)"
+ },
+ {
+  "page": 2,
+  "sec": "KEY",
+  "type": "mc",
+  "q": "Which is an example of repetition across both Bond posters?",
+  "options": [
+   "Bond shown in smart clothing as the dominant central figure",
+   "A golden gun pointed at Bond",
+   "A montage of earlier Bond films",
+   "A bikini-clad woman in the foreground"
+  ],
+  "answer": 0
+ },
+ {
+  "page": 2,
+  "sec": "KEY",
+  "type": "mc",
+  "q": "Which is an example of difference between the 1974 and 2021 posters?",
+  "options": [
+   "Both include the 007 name",
+   "Nomi is shown as an armed, skilled 00 agent rather than a sexualised side character",
+   "Both list the production companies",
+   "Bond wears a suit in both"
+  ],
+  "answer": 1
+ },
+ {
+  "page": 2,
+  "sec": "KEY",
+  "type": "mc",
+  "q": "Which real-world event do the power plant and explosions on The Man with the Golden Gun poster link to?",
+  "options": [
+   "The 1989 fall of the Berlin Wall",
+   "The 1973 energy crisis",
+   "The 1962 Cuban Missile Crisis",
+   "The 1969 Moon landing"
+  ],
+  "answer": 1
+ },
+ {
+  "page": 2,
+  "sec": "KEY",
+  "type": "mc",
+  "q": "Why were illustrations more common on film posters before the 1990s?",
+  "options": [
+   "Actors refused to be photographed",
+   "Colour posters were cheaper",
+   "Limited technology was available",
+   "The BBFC required drawings"
+  ],
+  "answer": 2
+ }
+];
+
+var PAGE_INFO = [{"title": "Page 1: The Products", "sub": "Release dates, producers, artists and the story behind each poster."}, {"title": "Page 2: Media Language", "sub": "Logos, costume, codes and conventions on both posters."}, {"title": "Page 3: Genre, Narrative and Context", "sub": "Propp, Neale, intertextuality and the 1970s context."}];
+
+var NPAGES = PAGE_INFO.length;
+var current = 0, submitted = false, warned = false;
+var answers = {};
+
+function norm(s) {
+  return String(s).toLowerCase().replace(/[-\u2013\u2014_]/g, " ").replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim();
+}
+function lev(a, b) {
+  var m = a.length, n = b.length, i, j, d = [];
+  for (i = 0; i <= m; i++) { d[i] = [i]; }
+  for (j = 1; j <= n; j++) { d[0][j] = j; }
+  for (i = 1; i <= m; i++) for (j = 1; j <= n; j++) {
+    d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+  }
+  return d[m][n];
+}
+function termMatch(ans, term) {
+  var t = norm(term);
+  if (ans.indexOf(t) !== -1) return true;
+  var tNo = t.replace(/ /g, ""), aNo = ans.replace(/ /g, "");
+  if (aNo.indexOf(tNo) !== -1) return true;
+  var limit = tNo.length >= 9 ? 2 : (tNo.length >= 5 ? 1 : 0);
+  if (limit === 0) return false;
+  var toks = ans.split(" "), size = t.split(" ").length, k, g;
+  for (k = 0; k + size <= toks.length; k++) {
+    g = toks.slice(k, k + size).join("").replace(/ /g, "");
+    if (lev(g, tNo) <= limit) return true;
+  }
+  return false;
+}
+function markSA(q, raw) {
+  var ans = norm(raw);
+  if (!ans) return false;
+  return q.accept.some(function (alt) {
+    return alt.every(function (term) { return termMatch(ans, term); });
+  });
+}
+function isAnswered(i) {
+  var v = answers[i];
+  if (QUESTIONS[i].type === "mc") return typeof v === "number";
+  return typeof v === "string" && v.trim() !== "";
+}
+function isCorrect(i) {
+  var q = QUESTIONS[i], v = answers[i];
+  if (!isAnswered(i)) return false;
+  return q.type === "mc" ? v === q.answer : markSA(q, v);
+}
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function build() {
+  var pages = document.getElementById("pages"), html = "", p, i;
+  document.getElementById("subline").textContent = QUESTIONS.length + " questions \u00b7 " + NPAGES + " pages \u00b7 answers lock when you submit";
+  for (p = 0; p < NPAGES; p++) {
+    html += '<section class="page" id="page' + p + '"><h2 class="page-title">' + esc(PAGE_INFO[p].title) + '</h2><p class="page-sub">' + esc(PAGE_INFO[p].sub) + '</p>';
+    for (i = 0; i < QUESTIONS.length; i++) {
+      if (QUESTIONS[i].page !== p) continue;
+      html += qHTML(i);
+    }
+    html += '</section>';
+  }
+  pages.innerHTML = html;
+  show(0);
+}
+function qHTML(i) {
+  var q = QUESTIONS[i], h = '<div class="q" id="q' + i + '"><div class="meta"><span><span class="num">Q' + (i + 1) + '</span> \u00b7 ' + esc(SECTIONS[q.sec]) + '</span><span>' + (q.type === "mc" ? "Multiple choice" : "Short answer") + '</span></div>';
+  h += '<div class="text">' + esc(q.q) + '</div>';
+  if (q.type === "mc") {
+    q.options.forEach(function (o, k) {
+      h += '<label class="opt" id="o' + i + '_' + k + '"><input type="radio" name="q' + i + '" value="' + k + '"> <span>' + esc(o) + '</span></label>';
+    });
+  } else {
+    h += '<input type="text" id="t' + i + '" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type your answer">';
+  }
+  h += '<div class="fb" id="fb' + i + '"></div></div>';
+  return h;
+}
+
+function show(n) {
+  current = n;
+  for (var p = 0; p < NPAGES; p++) {
+    document.getElementById("page" + p).classList.toggle("show", p === n || submitted);
+  }
+  var s = "";
+  for (var k = 0; k < NPAGES; k++) {
+    s += '<div class="step' + (k === n ? " active" : "") + (k < n ? " done" : "") + '">Page ' + (k + 1) + '</div>';
+  }
+  document.getElementById("steps").innerHTML = s;
+  document.getElementById("back").disabled = n === 0;
+  document.getElementById("next").textContent = n === NPAGES - 1 ? "Submit for marking" : "Next";
+  document.getElementById("warn").textContent = "";
+  warned = false;
+  if (!submitted) window.scrollTo(0, 0);
+}
+
+document.addEventListener("change", function (e) {
+  if (submitted) return;
+  var t = e.target;
+  if (t.type === "radio") {
+    var i = parseInt(t.name.slice(1), 10);
+    answers[i] = parseInt(t.value, 10);
+    QUESTIONS[i].options.forEach(function (o, k) {
+      document.getElementById("o" + i + "_" + k).classList.toggle("picked", k === answers[i]);
+    });
+  }
+});
+document.addEventListener("input", function (e) {
+  if (submitted) return;
+  var t = e.target;
+  if (t.type === "text") {
+    answers[parseInt(t.id.slice(1), 10)] = t.value;
+  }
+});
+
+document.getElementById("back").onclick = function () { if (current > 0) show(current - 1); };
+document.getElementById("next").onclick = function () {
+  if (current < NPAGES - 1) { show(current + 1); return; }
+  var missing = 0;
+  for (var i = 0; i < QUESTIONS.length; i++) if (!isAnswered(i)) missing++;
+  if (missing > 0 && !warned) {
+    warned = true;
+    document.getElementById("warn").textContent = "You have " + missing + " unanswered question" + (missing === 1 ? "" : "s") + ". Press Submit again to mark anyway. You cannot change answers afterwards.";
+    return;
+  }
+  if (missing === 0 && !warned) {
+    warned = true;
+    document.getElementById("warn").textContent = "Final check: you cannot change answers after submitting. Press Submit again to confirm.";
+    return;
+  }
+  submit();
+};
+
+function submit() {
+  submitted = true;
+  var i, q, ok, card, fb;
+  for (i = 0; i < QUESTIONS.length; i++) {
+    q = QUESTIONS[i]; ok = isCorrect(i);
+    card = document.getElementById("q" + i);
+    card.classList.add("locked", ok ? "right" : "wrong");
+    fb = document.getElementById("fb" + i);
+    var correctText = q.type === "mc" ? q.options[q.answer] : q.model;
+    fb.innerHTML = ok
+      ? '<strong class="ok">\u2713 Correct</strong>'
+      : '<strong class="no">\u2717 Incorrect' + (isAnswered(i) ? '' : ' (no answer)') + '</strong> Correct answer: ' + esc(correctText);
+    if (q.type === "mc") {
+      var radios = document.getElementsByName("q" + i);
+      for (var r = 0; r < radios.length; r++) radios[r].disabled = true;
+    } else {
+      document.getElementById("t" + i).disabled = true;
+    }
+  }
+  document.getElementById("steps").style.display = "none";
+  document.querySelector(".nav").style.display = "none";
+  document.getElementById("warn").style.display = "none";
+  for (var p = 0; p < NPAGES; p++) document.getElementById("page" + p).classList.add("show");
+  buildResults();
+  var pagesEl = document.getElementById("pages");
+  pagesEl.insertAdjacentHTML("afterbegin", '<h2 class="review-head">Review your answers</h2><p class="review-note">Scroll down to see every question with the correct answer. Screenshot the results box at the top for your OneNote.</p>');
+  document.getElementById("results").scrollIntoView();
+}
+
+function buildResults() {
+  var total = QUESTIONS.length, score = 0, i;
+  var bySec = {};
+  Object.keys(SECTIONS).forEach(function (k) { bySec[k] = { got: 0, of: 0, chips: [] }; });
+  for (i = 0; i < total; i++) {
+    var ok = isCorrect(i), s = bySec[QUESTIONS[i].sec];
+    s.of++; if (ok) { s.got++; score++; }
+    s.chips.push('<span class="chip ' + (ok ? 'r' : 'w') + '">Q' + (i + 1) + ' ' + (ok ? '\u2713' : '\u2717') + '</span>');
+  }
+  var pct = Math.round(score / total * 100);
+  var band = pct >= 85 ? "Excellent: secure knowledge" : pct >= 65 ? "Good: a few gaps to close" : pct >= 45 ? "Developing: revisit the booklet" : "Needs support: re-read the booklet and try again";
+  var rows = "", weak = [];
+  Object.keys(SECTIONS).forEach(function (k) {
+    var s = bySec[k], low = s.got / s.of < 0.5;
+    if (low) weak.push(SECTIONS[k]);
+    rows += '<tr><td><strong>' + esc(SECTIONS[k]) + '</strong></td><td>' + s.got + ' / ' + s.of + '</td><td><div class="chips">' + s.chips.join("") + '</div></td><td class="' + (low ? 'status-no' : 'status-ok') + '">' + (low ? 'Revisit' : 'Secure') + '</td></tr>';
+  });
+  var weakText = weak.length
+    ? '<strong>Weak areas to revisit:</strong> ' + weak.map(esc).join(", ")
+    : '<strong>Weak areas:</strong> none. You scored at least half in every section.';
+  document.getElementById("results").innerHTML =
+    '<div class="panel" id="panel"><h2>' + esc(RESULTS_TITLE) + '</h2>' +
+    '<div class="sub">' + esc(RESULTS_SUB) + '</div>' +
+    '<div class="score"><span class="big">' + score + ' / ' + total + '</span><span class="pct">' + pct + '%</span><span class="band">' + band + '</span></div>' +
+    '<table class="grid"><thead><tr><th>Section</th><th>Score</th><th>Questions</th><th>Status</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+    '<div class="weak">' + weakText + '</div></div>';
+  document.getElementById("results").style.display = "block";
+}
+
+build();
+</script>
+</body>
+</html>
