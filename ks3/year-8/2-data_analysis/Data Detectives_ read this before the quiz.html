@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Data Detectives: read this before the quiz</title>
+<style>
+:root{
+  --navy:#12254a; --navy-2:#1d3566; --cyan:#0aa8c9; --cyan-soft:#d9f3f9;
+  --amber:#e08a00; --amber-soft:#fff0d6; --green:#2a9d5c; --green-soft:#dcf4e5; --red:#d64545; --red-soft:#fde3e3;
+  --bg:#f5f8fc; --card:#ffffff; --text:#16233b; --muted:#53607a; --line:#d5deec;
+  --hero-text:#ffffff;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --navy:#0b1730; --navy-2:#162b57; --cyan:#35c6e3; --cyan-soft:#10303a;
+    --amber:#ffb23e; --amber-soft:#3a2a0b; --green:#58cf8a; --green-soft:#12301f; --red:#ff8383; --red-soft:#3b1717;
+    --bg:#0c1426; --card:#142039; --text:#e8eefb; --muted:#a3b0cc; --line:#2a3a5e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --navy:#0b1730; --navy-2:#162b57; --cyan:#35c6e3; --cyan-soft:#10303a;
+  --amber:#ffb23e; --amber-soft:#3a2a0b; --green:#58cf8a; --green-soft:#12301f; --red:#ff8383; --red-soft:#3b1717;
+  --bg:#0c1426; --card:#142039; --text:#e8eefb; --muted:#a3b0cc; --line:#2a3a5e;
+  color-scheme: dark;
+}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Calibri,Carlito,"Trebuchet MS",Arial,sans-serif;font-size:1.125rem;line-height:1.6}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+h1,h2,h3{font-family:"Trebuchet MS",Calibri,Carlito,Arial,sans-serif;line-height:1.2;margin:0 0 .5em}
+h2{font-size:1.75rem;color:var(--navy)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) h2{color:var(--cyan)}}
+:root[data-theme="dark"] h2{color:var(--cyan)}
+h3{font-size:1.25rem}
+p{margin:0 0 .9em;max-width:68ch}
+a{color:var(--cyan)}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+/* hero */
+.hero{background:var(--navy);color:var(--hero-text);padding:calc(env(safe-area-inset-top,0px) + 2.5rem) 1.25rem 2.5rem}
+.hero-in{max-width:960px;margin:0 auto;display:grid;gap:1.5rem;grid-template-columns:1.1fr .9fr;align-items:center}
+.hero h1{font-size:clamp(2rem,6vw,3.2rem);margin-bottom:.4em}
+.hero p{color:#dbe6fb;font-size:1.2rem}
+.hero .tag{display:inline-block;background:var(--cyan);color:#06222b;font-weight:700;padding:.2rem .8rem;border-radius:99px;margin-bottom:1rem;font-size:1rem}
+.mission{background:var(--navy-2);border:2px solid var(--cyan);border-radius:14px;padding:1rem 1.2rem;font-size:1.05rem;color:#fff}
+.mission strong{color:var(--cyan)}
+.mission ul{margin:.4rem 0 0;padding-left:1.2rem}
+@media (max-width:760px){.hero-in{grid-template-columns:1fr}}
+
+/* nav */
+nav.jump{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top,0px) + .5rem) .75rem .5rem}
+nav.jump ul{list-style:none;margin:0 auto;padding:0;max-width:960px;display:flex;gap:.4rem;overflow-x:auto}
+nav.jump a{display:block;white-space:nowrap;text-decoration:none;color:var(--text);background:var(--bg);border:1px solid var(--line);padding:.3rem .8rem;border-radius:99px;font-size:.98rem}
+nav.jump a:hover{border-color:var(--cyan)}
+
+main{max-width:960px;margin:0 auto;padding:1rem 1.25rem 3rem}
+section{padding:2.2rem 0 1rem;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:0}
+.lead{font-size:1.2rem;color:var(--muted)}
+
+.grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));margin:1rem 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem}
+.card h3{margin-bottom:.3em}
+.card p:last-child{margin-bottom:0}
+.keyterm{background:var(--cyan-soft);border-left:6px solid var(--cyan);border-radius:8px;padding:.7rem 1rem;margin:1rem 0}
+.keyterm b{color:var(--navy)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .keyterm b{color:var(--cyan)}}
+:root[data-theme="dark"] .keyterm b{color:var(--cyan)}
+.watch{background:var(--amber-soft);border-left:6px solid var(--amber);border-radius:8px;padding:.7rem 1rem;margin:1rem 0}
+
+.steps{list-style:none;margin:1rem 0;padding:0;display:grid;gap:.6rem}
+.steps li{display:flex;gap:.9rem;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem 1rem}
+.steps .n{flex:none;width:2.1rem;height:2.1rem;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .steps .n{background:var(--cyan);color:#06222b}}
+:root[data-theme="dark"] .steps .n{background:var(--cyan);color:#06222b}
+
+button{font:inherit;cursor:pointer}
+.btn{background:var(--navy);color:#fff;border:0;border-radius:10px;padding:.55rem 1rem;font-weight:700}
+.btn:hover{background:var(--navy-2)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn{background:var(--cyan);color:#06222b}}
+:root[data-theme="dark"] .btn{background:var(--cyan);color:#06222b}
+.tabs{display:flex;flex-wrap:wrap;gap:.5rem;margin:.5rem 0 1rem}
+.tab{background:var(--card);color:var(--text);border:2px solid var(--line);border-radius:10px;padding:.45rem .9rem}
+.tab[aria-pressed="true"]{border-color:var(--cyan);background:var(--cyan-soft);font-weight:700}
+
+.lab{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin:1.2rem 0}
+.lab h3{margin-top:0}
+.lab svg{width:100%;height:auto;display:block;max-width:560px}
+.svgtxt{fill:var(--text);font-family:Calibri,Carlito,Arial,sans-serif}
+.axis{stroke:var(--muted);stroke-width:2}
+.out{padding:.7rem 1rem;border-radius:8px;margin-top:.8rem;min-height:3rem}
+.out.good{background:var(--green-soft);border-left:6px solid var(--green)}
+.out.bad{background:var(--red-soft);border-left:6px solid var(--red)}
+.out.info{background:var(--cyan-soft);border-left:6px solid var(--cyan)}
+
+table.data{border-collapse:collapse;width:100%;max-width:560px;margin:.5rem 0}
+table.data th,table.data td{border:1px solid var(--line);padding:.4rem .7rem;text-align:left}
+table.data th{background:var(--cyan-soft)}
+table.data td.pick{cursor:pointer}
+table.data td.pick:hover{background:var(--amber-soft)}
+table.data td.flag{background:var(--amber-soft);outline:2px solid var(--amber);outline-offset:-2px}
+table.data td.right{background:var(--green-soft)}
+table.data td.miss{background:var(--red-soft)}
+
+.nums{display:flex;flex-wrap:wrap;gap:.5rem;margin:.6rem 0}
+.num{min-width:3rem;text-align:center;padding:.5rem .6rem;border:2px solid var(--line);border-radius:10px;background:var(--card);font-weight:700;font-size:1.2rem;transition:background .2s,border-color .2s}
+.num.mid{background:var(--cyan-soft);border-color:var(--cyan)}
+.num.big{background:var(--amber-soft);border-color:var(--amber)}
+
+.quick{margin:1rem 0}
+.quick details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem}
+.quick summary{cursor:pointer;font-weight:700}
+.quick details[open] summary{margin-bottom:.4rem}
+
+dl.words{display:grid;grid-template-columns:minmax(120px,200px) 1fr;gap:.4rem 1rem;margin:1rem 0}
+dl.words dt{font-weight:700;color:var(--navy)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) dl.words dt{color:var(--cyan)}}
+:root[data-theme="dark"] dl.words dt{color:var(--cyan)}
+dl.words dd{margin:0}
+dl.words dt,dl.words dd{padding:.4rem 0;border-bottom:1px solid var(--line)}
+@media (max-width:560px){dl.words{grid-template-columns:1fr}dl.words dt{border-bottom:0;padding-bottom:0}}
+
+.checklist{list-style:none;padding:0;margin:1rem 0}
+.checklist li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.5rem .9rem;margin-bottom:.5rem}
+.checklist label{display:flex;gap:.7rem;align-items:flex-start;cursor:pointer}
+.checklist input{width:1.3rem;height:1.3rem;margin-top:.2rem;accent-color:var(--cyan)}
+.table-wrap{overflow-x:auto}
+.quiz-cta{margin:1.5rem 0 .5rem;padding:1.2rem 1.3rem;background:var(--card);border:2px solid var(--amber);border-radius:16px;display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between}
+.quiz-cta p{margin:0;max-width:44ch}
+.btn-orange{display:inline-block;background:#f28c00;color:#1a1200;text-decoration:none;font-weight:700;font-size:1.2rem;padding:.8rem 1.6rem;border-radius:12px;border:2px solid #b86500}
+.btn-orange:hover{background:#ffa22a}
+.btn-orange:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+footer{max-width:960px;margin:0 auto;padding:1rem 1.25rem 2rem;color:var(--muted);font-size:.95rem}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-in">
+    <div>
+      <span class="tag">Year 8 Data Science</span>
+      <h1>Data Detectives</h1>
+      <p>Data is everywhere. Data scientists are the detectives who find the clues hidden inside it. Read this page, try the activities, and you will be ready for the quiz.</p>
+    </div>
+    <div class="mission">
+      <strong>Your mission</strong>
+      <ul>
+        <li>Read each section slowly.</li>
+        <li>Try every activity.</li>
+        <li>Use your own words to explain each idea to a partner.</li>
+      </ul>
+      <p style="margin:.7rem 0 0">Tip: the quiz asks the same ideas in different ways. Learning the meaning is better than memorising one sentence.</p>
+    </div>
+  </div>
+</header>
+
+<nav class="jump" aria-label="Jump to a section">
+  <ul>
+    <li><a href="#big-picture">The big picture</a></li>
+    <li><a href="#clean">Getting data ready</a></li>
+    <li><a href="#charts">Charts and graphs</a></li>
+    <li><a href="#relationships">Relationships</a></li>
+    <li><a href="#middle">The middle value</a></li>
+    <li><a href="#outliers">Outliers</a></li>
+    <li><a href="#words">Key words</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- ===================== BIG PICTURE ===================== -->
+<section id="big-picture">
+  <h2>The big picture</h2>
+  <p class="lead">Every time you watch a video, play a game or tap a map, data is made. A data scientist uses that data to answer questions.</p>
+
+  <div class="keyterm"><b>Data science</b> is the study of data so that we can get knowledge from it. Knowledge means useful facts that help us make good choices.</div>
+
+  <h3>Four jobs you need to know</h3>
+  <div class="grid">
+    <div class="card">
+      <h3>Data analysis</h3>
+      <p>Looking carefully at data to answer a question. Many people do basic data analysis in a <b>spreadsheet</b>. A spreadsheet is a grid of rows and columns that can sort numbers and work things out. <b>Excel</b> and <b>Google Sheets</b> are two well-known examples.</p>
+    </div>
+    <div class="card">
+      <h3>Data mining</h3>
+      <p>Digging through lots of data to <b>find patterns and information</b> that you would not spot by just looking. Think of mining for gold: you sift through tonnes of rock to find a few shiny pieces.</p>
+    </div>
+    <div class="card">
+      <h3>Machine learning</h3>
+      <p>A method where a computer uses <b>algorithms</b> (sets of step-by-step rules) to learn patterns from data. The more data it sees, the better it gets. This is how a video app learns which clips you like.</p>
+    </div>
+    <div class="card">
+      <h3>Data visualisation</h3>
+      <p>Showing data as a picture, such as a chart or graph. A picture lets our brains <b>spot patterns much faster</b> than a long list of numbers.</p>
+    </div>
+  </div>
+
+  <div class="watch"><b>Watch out:</b> “data mining” and “machine learning” are close cousins. Data mining is about <i>finding</i> the patterns. Machine learning is about a computer <i>using algorithms to learn</i> from them. Read each quiz question closely to see which one it describes.</div>
+
+  <h3>The steps of a data science project</h3>
+  <p>Data scientists follow steps in order. The order matters!</p>
+  <ol class="steps">
+    <li><span class="n">1</span><div><b>Ask a question.</b> Decide what problem you want to solve. This is always the starting point, because it tells you what data you need. Example: “Do students who sleep more feel less tired in lessons?”</div></li>
+    <li><span class="n">2</span><div><b>Collect data.</b> Find or gather the numbers and facts. A survey is one way.</div></li>
+    <li><span class="n">3</span><div><b>Check and clean the data.</b> Make sure it is correct and fix the mistakes (see the next section).</div></li>
+    <li><span class="n">4</span><div><b>Analyse it.</b> Look for patterns and relationships.</div></li>
+    <li><span class="n">5</span><div><b>Visualise it.</b> Draw a chart or graph.</div></li>
+    <li><span class="n">6</span><div><b>Share what you found.</b> Explain your answer to the question you started with.</div></li>
+  </ol>
+</section>
+
+<!-- ===================== CLEAN ===================== -->
+<section id="clean">
+  <h2>Getting data ready</h2>
+  <p class="lead">Data is often messy. People make typing mistakes, leave boxes empty or write silly answers. If we use bad data, we get bad answers.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Data validation</h3>
+      <p><b>Checking</b> that the data is accurate and good enough to use. We check it against rules, such as “age must be a number between 11 and 14”.</p>
+    </div>
+    <div class="card">
+      <h3>Data cleaning</h3>
+      <p><b>Finding and removing (or fixing) errors</b> in the data. Cleaning makes sure the data is accurate and useful for analysis.</p>
+    </div>
+  </div>
+  <div class="watch"><b>How to tell them apart:</b> validation is like a <i>check-up</i>, because you test whether the data is OK. Cleaning is like the <i>treatment</i>, because you fix what is wrong. They work together.</div>
+
+  <div class="lab">
+    <h3>Try it: find the errors</h3>
+    <p>A Year 8 class answered a survey. The rules were: age is 11 to 14, and screen time is between 0 and 16 hours a day. <b>Click the cells you think are errors</b>, then press Check.</p>
+    <div class="table-wrap">
+    <table class="data" id="errTable">
+      <thead><tr><th>Student</th><th>Age</th><th>Screen time (hours/day)</th></tr></thead>
+      <tbody>
+        <tr><td>Zara</td><td class="pick" data-e="0">12</td><td class="pick" data-e="0">3</td></tr>
+        <tr><td>Leo</td><td class="pick" data-e="0">13</td><td class="pick" data-e="0">2.5</td></tr>
+        <tr><td>Mia</td><td class="pick" data-e="1">120</td><td class="pick" data-e="0">4</td></tr>
+        <tr><td>Sam</td><td class="pick" data-e="0">12</td><td class="pick" data-e="1">-5</td></tr>
+        <tr><td>Ola</td><td class="pick" data-e="0">13</td><td class="pick" data-e="1">lots</td></tr>
+        <tr><td>Kit</td><td class="pick" data-e="0">12</td><td class="pick" data-e="0">3</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <button class="btn" id="errCheck" type="button">Check my answers</button>
+    <div class="out info" id="errOut" role="status">Pick the cells that break the rules.</div>
+  </div>
+</section>
+
+<!-- ===================== CHARTS ===================== -->
+<section id="charts">
+  <h2>Charts and graphs</h2>
+  <p class="lead">A chart or graph is the most common way to show data. The big advantage is that you can see patterns and compare things <b>quickly</b>, without reading every number.</p>
+
+  <p>Different charts do different jobs. Choose a job below to see which chart fits.</p>
+  <div class="lab">
+    <div class="tabs" role="group" aria-label="Choose a job">
+      <button class="tab" type="button" data-chart="bar" aria-pressed="true">Compare amounts</button>
+      <button class="tab" type="button" data-chart="line" aria-pressed="false">Change over time</button>
+      <button class="tab" type="button" data-chart="pie" aria-pressed="false">Parts of a whole</button>
+      <button class="tab" type="button" data-chart="scatter" aria-pressed="false">Two things together</button>
+    </div>
+    <div id="chartBox"></div>
+    <div class="out info" id="chartText" role="status"></div>
+  </div>
+
+  <div class="keyterm"><b>Software for charts:</b> spreadsheet programs such as Excel and Google Sheets can draw charts from your data in a few clicks. Specialist visualisation tools, such as Tableau and Power BI, do the same job for much bigger data.</div>
+</section>
+
+<!-- ===================== RELATIONSHIPS ===================== -->
+<section id="relationships">
+  <h2>Relationships between data</h2>
+  <p class="lead">Data scientists often ask: “When one thing changes, what happens to the other?”</p>
+
+  <div class="keyterm"><b>Correlation</b> is the word for the relationship between two variables. A <b>variable</b> is anything that can change or be measured, such as height, age or the score in a game. When we talk about the general relationship between two variables, we are talking about their correlation.</div>
+
+  <p>The best graph for this is a <b>scatter graph</b> (also called a scatter plot or scatter diagram). It shows the relationship between two <b>quantitative</b> variables. Quantitative just means they are numbers you can measure or count. Each dot is one person or one thing.</p>
+
+  <div class="lab">
+    <h3>Try it: three kinds of correlation</h3>
+    <div class="tabs" role="group" aria-label="Choose a correlation">
+      <button class="tab" type="button" data-corr="pos" aria-pressed="true">Positive</button>
+      <button class="tab" type="button" data-corr="neg" aria-pressed="false">Negative</button>
+      <button class="tab" type="button" data-corr="none" aria-pressed="false">None</button>
+    </div>
+    <div id="corrBox"></div>
+    <div class="out info" id="corrText" role="status"></div>
+  </div>
+
+  <div class="grid">
+    <div class="card"><h3>Positive correlation</h3><p>Both variables go <b>up together</b>. The dots slope upwards from left to right.</p></div>
+    <div class="card"><h3>Negative correlation</h3><p>One variable goes <b>up</b> while the other goes <b>down</b>. The dots slope downwards from left to right.</p></div>
+    <div class="card"><h3>No correlation</h3><p>There is <b>no relationship</b> between the variables. The dots are scattered with no pattern.</p></div>
+  </div>
+
+  <h3>What is a trend?</h3>
+  <p>A <b>trend</b> is a pattern you can see in a data set, such as a gradual rise or fall. If the number of steps you walk each week keeps going up, there is an upward trend. A <b>line graph</b> is great for showing trends over time.</p>
+
+  <div class="watch"><b>Careful!</b> Correlation does not always mean that one thing <i>causes</i> the other. The number of umbrellas sold and the number of puddles in town go up together, but umbrellas do not make puddles. The rain causes both.</div>
+
+  <div class="quick">
+    <details><summary>Quick think: what kind of correlation is it?</summary>
+      <p>Look at these three pairs. Say positive, negative or none, and explain why.</p>
+      <p>A) Hours spent practising piano and number of mistakes in a performance.<br>B) Length of a bus journey and the price of the ticket.<br>C) Your birthday month and your score in a spelling test.</p>
+      <p><b>Answers:</b> A is negative (more practice, fewer mistakes). B is positive (longer journey, higher price). C is none (they have nothing to do with each other).</p>
+    </details>
+  </div>
+</section>
+
+<!-- ===================== MIDDLE ===================== -->
+<section id="middle">
+  <h2>The middle value</h2>
+  <p class="lead">When we have a lot of numbers, we need one number that tells us what is typical.</p>
+
+  <div class="keyterm"><b>Median</b> is the middle value in a list of data values that has been <b>sorted</b> (put in order from smallest to biggest).</div>
+
+  <div class="lab">
+    <h3>Try it: find the median</h3>
+    <p>These are the number of books five students read last month.</p>
+    <div class="nums" id="medNums" aria-live="polite"></div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+      <button class="btn" type="button" id="medSort">1. Sort the numbers</button>
+      <button class="btn" type="button" id="medMid">2. Find the middle</button>
+      <button class="btn" type="button" id="medAdd">Add one more student</button>
+      <button class="btn" type="button" id="medReset">Start again</button>
+    </div>
+    <div class="out info" id="medText" role="status">Press “Sort the numbers” first. You must always sort before you find the median.</div>
+  </div>
+
+  <p><b>If there are two middle numbers</b> (an even amount of data), add them together and divide by 2. The answer is halfway between them.</p>
+</section>
+
+<!-- ===================== OUTLIERS ===================== -->
+<section id="outliers">
+  <h2>Outliers</h2>
+  <p class="lead">Sometimes one data point is very different from all the others.</p>
+
+  <div class="keyterm"><b>Outlier:</b> a data point that does not fit the pattern of the rest of the data. It stands out, usually because it is much higher or much lower than the other values.</div>
+
+  <div class="lab">
+    <h3>Try it: spot the outlier</h3>
+    <p>Each dot is a student. The graph shows hours of football practice and goals scored. <b>Click the dot that does not fit the pattern.</b></p>
+    <div id="outBox"></div>
+    <div class="out info" id="outText" role="status">Click a dot.</div>
+  </div>
+
+  <h3>Why do we look for outliers?</h3>
+  <div class="grid">
+    <div class="card"><h3>It might be a mistake</h3><p>Maybe someone typed 120 instead of 12. Finding the outlier lets us check and fix it.</p></div>
+    <div class="card"><h3>It can change the results</h3><p>One very big or very small value can pull the answers away from the truth. This could lead us to a wrong conclusion.</p></div>
+    <div class="card"><h3>It might be interesting</h3><p>Sometimes the outlier is real and tells us something special, such as a person who is truly amazing at something. We should find out why.</p></div>
+  </div>
+
+  <div class="lab">
+    <h3>Try it: see the damage one outlier can do</h3>
+    <p>Six students said how much pocket money they get each week. The <b>mean</b> is the usual “average”: add all the values, then divide by how many there are.</p>
+    <div class="nums" id="pmNums"></div>
+    <button class="btn" type="button" id="pmToggle">Add the outlier</button>
+    <div class="out info" id="pmText" role="status"></div>
+  </div>
+
+  <div class="watch"><b>Remember:</b> an outlier is not always wrong. Do not just delete it. First ask, “Is this a mistake, or is it real?”</div>
+</section>
+
+<!-- ===================== WORDS ===================== -->
+<section id="words">
+  <h2>Key words</h2>
+  <p>Say each word out loud and explain it to a partner without looking.</p>
+  <dl class="words">
+    <dt>Data science</dt><dd>The study of data to get knowledge from it.</dd>
+    <dt>Data analysis</dt><dd>Examining data carefully to answer a question. Spreadsheets are often used for the basics.</dd>
+    <dt>Data mining</dt><dd>Searching large amounts of data to find patterns and information.</dd>
+    <dt>Machine learning</dt><dd>Using algorithms so a computer can learn patterns from data.</dd>
+    <dt>Data validation</dt><dd>Checking that data is accurate and good quality.</dd>
+    <dt>Data cleaning</dt><dd>Finding and removing or fixing errors in data.</dd>
+    <dt>Visualisation</dt><dd>Showing data as a chart or graph so patterns are easy to see.</dd>
+    <dt>Bar graph</dt><dd>Compares amounts in different groups.</dd>
+    <dt>Line graph</dt><dd>Shows how something changes over time (a trend).</dd>
+    <dt>Pie chart</dt><dd>Shows parts of a whole.</dd>
+    <dt>Scatter graph</dt><dd>Shows the relationship between two number variables.</dd>
+    <dt>Correlation</dt><dd>The relationship between two variables.</dd>
+    <dt>Positive correlation</dt><dd>Both variables increase together.</dd>
+    <dt>Negative correlation</dt><dd>One increases while the other decreases.</dd>
+    <dt>No correlation</dt><dd>There is no relationship between the variables.</dd>
+    <dt>Trend</dt><dd>A pattern in data, such as a gradual increase or decrease.</dd>
+    <dt>Median</dt><dd>The middle value in a sorted list.</dd>
+    <dt>Outlier</dt><dd>A data point that does not fit the pattern and stands out from the rest.</dd>
+  </dl>
+
+  <h3>Before you start the quiz</h3>
+  <p>Tick each one when you could explain it to a friend.</p>
+  <ul class="checklist">
+    <li><label><input type="checkbox"> I can say what data science is and name the first step in a project.</label></li>
+    <li><label><input type="checkbox"> I can tell the difference between data validation and data cleaning.</label></li>
+    <li><label><input type="checkbox"> I know which chart to choose for comparing, trends, parts of a whole and relationships.</label></li>
+    <li><label><input type="checkbox"> I can describe positive, negative and no correlation.</label></li>
+    <li><label><input type="checkbox"> I can find the median, even when there are two middle numbers.</label></li>
+    <li><label><input type="checkbox"> I can explain what an outlier is and why it matters.</label></li>
+  </ul>
+
+  <div class="quiz-cta">
+    <p><b>Ready?</b> Log in to Educake to start your quiz. You can look back at this page if you get stuck.</p>
+    <a class="btn-orange" href="https://www.educake.co.uk/" target="_blank" rel="noopener noreferrer">Go to Educake</a>
+  </div>
+</section>
+
+</main>
+<footer>Year 8 Data Science | Read this page first, then complete the quiz in your own words.</footer>
+
+<script>
+(function(){
+  var NS="http://www.w3.org/2000/svg";
+  function $(id){return document.getElementById(id);}
+  function svgOpen(w,h){return '<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="Example graph" xmlns="'+NS+'">';}
+
+  /* ---------- error finder ---------- */
+  var errCells=[].slice.call(document.querySelectorAll("#errTable td.pick"));
+  errCells.forEach(function(td){
+    td.tabIndex=0;
+    function tog(){ if(td.classList.contains("right")||td.classList.contains("miss"))return; td.classList.toggle("flag"); }
+    td.addEventListener("click",tog);
+    td.addEventListener("keydown",function(e){ if(e.key==="Enter"||e.key===" "){e.preventDefault();tog();} });
+  });
+  $("errCheck").addEventListener("click",function(){
+    var hit=0,wrong=0,miss=0;
+    errCells.forEach(function(td){
+      var isErr=td.getAttribute("data-e")==="1", flagged=td.classList.contains("flag");
+      td.classList.remove("right","miss");
+      if(flagged&&isErr){td.classList.remove("flag");td.classList.add("right");hit++;}
+      else if(flagged&&!isErr){wrong++;}
+      else if(!flagged&&isErr){td.classList.add("miss");miss++;}
+    });
+    var o=$("errOut");
+    if(hit===3&&wrong===0){
+      o.className="out good";
+      o.innerHTML="<b>All three found.</b> Age 120 is impossible. Screen time of -5 hours cannot happen. “lots” is not a number. Validation spotted them. Cleaning would fix them, for example by asking the student again.";
+    } else {
+      o.className="out bad";
+      o.innerHTML="You found "+hit+" of 3 errors"+(wrong?" and flagged "+wrong+" cell(s) that follow the rules (they are still highlighted in amber)":"")+(miss?". Red cells are errors you missed":"")+". Re-read the rules above and try again: untick amber cells by clicking them.";
+    }
+  });
+
+  /* ---------- chart chooser ---------- */
+  var chartDefs={
+    bar:{text:"<b>Bar graph.</b> Use it to compare amounts in different groups. Here, the heights of the bars make it easy to see which pet is most popular.",
+      draw:function(){
+        var d=[["Dogs",12],["Cats",9],["Fish",5],["Rabbits",3]],s=svgOpen(420,250);
+        s+='<line class="axis" x1="50" y1="200" x2="400" y2="200"/><line class="axis" x1="50" y1="20" x2="50" y2="200"/>';
+        d.forEach(function(r,i){var h=r[1]*13,x=70+i*85;
+          s+='<rect x="'+x+'" y="'+(200-h)+'" width="55" height="'+h+'" rx="4" fill="var(--cyan)"/>';
+          s+='<text class="svgtxt" x="'+(x+27)+'" y="222" font-size="14" text-anchor="middle">'+r[0]+'</text>';
+          s+='<text class="svgtxt" x="'+(x+27)+'" y="'+(194-h)+'" font-size="14" text-anchor="middle" font-weight="700">'+r[1]+'</text>';});
+        s+='<text class="svgtxt" x="210" y="244" font-size="13" text-anchor="middle">Favourite pet (number of students)</text></svg>';return s;}},
+    line:{text:"<b>Line graph.</b> Use it to show how something changes over a period of time. Here, you can see the trend: the savings go up month after month.",
+      draw:function(){
+        var v=[5,12,18,22,35,41],m=["Jan","Feb","Mar","Apr","May","Jun"],s=svgOpen(420,250),pts=[];
+        s+='<line class="axis" x1="50" y1="200" x2="400" y2="200"/><line class="axis" x1="50" y1="20" x2="50" y2="200"/>';
+        v.forEach(function(y,i){var px=70+i*64,py=200-y*4;pts.push(px+","+py);});
+        s+='<polyline points="'+pts.join(" ")+'" fill="none" stroke="var(--cyan)" stroke-width="4"/>';
+        v.forEach(function(y,i){var px=70+i*64,py=200-y*4;
+          s+='<circle cx="'+px+'" cy="'+py+'" r="6" fill="var(--navy-2)" stroke="var(--cyan)" stroke-width="3"/><text class="svgtxt" x="'+px+'" y="222" font-size="14" text-anchor="middle">'+m[i]+'</text>';});
+        s+='<text class="svgtxt" x="210" y="244" font-size="13" text-anchor="middle">Month (savings in pounds)</text></svg>';return s;}},
+    pie:{text:"<b>Pie chart.</b> Use it to show parts of a whole. The whole circle is 100% of something, and each slice is one part. Here, the whole is a weekend day.",
+      draw:function(){
+        var d=[["Sleep",40,"var(--navy-2)"],["Screens",25,"var(--cyan)"],["Sport",20,"var(--green)"],["Chores",15,"var(--amber)"]],s=svgOpen(420,250),a0=-Math.PI/2,cx=120,cy=125,r=100;
+        d.forEach(function(x,i){var a1=a0+x[1]/100*2*Math.PI;
+          var p='M'+cx+','+cy+' L'+(cx+r*Math.cos(a0))+','+(cy+r*Math.sin(a0))+' A'+r+','+r+' 0 '+(x[1]>50?1:0)+' 1 '+(cx+r*Math.cos(a1))+','+(cy+r*Math.sin(a1))+' Z';
+          s+='<path d="'+p+'" fill="'+x[2]+'" stroke="var(--card)" stroke-width="3"/>';
+          s+='<rect x="260" y="'+(60+i*34)+'" width="18" height="18" rx="3" fill="'+x[2]+'"/><text class="svgtxt" x="286" y="'+(75+i*34)+'" font-size="15">'+x[0]+' ('+x[1]+'%)</text>';
+          a0=a1;});
+        return s+'</svg>';}},
+    scatter:{text:"<b>Scatter graph.</b> Use it to see the relationship between two number variables. Each dot is one student, showing height and arm span together.",
+      draw:function(){return scatterSVG("pos","Height (cm)","Arm span (cm)",false);}}
+  };
+  function showChart(k){
+    $("chartBox").innerHTML=chartDefs[k].draw();
+    $("chartText").innerHTML=chartDefs[k].text;
+    [].forEach.call(document.querySelectorAll("[data-chart]"),function(b){b.setAttribute("aria-pressed",b.getAttribute("data-chart")===k?"true":"false");});
+  }
+  [].forEach.call(document.querySelectorAll("[data-chart]"),function(b){b.addEventListener("click",function(){showChart(b.getAttribute("data-chart"));});});
+
+  /* ---------- scatter generator ---------- */
+  function scatterSVG(mode,xl,yl,trend){
+    var seed=7;function rnd(){seed=(seed*9301+49297)%233280;return seed/233280;}
+    var s=svgOpen(420,270),i,x,y,px,py;
+    s+='<line class="axis" x1="50" y1="220" x2="400" y2="220"/><line class="axis" x1="50" y1="20" x2="50" y2="220"/>';
+    var pts=[];
+    for(i=0;i<16;i++){
+      x=0.05+i*0.06;
+      if(mode==="pos")y=x+(rnd()-.5)*0.22;
+      else if(mode==="neg")y=1-x+(rnd()-.5)*0.22;
+      else y=0.1+rnd()*0.8;
+      y=Math.max(.05,Math.min(.95,y));
+      pts.push([x,y]);
+    }
+    if(mode==="none"){pts.forEach(function(p,j){p[0]=0.05+rnd()*0.9;});}
+    pts.forEach(function(p){px=50+p[0]*340;py=220-p[1]*190;
+      s+='<circle cx="'+px+'" cy="'+py+'" r="6" fill="var(--cyan)" stroke="var(--navy-2)" stroke-width="1.5"/>';});
+    if(trend&&mode==="pos")s+='<line x1="60" y1="205" x2="385" y2="40" stroke="var(--amber)" stroke-width="3" stroke-dasharray="7 6"/>';
+    if(trend&&mode==="neg")s+='<line x1="60" y1="40" x2="385" y2="205" stroke="var(--amber)" stroke-width="3" stroke-dasharray="7 6"/>';
+    s+='<text class="svgtxt" x="225" y="254" font-size="14" text-anchor="middle">'+xl+'</text>';
+    s+='<text class="svgtxt" x="14" y="120" font-size="14" text-anchor="middle" transform="rotate(-90 14 120)">'+yl+'</text></svg>';
+    return s;
+  }
+  var corrDefs={
+    pos:{x:"Hours of practice",y:"Free throws scored",t:"<b>Positive correlation.</b> More practice goes with more free throws scored. Both go up. The dashed line shows the direction of the pattern."},
+    neg:{x:"Hours of gaming",y:"Battery left (%)",t:"<b>Negative correlation.</b> The longer the console is used, the less battery is left. One goes up while the other goes down."},
+    none:{x:"Shoe size",y:"Spelling test score",t:"<b>No correlation.</b> Shoe size has nothing to do with spelling scores. The dots are scattered with no pattern."}
+  };
+  function showCorr(k){
+    var d=corrDefs[k];
+    $("corrBox").innerHTML=scatterSVG(k,d.x,d.y,true);
+    $("corrText").innerHTML=d.t;
+    [].forEach.call(document.querySelectorAll("[data-corr]"),function(b){b.setAttribute("aria-pressed",b.getAttribute("data-corr")===k?"true":"false");});
+  }
+  [].forEach.call(document.querySelectorAll("[data-corr]"),function(b){b.addEventListener("click",function(){showCorr(b.getAttribute("data-corr"));});});
+
+  /* ---------- median ---------- */
+  var base=[14,3,9,21,7],medList,sorted,even;
+  function medReset(){medList=base.slice();sorted=false;even=false;medDraw();
+    $("medText").className="out info";$("medText").textContent="Press “Sort the numbers” first. You must always sort before you find the median.";}
+  function medDraw(midIdx){
+    var h="";medList.forEach(function(n,i){h+='<span class="num'+(midIdx&&midIdx.indexOf(i)>-1?' mid':'')+'">'+n+'</span>';});
+    $("medNums").innerHTML=h;
+  }
+  $("medSort").addEventListener("click",function(){
+    medList.sort(function(a,b){return a-b;});sorted=true;medDraw();
+    $("medText").className="out info";$("medText").textContent="Sorted from smallest to biggest. Now find the middle.";
+  });
+  $("medMid").addEventListener("click",function(){
+    var o=$("medText");
+    if(!sorted){o.className="out bad";o.textContent="Stop! Sort the numbers first. The middle of an unsorted list is not the median.";return;}
+    var n=medList.length;
+    if(n%2===1){var m=(n-1)/2;medDraw([m]);o.className="out good";o.innerHTML="There are "+n+" numbers. The middle one has the same number of values on each side. <b>The median is "+medList[m]+".</b>";}
+    else{var a=n/2-1,b=n/2,v=(medList[a]+medList[b])/2;medDraw([a,b]);o.className="out good";o.innerHTML="There are "+n+" numbers, so there are two middle values: "+medList[a]+" and "+medList[b]+". Add them and divide by 2: <b>the median is "+v+".</b>";}
+  });
+  $("medAdd").addEventListener("click",function(){
+    if(even)return;medList.push(12);even=true;sorted=false;medDraw();
+    $("medText").className="out info";$("medText").textContent="A sixth student read 12 books. The list is not in order again, so sort it and then find the middle.";
+  });
+  $("medReset").addEventListener("click",medReset);
+
+  /* ---------- outlier spot ---------- */
+  function drawOutlier(){
+    var data=[[1,2],[2,2.5],[3,4],[4,4.5],[5,6],[6,6.5],[7,8],[8,8.5],[9,3]],s=svgOpen(420,270);
+    s+='<line class="axis" x1="50" y1="220" x2="400" y2="220"/><line class="axis" x1="50" y1="20" x2="50" y2="200"/><line class="axis" x1="50" y1="20" x2="50" y2="220"/>';
+    data.forEach(function(p,i){var px=50+p[0]*35,py=220-p[1]*20;
+      s+='<circle data-i="'+i+'" cx="'+px+'" cy="'+py+'" r="9" fill="var(--cyan)" stroke="var(--navy-2)" stroke-width="2" style="cursor:pointer" tabindex="0" role="button" aria-label="Dot '+(i+1)+'"/>';});
+    s+='<text class="svgtxt" x="225" y="254" font-size="14" text-anchor="middle">Hours of practice</text>';
+    s+='<text class="svgtxt" x="14" y="120" font-size="14" text-anchor="middle" transform="rotate(-90 14 120)">Goals scored</text></svg>';
+    $("outBox").innerHTML=s;
+    [].forEach.call($("outBox").querySelectorAll("circle"),function(c){
+      function pick(){
+        var i=+c.getAttribute("data-i"),o=$("outText");
+        if(i===8){c.setAttribute("fill","var(--amber)");o.className="out good";o.innerHTML="<b>Yes, that is the outlier.</b> Every other dot rises as practice goes up, but this student practised a lot and scored few goals. It does not fit the pattern. We should check: was it a mistake, or was the student injured?";}
+        else{o.className="out bad";o.textContent="That dot follows the upward pattern, so it is not the outlier. Look for the one that is far away from the rest.";}
+      }
+      c.addEventListener("click",pick);
+      c.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();pick();}});
+    });
+  }
+
+  /* ---------- pocket money ---------- */
+  var withOut=false;
+  function drawPM(){
+    var vals=[4,5,5,6,7,8];if(withOut)vals.push(60);
+    var h="";vals.forEach(function(v){h+='<span class="num'+(v===60?' big':'')+'">£'+v+'</span>';});
+    $("pmNums").innerHTML=h;
+    var sum=vals.reduce(function(a,b){return a+b;},0),mean=sum/vals.length;
+    var s=vals.slice().sort(function(a,b){return a-b;}),n=s.length;
+    var med=n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;
+    $("pmText").className="out "+(withOut?"bad":"info");
+    $("pmText").innerHTML="Mean: <b>£"+mean.toFixed(2)+"</b> &nbsp;|&nbsp; Median: <b>£"+med.toFixed(2)+"</b>"+(withOut?"<br>One student with £60 dragged the mean up a lot, so it no longer shows what most students get. This is why we look for outliers before we trust our results.":"<br>These numbers all look similar, so the mean and median are close.");
+    $("pmToggle").textContent=withOut?"Remove the outlier":"Add the outlier";
+  }
+  $("pmToggle").addEventListener("click",function(){withOut=!withOut;drawPM();});
+
+  /* init */
+  showChart("bar");showCorr("pos");medReset();drawOutlier();drawPM();
+})();
+</script>
+</body>
+</html>
