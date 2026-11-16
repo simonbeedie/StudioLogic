@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spreadsheet Skills: read this before the quiz</title>
+<style>
+:root{
+  --navy:#12254a; --navy-2:#1d3566; --cyan:#0aa8c9; --cyan-soft:#d9f3f9;
+  --amber:#e08a00; --amber-soft:#fff0d6; --green:#2a9d5c; --green-soft:#dcf4e5; --red:#d64545; --red-soft:#fde3e3;
+  --bg:#f5f8fc; --card:#ffffff; --text:#16233b; --muted:#53607a; --line:#d5deec; --hl:var(--navy);
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --navy:#0b1730; --navy-2:#162b57; --cyan:#35c6e3; --cyan-soft:#10303a;
+    --amber:#ffb23e; --amber-soft:#3a2a0b; --green:#58cf8a; --green-soft:#12301f; --red:#ff8383; --red-soft:#3b1717;
+    --bg:#0c1426; --card:#142039; --text:#e8eefb; --muted:#a3b0cc; --line:#2a3a5e; --hl:var(--cyan);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --navy:#0b1730; --navy-2:#162b57; --cyan:#35c6e3; --cyan-soft:#10303a;
+  --amber:#ffb23e; --amber-soft:#3a2a0b; --green:#58cf8a; --green-soft:#12301f; --red:#ff8383; --red-soft:#3b1717;
+  --bg:#0c1426; --card:#142039; --text:#e8eefb; --muted:#a3b0cc; --line:#2a3a5e; --hl:var(--cyan);
+  color-scheme: dark;
+}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Calibri,Carlito,"Trebuchet MS",Arial,sans-serif;font-size:1.125rem;line-height:1.6}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+h1,h2,h3{font-family:"Trebuchet MS",Calibri,Carlito,Arial,sans-serif;line-height:1.2;margin:0 0 .5em}
+h2{font-size:1.75rem;color:var(--hl)}
+h3{font-size:1.25rem}
+p{margin:0 0 .9em;max-width:68ch}
+code,.mono{font-family:Consolas,"Courier New",monospace;background:var(--cyan-soft);padding:.05rem .4rem;border-radius:5px;font-size:1.02em}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+.hero{background:var(--navy);color:#fff;padding:calc(env(safe-area-inset-top,0px) + 2.5rem) 1.25rem 2.5rem}
+.hero-in{max-width:960px;margin:0 auto;display:grid;gap:1.5rem;grid-template-columns:1.1fr .9fr;align-items:center}
+.hero h1{font-size:clamp(2rem,6vw,3.2rem);margin-bottom:.4em}
+.hero p{color:#dbe6fb;font-size:1.2rem}
+.hero .tag{display:inline-block;background:var(--cyan);color:#06222b;font-weight:700;padding:.2rem .8rem;border-radius:99px;margin-bottom:1rem;font-size:1rem}
+.mission{background:var(--navy-2);border:2px solid var(--cyan);border-radius:14px;padding:1rem 1.2rem;font-size:1.05rem;color:#fff}
+.mission strong{color:var(--cyan)}
+.mission ul{margin:.4rem 0 0;padding-left:1.2rem}
+@media (max-width:760px){.hero-in{grid-template-columns:1fr}}
+
+nav.jump{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top,0px) + .5rem) .75rem .5rem}
+nav.jump ul{list-style:none;margin:0 auto;padding:0;max-width:960px;display:flex;gap:.4rem;overflow-x:auto}
+nav.jump a{display:block;white-space:nowrap;text-decoration:none;color:var(--text);background:var(--bg);border:1px solid var(--line);padding:.3rem .8rem;border-radius:99px;font-size:.98rem}
+nav.jump a:hover{border-color:var(--cyan)}
+
+main{max-width:960px;margin:0 auto;padding:1rem 1.25rem 3rem}
+section{padding:2.2rem 0 1rem;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:0}
+.lead{font-size:1.2rem;color:var(--muted)}
+.grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin:1rem 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem}
+.card h3{margin-bottom:.3em}
+.card p:last-child{margin-bottom:0}
+.keyterm{background:var(--cyan-soft);border-left:6px solid var(--cyan);border-radius:8px;padding:.7rem 1rem;margin:1rem 0}
+.keyterm b{color:var(--hl)}
+.watch{background:var(--amber-soft);border-left:6px solid var(--amber);border-radius:8px;padding:.7rem 1rem;margin:1rem 0}
+
+button{font:inherit;cursor:pointer}
+.btn{background:var(--navy);color:#fff;border:0;border-radius:10px;padding:.5rem 1rem;font-weight:700}
+.btn:hover{background:var(--navy-2)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn{background:var(--cyan);color:#06222b}}
+:root[data-theme="dark"] .btn{background:var(--cyan);color:#06222b}
+.btnrow{display:flex;gap:.5rem;flex-wrap:wrap;margin:.6rem 0}
+.tab{background:var(--card);color:var(--text);border:2px solid var(--line);border-radius:10px;padding:.45rem .9rem}
+.tab[aria-pressed="true"]{border-color:var(--cyan);background:var(--cyan-soft);font-weight:700}
+
+.lab{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin:1.2rem 0}
+.lab h3{margin-top:0}
+.out{padding:.7rem 1rem;border-radius:8px;margin-top:.8rem;min-height:3rem}
+.out.good{background:var(--green-soft);border-left:6px solid var(--green)}
+.out.bad{background:var(--red-soft);border-left:6px solid var(--red)}
+.out.info{background:var(--cyan-soft);border-left:6px solid var(--cyan)}
+.table-wrap{overflow-x:auto}
+
+/* spreadsheet look */
+.fbar{display:flex;align-items:stretch;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:.4rem 0;max-width:560px;background:var(--card)}
+.fbar .nb{min-width:5.2rem;padding:.3rem .6rem;background:var(--cyan-soft);font-weight:700;border-right:1px solid var(--line);text-align:center}
+.fbar .fx{padding:.3rem .7rem;font-family:Consolas,"Courier New",monospace;flex:1;min-height:2rem}
+.fbar .fxl{padding:.3rem .5rem;color:var(--muted);font-style:italic;border-right:1px solid var(--line)}
+table.sheet{border-collapse:collapse;max-width:560px;width:100%;background:var(--card);table-layout:fixed}
+table.sheet th,table.sheet td{border:1px solid var(--line);padding:.35rem .6rem;text-align:left;height:2.2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+table.sheet th{background:var(--cyan-soft);text-align:center;font-weight:700;color:var(--text)}
+table.sheet th.rh{width:2.6rem}
+table.sheet td.sel{outline:3px solid var(--amber);outline-offset:-3px;background:var(--amber-soft)}
+table.sheet td.cell{cursor:pointer}
+table.sheet td.cell:hover{background:var(--cyan-soft)}
+table.sheet td.hdr{font-weight:700}
+table.sheet td.num{text-align:right}
+table.sheet td.calc{background:var(--green-soft)}
+table.sheet td.bad{background:var(--red-soft)}
+table.sheet td.hit{background:var(--green-soft)}
+.sw{display:inline-block;width:1.7rem;height:1.7rem;border-radius:6px;border:2px solid var(--line);vertical-align:middle}
+.sw-btn{background:none;border:0;padding:.15rem}
+.sw-btn:focus-visible .sw{outline:3px solid var(--amber)}
+
+input.type{font:inherit;font-family:Consolas,"Courier New",monospace;padding:.5rem .7rem;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--text);width:100%;max-width:340px}
+input.type:focus-visible{border-color:var(--cyan)}
+
+dl.words{display:grid;grid-template-columns:minmax(130px,210px) 1fr;gap:.4rem 1rem;margin:1rem 0}
+dl.words dt{font-weight:700;color:var(--hl)}
+dl.words dd{margin:0}
+dl.words dt,dl.words dd{padding:.4rem 0;border-bottom:1px solid var(--line)}
+@media (max-width:560px){dl.words{grid-template-columns:1fr}dl.words dt{border-bottom:0;padding-bottom:0}}
+.checklist{list-style:none;padding:0;margin:1rem 0}
+.checklist li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.5rem .9rem;margin-bottom:.5rem}
+.checklist label{display:flex;gap:.7rem;align-items:flex-start;cursor:pointer}
+.checklist input{width:1.3rem;height:1.3rem;margin-top:.2rem;accent-color:var(--cyan)}
+.quick{margin:1rem 0}
+.quick details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem}
+.quick summary{cursor:pointer;font-weight:700}
+.quick details[open] summary{margin-bottom:.4rem}
+.quiz-cta{margin:1.5rem 0 .5rem;padding:1.2rem 1.3rem;background:var(--card);border:2px solid var(--amber);border-radius:16px;display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between}
+.quiz-cta p{margin:0;max-width:44ch}
+.btn-orange{display:inline-block;background:#f28c00;color:#1a1200;text-decoration:none;font-weight:700;font-size:1.2rem;padding:.8rem 1.6rem;border-radius:12px;border:2px solid #b86500}
+.btn-orange:hover{background:#ffa22a}
+.btn-orange:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+.svgtxt{fill:var(--text);font-family:Calibri,Carlito,Arial,sans-serif}
+footer{max-width:960px;margin:0 auto;padding:1rem 1.25rem 2rem;color:var(--muted);font-size:.95rem}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-in">
+    <div>
+      <span class="tag">Year 8 Spreadsheets</span>
+      <h1>Spreadsheet Skills</h1>
+      <p>A spreadsheet is a grid that stores data and does the sums for you. Learn the parts of the grid, the tools and the functions, then try them out before your quiz.</p>
+    </div>
+    <div class="mission">
+      <strong>Your mission</strong>
+      <ul>
+        <li>Read each section slowly.</li>
+        <li>Click, type and try every activity.</li>
+        <li>Explain each idea to a partner in your own words.</li>
+      </ul>
+      <p style="margin:.7rem 0 0">Tip: the quiz asks about the same ideas in different ways, so learn what each thing <i>does</i>.</p>
+    </div>
+  </div>
+</header>
+
+<nav class="jump" aria-label="Jump to a section">
+  <ul>
+    <li><a href="#grid">The grid</a></li>
+    <li><a href="#formulas">Formulas</a></li>
+    <li><a href="#functions">Functions</a></li>
+    <li><a href="#fixed">Fixed references</a></li>
+    <li><a href="#tools">Handy tools</a></li>
+    <li><a href="#typeit">Type it</a></li>
+    <li><a href="#words">Key words</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- ============ GRID ============ -->
+<section id="grid">
+  <h2>The grid</h2>
+  <p class="lead">Every spreadsheet is built from the same few parts. Learn their names first.</p>
+
+  <div class="grid">
+    <div class="card"><h3>Cell</h3><p>One box in the grid. A cell holds a <b>single data point</b>, such as a name, a number or a date.</p></div>
+    <div class="card"><h3>Column</h3><p>A line of cells going <b>up and down</b> (vertical). Columns are named with letters: A, B, C…</p></div>
+    <div class="card"><h3>Row</h3><p>A line of cells going <b>across</b> (horizontal). Rows are named with numbers: 1, 2, 3…</p></div>
+    <div class="card"><h3>Range</h3><p>A <b>group of cells</b> that you select together, so you can format them or use them in a calculation.</p></div>
+  </div>
+
+  <div class="watch"><b>Memory trick:</b> a <b>column</b> is like a tall pillar holding up a building, so columns go up and down. Rows are like rows of seats in a cinema, so they go across.</div>
+
+  <div class="keyterm"><b>Cell reference:</b> the name of a cell, made from its column letter and then its row number. The cell where column C meets row 4 is called <code>C4</code>.</div>
+
+  <div class="keyterm"><b>Formula bar:</b> the bar near the top of the spreadsheet. It shows what is inside the selected cell, and you can edit the cell there too. Next to it is a small box showing the cell’s reference.</div>
+
+  <div class="lab">
+    <h3>Try it: explore the grid</h3>
+    <p>This is a tuck shop sheet. <b>Click any cell.</b> Watch the reference and the formula bar change. Then <b>click a second cell</b> to select a range.</p>
+    <div class="fbar"><span class="nb" id="gNB">–</span><span class="fxl">fx</span><span class="fx" id="gFX">Click a cell</span></div>
+    <div class="table-wrap"><table class="sheet" id="gSheet" aria-label="Tuck shop spreadsheet"></table></div>
+    <div class="out info" id="gOut" role="status">Click a cell to start.</div>
+    <div class="btnrow"><button class="btn" type="button" id="gReset">Clear selection</button></div>
+  </div>
+</section>
+
+<!-- ============ FORMULAS ============ -->
+<section id="formulas">
+  <h2>Formulas</h2>
+  <p class="lead">A formula is an instruction that tells the spreadsheet to work something out.</p>
+
+  <div class="keyterm">Every formula starts with the <b>equals sign</b> <code>=</code>. The equals sign tells the spreadsheet, “This is a calculation, not just text.”</div>
+
+  <div class="lab">
+    <h3>Try it: see why <code>=</code> matters</h3>
+    <div class="btnrow">
+      <button class="tab" type="button" data-eq="with" aria-pressed="true">Typed with =</button>
+      <button class="tab" type="button" data-eq="without" aria-pressed="false">Typed without =</button>
+    </div>
+    <div class="fbar"><span class="nb">B7</span><span class="fxl">fx</span><span class="fx" id="eqFX"></span></div>
+    <table class="sheet" aria-label="Equals sign example"><tr><th class="rh"></th><th>B</th></tr><tr><th>7</th><td id="eqCell" class="num"></td></tr></table>
+    <div class="out info" id="eqOut" role="status"></div>
+  </div>
+
+  <p>Inside a formula you can use the symbols <code>+</code> add, <code>-</code> subtract, <code>*</code> multiply and <code>/</code> divide, as well as cell references. Because the formula uses references, the answer <b>updates by itself</b> when a number changes.</p>
+</section>
+
+<!-- ============ FUNCTIONS ============ -->
+<section id="functions">
+  <h2>Functions</h2>
+  <p class="lead">A function is a ready-made formula that is already built into the spreadsheet.</p>
+
+  <div class="keyterm"><b>Function:</b> a <b>preset formula</b>. You give it a range of cells, and it does the work. Without functions, adding 50 cells would mean typing 50 plus signs!</div>
+
+  <h3>How to write one</h3>
+  <p>Start with <code>=</code>, then the function name, then the range inside brackets. A range is written with a <b>colon</b> between the first and last cells. Functions do not need spaces.</p>
+  <p style="font-size:1.4rem"><code>=SUM(B3:B9)</code></p>
+  <p>This reads: “Add up the cells from B3 to B9.” Capital letters are neater, but spreadsheets also understand small letters.</p>
+
+  <div class="grid">
+    <div class="card"><h3><code>SUM</code></h3><p><b>Adds up</b> the numbers in a range.</p></div>
+    <div class="card"><h3><code>AVERAGE</code></h3><p>Finds the <b>average</b>: it adds the numbers, then divides by how many there are.</p></div>
+    <div class="card"><h3><code>MIN</code></h3><p>Finds the <b>smallest</b> (lowest) value. Think “minimum”.</p></div>
+    <div class="card"><h3><code>MAX</code></h3><p>Finds the <b>biggest</b> (largest) value. Think “maximum”.</p></div>
+    <div class="card"><h3><code>COUNT</code></h3><p><b>Counts how many cells contain numbers</b> in a range. It skips words.</p></div>
+  </div>
+
+  <div class="watch"><b>Spot the difference:</b> <code>SUM</code> adds the <i>values</i> together. <code>COUNT</code> only counts <i>how many</i> number cells there are. If five cells hold 10, 20, 30, 40 and 50, SUM gives 150 but COUNT gives 5.</div>
+
+  <div class="lab">
+    <h3>Try it: use the functions</h3>
+    <p>Use the tuck shop sheet. <b>Click one cell, then click another</b> to select a range. Then press a function button.</p>
+    <div class="fbar"><span class="nb" id="fNB">–</span><span class="fxl">fx</span><span class="fx" id="fFX">Select a range</span></div>
+    <div class="table-wrap"><table class="sheet" id="fSheet" aria-label="Tuck shop spreadsheet for functions"></table></div>
+    <div class="btnrow">
+      <button class="btn" type="button" data-fn="SUM">SUM</button>
+      <button class="btn" type="button" data-fn="AVERAGE">AVERAGE</button>
+      <button class="btn" type="button" data-fn="MIN">MIN</button>
+      <button class="btn" type="button" data-fn="MAX">MAX</button>
+      <button class="btn" type="button" data-fn="COUNT">COUNT</button>
+    </div>
+    <div class="out info" id="fOut" role="status">Try the “Sold” column, then try a range that includes words in column A. See what COUNT does with words.</div>
+  </div>
+</section>
+
+<!-- ============ FIXED ============ -->
+<section id="fixed">
+  <h2>Keeping a reference fixed</h2>
+  <p class="lead">When you copy a formula down a column, the cell references change to match the new row. Usually that is helpful. Sometimes it causes trouble.</p>
+
+  <div class="keyterm"><b>Absolute reference:</b> a cell reference that stays <b>locked</b> when the formula is copied or moved. You make one by putting a dollar sign <code>$</code> before the column letter and the row number. So <code>D1</code> becomes <code>$D$1</code>.</div>
+
+  <p>A normal reference is a <b>relative reference</b>. It moves with the formula.</p>
+
+  <div class="lab">
+    <h3>Try it: copy the formula down</h3>
+    <p>A game gives <b>10 points for every item</b> collected. The 10 is in cell D1. Column C works out the points: items × 10.</p>
+    <div class="btnrow">
+      <button class="tab" type="button" data-abs="rel" aria-pressed="true">Normal reference: D1</button>
+      <button class="tab" type="button" data-abs="abs" aria-pressed="false">Absolute reference: $D$1</button>
+    </div>
+    <div class="table-wrap"><table class="sheet" id="absSheet" aria-label="Absolute reference example"></table></div>
+    <div class="out info" id="absOut" role="status"></div>
+  </div>
+</section>
+
+<!-- ============ TOOLS ============ -->
+<section id="tools">
+  <h2>Handy tools</h2>
+  <p class="lead">These features save time and make a spreadsheet clearer.</p>
+
+  <div class="grid">
+    <div class="card"><h3>Autofill</h3><p>Fills in cells for you by <b>copying a pattern</b> from the cells next to it. Select the cells, then drag the small square in the corner (the <b>fill handle</b>).</p></div>
+    <div class="card"><h3>Sort</h3><p>Puts data in order. <b>Ascending</b> means smallest to largest, or A to Z. <b>Descending</b> means largest to smallest, or Z to A. Works on numbers and on words.</p></div>
+    <div class="card"><h3>Merge cells</h3><p>Joins several cells into <b>one larger cell</b>. It is often used for a title across the top of a table.</p></div>
+    <div class="card"><h3>Fill colour</h3><p>Changes the <b>background colour</b> of a cell. Use it to make headings stand out.</p></div>
+    <div class="card"><h3>Chart</h3><p>Turns your numbers into a <b>picture</b>, so patterns are easier to see.</p></div>
+  </div>
+
+  <div class="watch"><b>Do not mix up:</b> “fill colour” changes the background of a cell. The font colour changes the letters. “Autofill” is about filling in <i>values</i>, not colours.</div>
+
+  <div class="lab">
+    <h3>Try it: autofill</h3>
+    <p>Pick a starting pattern, then press “Drag the fill handle”.</p>
+    <div class="btnrow">
+      <button class="tab" type="button" data-af="days" aria-pressed="true">Mon, Tue</button>
+      <button class="tab" type="button" data-af="months" aria-pressed="false">Jan, Feb</button>
+      <button class="tab" type="button" data-af="num" aria-pressed="false">5, 10</button>
+      <button class="tab" type="button" data-af="odd" aria-pressed="false">3, 6</button>
+    </div>
+    <div class="table-wrap"><table class="sheet" id="afSheet" aria-label="Autofill example"></table></div>
+    <div class="btnrow"><button class="btn" type="button" id="afGo">Drag the fill handle</button></div>
+    <div class="out info" id="afOut" role="status"></div>
+  </div>
+
+  <div class="lab">
+    <h3>Try it: sort</h3>
+    <div class="btnrow">
+      <button class="btn" type="button" data-sort="nameA">Name A to Z</button>
+      <button class="btn" type="button" data-sort="nameD">Name Z to A</button>
+      <button class="btn" type="button" data-sort="scoreA">Score: smallest first</button>
+      <button class="btn" type="button" data-sort="scoreD">Score: largest first</button>
+    </div>
+    <div class="table-wrap"><table class="sheet" id="sortSheet" aria-label="Sorting example"></table></div>
+    <div class="out info" id="sortOut" role="status">Notice that each name stays with its own score. Sorting moves whole rows.</div>
+  </div>
+
+  <div class="lab">
+    <h3>Try it: merge cells and fill colour</h3>
+    <p><b>Click a cell</b> to select it, then pick a colour. Press the merge button to join the top three cells into one.</p>
+    <div class="table-wrap"><table class="sheet" id="fmtSheet" aria-label="Formatting example"></table></div>
+    <div class="btnrow" id="swatches" role="group" aria-label="Fill colours">
+      <button class="sw-btn" type="button" data-col="#ffd27a" aria-label="Orange fill"><span class="sw" style="background:#ffd27a"></span></button>
+      <button class="sw-btn" type="button" data-col="#9fe3f2" aria-label="Cyan fill"><span class="sw" style="background:#9fe3f2"></span></button>
+      <button class="sw-btn" type="button" data-col="#a9e5b9" aria-label="Green fill"><span class="sw" style="background:#a9e5b9"></span></button>
+      <button class="sw-btn" type="button" data-col="" aria-label="No fill"><span class="sw" style="background:transparent"></span></button>
+      <button class="btn" type="button" id="mergeBtn">Merge the top row</button>
+    </div>
+    <div class="out info" id="fmtOut" role="status">Click a cell, then choose a fill colour.</div>
+  </div>
+
+  <div class="lab">
+    <h3>Charts</h3>
+    <p>Select a range of data, then insert a chart. Here is the tuck shop “Sold” column as a chart.</p>
+    <div id="chartBox"></div>
+  </div>
+</section>
+
+<!-- ============ TYPE IT ============ -->
+<section id="typeit">
+  <h2>Type it like a pro</h2>
+  <p class="lead">Practise writing functions exactly as you would type them. Use the <b>formula bar rules</b>: start with <code>=</code>, write the function name, then brackets with the range inside, and no spaces.</p>
+
+  <div class="watch"><b>The pattern:</b> <code>=NAME(first:last)</code>. The colon means “all the cells from the first one to the last one”. When you are asked to write a function exactly as you would type it, include the <code>=</code> at the start unless the question tells you otherwise.</div>
+
+  <div class="lab">
+    <h3>Your turn</h3>
+    <p id="tiQ"></p>
+    <input class="type" id="tiIn" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Type your function" placeholder="Type here">
+    <div class="btnrow"><button class="btn" type="button" id="tiCheck">Check</button><button class="btn" type="button" id="tiNext">Next question</button></div>
+    <div class="out info" id="tiOut" role="status"></div>
+  </div>
+</section>
+
+<!-- ============ WORDS ============ -->
+<section id="words">
+  <h2>Key words</h2>
+  <p>Say each word out loud and explain it to a partner without looking.</p>
+  <dl class="words">
+    <dt>Cell</dt><dd>One box in the grid, holding a single piece of data.</dd>
+    <dt>Column</dt><dd>A vertical line of cells (up and down), named with a letter.</dd>
+    <dt>Row</dt><dd>A horizontal line of cells (across), named with a number.</dd>
+    <dt>Cell reference</dt><dd>The name of a cell: column letter then row number, such as C4.</dd>
+    <dt>Range</dt><dd>A group of cells selected together. Written like C2:C6.</dd>
+    <dt>Formula bar</dt><dd>The bar near the top where you see and edit what is in a cell.</dd>
+    <dt>Formula</dt><dd>A calculation. It always starts with =.</dd>
+    <dt>Function</dt><dd>A preset formula, such as SUM.</dd>
+    <dt>SUM</dt><dd>Adds up the numbers in a range.</dd>
+    <dt>AVERAGE</dt><dd>Finds the average of the numbers in a range.</dd>
+    <dt>MIN</dt><dd>Finds the lowest value in a range.</dd>
+    <dt>MAX</dt><dd>Finds the largest value in a range.</dd>
+    <dt>COUNT</dt><dd>Counts the cells in a range that hold numbers.</dd>
+    <dt>Absolute reference</dt><dd>A reference locked with $ so it does not change when copied.</dd>
+    <dt>Autofill</dt><dd>Fills cells automatically using a pattern from nearby cells.</dd>
+    <dt>Sort</dt><dd>Puts data in order, ascending or descending.</dd>
+    <dt>Merge cells</dt><dd>Joins cells into one larger cell.</dd>
+    <dt>Fill colour</dt><dd>Changes the background colour of a cell.</dd>
+    <dt>Chart</dt><dd>A picture made from your data.</dd>
+  </dl>
+
+  <h3>Before you start the quiz</h3>
+  <p>Tick each one when you could explain it to a friend.</p>
+  <ul class="checklist">
+    <li><label><input type="checkbox"> I know the difference between a cell, a row, a column and a range.</label></li>
+    <li><label><input type="checkbox"> I know what the formula bar is for and which symbol starts every formula.</label></li>
+    <li><label><input type="checkbox"> I can say what SUM, AVERAGE, MIN, MAX and COUNT each do.</label></li>
+    <li><label><input type="checkbox"> I can write a function with a range, with no spaces.</label></li>
+    <li><label><input type="checkbox"> I can explain what an absolute reference is and how to make one.</label></li>
+    <li><label><input type="checkbox"> I know what autofill, sort, merge cells, fill colour and charts do.</label></li>
+  </ul>
+
+  <div class="quiz-cta">
+    <p><b>Ready?</b> Log in to Educake to start your quiz. You can look back at this page if you get stuck.</p>
+    <a class="btn-orange" href="https://www.educake.co.uk/" target="_blank" rel="noopener noreferrer">Go to Educake</a>
+  </div>
+</section>
+
+</main>
+<footer>Year 8 Spreadsheets | Read this page first, then complete the quiz in your own words.</footer>
+
+<script>
+(function(){
+  function $(id){return document.getElementById(id);}
+  var COLS=["A","B","C"];
+  var DATA=[
+    ["Snack","Price (£)","Sold"],
+    ["Crisps",1.2,30],
+    ["Cookies",0.8,45],
+    ["Fruit",0.5,25],
+    ["Juice",1.0,38],
+    ["Flapjack",0.9,12]
+  ];
+  function ref(c,r){return COLS[c]+(r+1);}
+
+  /* generic sheet with range select */
+  function makeSheet(tableId,onChange){
+    var t=$(tableId),a=null,b=null,h="<tr><th class='rh'></th>";
+    COLS.forEach(function(c){h+="<th>"+c+"</th>";});h+="</tr>";
+    DATA.forEach(function(row,r){
+      h+="<tr><th>"+(r+1)+"</th>";
+      row.forEach(function(v,c){
+        h+="<td class='cell"+(typeof v==="number"?" num":"")+(r===0?" hdr":"")+"' data-r='"+r+"' data-c='"+c+"' tabindex='0'>"+v+"</td>";
+      });h+="</tr>";
+    });
+    t.innerHTML=h;
+    var cells=[].slice.call(t.querySelectorAll("td.cell"));
+    function box(){
+      if(!a)return null;
+      var e=b||a;
+      return {r1:Math.min(a.r,e.r),r2:Math.max(a.r,e.r),c1:Math.min(a.c,e.c),c2:Math.max(a.c,e.c)};
+    }
+    function paint(){
+      var bx=box();
+      cells.forEach(function(td){
+        var r=+td.dataset.r,c=+td.dataset.c;
+        td.classList.toggle("sel",!!bx&&r>=bx.r1&&r<=bx.r2&&c>=bx.c1&&c<=bx.c2);
+      });
+      onChange(bx);
+    }
+    function pick(td){
+      var p={r:+td.dataset.r,c:+td.dataset.c};
+      if(!a||b){a=p;b=null;}else{b=p;}
+      paint();
+    }
+    cells.forEach(function(td){
+      td.addEventListener("click",function(){pick(td);});
+      td.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();pick(td);}});
+    });
+    return {clear:function(){a=null;b=null;paint();}};
+  }
+  function rangeText(bx){
+    var s=ref(bx.c1,bx.r1),e=ref(bx.c2,bx.r2);
+    return s===e?s:s+":"+e;
+  }
+
+  /* ---- grid explorer ---- */
+  var g=makeSheet("gSheet",function(bx){
+    if(!bx){$("gNB").textContent="–";$("gFX").textContent="Click a cell";$("gOut").className="out info";$("gOut").textContent="Click a cell to start.";return;}
+    var txt=rangeText(bx);
+    $("gNB").textContent=txt;
+    if(bx.r1===bx.r2&&bx.c1===bx.c2){
+      $("gFX").textContent=DATA[bx.r1][bx.c1];
+      $("gOut").className="out good";
+      $("gOut").innerHTML="Cell <b>"+txt+"</b> is in column <b>"+COLS[bx.c1]+"</b> and row <b>"+(bx.r1+1)+"</b>. Its contents appear in the formula bar. Click a second cell to make a range.";
+    } else {
+      var kind=bx.c1===bx.c2?"a vertical line of cells, so it sits inside one <b>column</b>":(bx.r1===bx.r2?"a horizontal line of cells, so it sits inside one <b>row</b>":"a block of cells");
+      $("gFX").textContent="(range selected)";
+      $("gOut").className="out good";
+      $("gOut").innerHTML="You selected the <b>range "+txt+"</b>. This is "+kind+".";
+    }
+  });
+  $("gReset").addEventListener("click",function(){g.clear();});
+
+  /* ---- equals sign ---- */
+  var eqMode="with";
+  function eqDraw(){
+    var withEq=eqMode==="with";
+    $("eqFX").textContent=withEq?"=3+4":"3+4";
+    $("eqCell").textContent=withEq?"7":"3+4";
+    $("eqOut").className="out "+(withEq?"good":"bad");
+    $("eqOut").innerHTML=withEq?"The spreadsheet saw the <b>=</b> and worked out the answer: 7.":"There is no <b>=</b>, so the spreadsheet treats <code>3+4</code> as plain text. It does no calculation.";
+    [].forEach.call(document.querySelectorAll("[data-eq]"),function(x){x.setAttribute("aria-pressed",x.dataset.eq===eqMode?"true":"false");});
+  }
+  [].forEach.call(document.querySelectorAll("[data-eq]"),function(x){x.addEventListener("click",function(){eqMode=x.dataset.eq;eqDraw();});});
+  eqDraw();
+
+  /* ---- functions lab ---- */
+  var curBox=null;
+  makeSheet("fSheet",function(bx){
+    curBox=bx;
+    if(!bx){$("fNB").textContent="–";$("fFX").textContent="Select a range";return;}
+    $("fNB").textContent=rangeText(bx);
+    $("fFX").textContent="(range selected: "+rangeText(bx)+")";
+  });
+  [].forEach.call(document.querySelectorAll("[data-fn]"),function(btn){
+    btn.addEventListener("click",function(){
+      var o=$("fOut"),fn=btn.dataset.fn;
+      if(!curBox||(curBox.r1===curBox.r2&&curBox.c1===curBox.c2&&false)){o.className="out bad";o.textContent="Select a range first: click one cell, then click another.";return;}
+      var nums=[],words=0,total=0;
+      for(var r=curBox.r1;r<=curBox.r2;r++)for(var c=curBox.c1;c<=curBox.c2;c++){
+        var v=DATA[r][c];total++;
+        if(typeof v==="number")nums.push(v);else words++;
+      }
+      var f="="+fn+"("+rangeText(curBox)+")";
+      $("fFX").textContent=f;
+      if(!nums.length){o.className="out bad";o.innerHTML="<code>"+f+"</code> has no numbers to work with, because those cells hold words. Try a range in the Price or Sold columns.";return;}
+      var res,sum=nums.reduce(function(x,y){return x+y;},0);
+      if(fn==="SUM")res=sum;
+      if(fn==="AVERAGE")res=sum/nums.length;
+      if(fn==="MIN")res=Math.min.apply(null,nums);
+      if(fn==="MAX")res=Math.max.apply(null,nums);
+      if(fn==="COUNT")res=nums.length;
+      res=Math.round(res*100)/100;
+      var extra=(words&&fn==="COUNT")?" There were "+total+" cells in the range, but "+words+" held words, so COUNT skipped them.":(words?" The "+words+" word cell(s) were ignored.":"");
+      o.className="out good";
+      o.innerHTML="<code>"+f+"</code> gives <b>"+res+"</b>."+extra;
+    });
+  });
+
+  /* ---- absolute reference ---- */
+  var absMode="rel";
+  function absDraw(){
+    var qty=[3,5,2,4],h="<tr><th class='rh'></th><th>B items</th><th>C formula</th><th>C result</th><th>D</th></tr>";
+    h+="<tr><th>1</th><td></td><td></td><td></td><td class='num hdr'>10</td></tr>";
+    var ok=true,res=[];
+    qty.forEach(function(q,i){
+      var row=i+2,dRow=absMode==="abs"?1:row-1;
+      var f="=B"+row+"*"+(absMode==="abs"?"$D$1":"D"+dRow);
+      var mult=dRow===1?10:0,val=q*mult;
+      if(val===0)ok=false;res.push(val);
+      h+="<tr><th>"+row+"</th><td class='num'>"+q+"</td><td class='mono'>"+f+"</td><td class='num "+(val===0?"bad":"calc")+"'>"+val+"</td><td>"+(row===1?"10":"")+"</td></tr>";
+    });
+    $("absSheet").innerHTML=h;
+    $("absOut").className="out "+(ok?"good":"bad");
+    $("absOut").innerHTML=ok?"The <b>$</b> locks the reference to D1, so every row multiplies by 10. All the answers are correct.":"The reference <code>D1</code> is <b>relative</b>, so when the formula is copied down it slides to D2, D3 and D4. Those cells are empty, so the answers become 0. The points are wrong!";
+    [].forEach.call(document.querySelectorAll("[data-abs]"),function(x){x.setAttribute("aria-pressed",x.dataset.abs===absMode?"true":"false");});
+  }
+  [].forEach.call(document.querySelectorAll("[data-abs]"),function(x){x.addEventListener("click",function(){absMode=x.dataset.abs;absDraw();});});
+  absDraw();
+
+  /* ---- autofill ---- */
+  var afSets={
+    days:{start:["Mon","Tue"],list:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],t:"The spreadsheet knows the days of the week, so it carried on: Wed, Thu, Fri, Sat, Sun."},
+    months:{start:["Jan","Feb"],list:["Jan","Feb","Mar","Apr","May","Jun","Jul"],t:"The spreadsheet knows the months of the year and filled in the next five."},
+    num:{start:[5,10],list:[5,10,15,20,25,30,35],t:"The numbers go up by 5 each time, so autofill spotted the pattern and kept adding 5."},
+    odd:{start:[3,6],list:[3,6,9,12,15,18,21],t:"The numbers go up by 3 each time, so autofill kept adding 3."}
+  };
+  var afKey="days",afDone=false;
+  function afDraw(){
+    var s=afSets[afKey],h="<tr><th class='rh'></th>";
+    for(var i=0;i<7;i++)h+="<th>"+"ABCDEFG"[i]+"</th>";h+="</tr><tr><th>1</th>";
+    for(i=0;i<7;i++){
+      var filled=i>=2;
+      h+="<td class='"+(i<2?"hdr":(afDone?"calc":""))+"'>"+(i<2||afDone?s.list[i]:"")+"</td>";
+    }
+    h+="</tr>";
+    $("afSheet").innerHTML=h;
+    $("afOut").className="out info";
+    $("afOut").innerHTML=afDone?s.t:"The first two cells show the pattern. What will autofill put in the other five?";
+    [].forEach.call(document.querySelectorAll("[data-af]"),function(x){x.setAttribute("aria-pressed",x.dataset.af===afKey?"true":"false");});
+  }
+  [].forEach.call(document.querySelectorAll("[data-af]"),function(x){x.addEventListener("click",function(){afKey=x.dataset.af;afDone=false;afDraw();});});
+  $("afGo").addEventListener("click",function(){afDone=true;afDraw();});
+  afDraw();
+
+  /* ---- sort ---- */
+  var people=[["Priya",72],["Ben",55],["Chloe",90],["Dan",61],["Esme",83]];
+  function sortDraw(rows){
+    var h="<tr><th class='rh'></th><th>A Name</th><th>B Score</th></tr>";
+    rows.forEach(function(p,i){h+="<tr><th>"+(i+2)+"</th><td>"+p[0]+"</td><td class='num'>"+p[1]+"</td></tr>";});
+    $("sortSheet").innerHTML=h;
+  }
+  sortDraw(people);
+  var sortMsg={
+    nameA:"Sorted <b>ascending</b> by name: A to Z.",
+    nameD:"Sorted <b>descending</b> by name: Z to A.",
+    scoreA:"Sorted <b>ascending</b> by score: smallest to largest.",
+    scoreD:"Sorted <b>descending</b> by score: largest to smallest."
+  };
+  [].forEach.call(document.querySelectorAll("[data-sort]"),function(btn){
+    btn.addEventListener("click",function(){
+      var k=btn.dataset.sort,rows=people.slice();
+      rows.sort(function(x,y){
+        if(k==="nameA")return x[0]<y[0]?-1:1;
+        if(k==="nameD")return x[0]<y[0]?1:-1;
+        if(k==="scoreA")return x[1]-y[1];
+        return y[1]-x[1];
+      });
+      sortDraw(rows);
+      $("sortOut").className="out good";
+      $("sortOut").innerHTML=sortMsg[k]+" Each name stays with its own score.";
+    });
+  });
+
+  /* ---- format lab ---- */
+  var fills={},merged=false,fsel=null;
+  var fmtText=[["Term 1 results","",""],["Maths","Art","Music"],["64","71","58"]];
+  function fmtDraw(){
+    var h="<tr><th class='rh'></th><th>A</th><th>B</th><th>C</th></tr>";
+    for(var r=0;r<3;r++){
+      h+="<tr><th>"+(r+1)+"</th>";
+      for(var c=0;c<3;c++){
+        if(r===0&&merged&&c>0)continue;
+        var id=r+"-"+c,span=(r===0&&merged&&c===0)?" colspan='3'":"";
+        var sty=(span?"text-align:center;":"")+(fills[id]?"background:"+fills[id]+";color:#16233b;":"");
+        h+="<td class='cell"+(fsel===id?" sel":"")+(r===0?" hdr":"")+"' data-id='"+id+"'"+span+(sty?" style='"+sty+"'":"")+" tabindex='0'>"+fmtText[r][c]+"</td>";
+      }
+      h+="</tr>";
+    }
+    $("fmtSheet").innerHTML=h;
+    [].forEach.call($("fmtSheet").querySelectorAll("td.cell"),function(td){
+      function p(){fsel=td.dataset.id;$("fmtOut").className="out info";$("fmtOut").innerHTML="Cell selected. Choose a fill colour.";fmtDraw();}
+      td.addEventListener("click",p);
+      td.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();p();}});
+    });
+  }
+  [].forEach.call(document.querySelectorAll("[data-col]"),function(b){
+    b.addEventListener("click",function(){
+      if(!fsel){$("fmtOut").className="out bad";$("fmtOut").textContent="Click a cell first, then choose a colour.";return;}
+      if(b.dataset.col)fills[fsel]=b.dataset.col;else delete fills[fsel];
+      $("fmtOut").className="out good";
+      $("fmtOut").innerHTML="Fill colour changes the <b>background</b> of the selected cell.";
+      fmtDraw();
+    });
+  });
+  $("mergeBtn").addEventListener("click",function(){
+    merged=!merged;fsel=null;
+    $("mergeBtn").textContent=merged?"Unmerge the top row":"Merge the top row";
+    $("fmtOut").className="out good";
+    $("fmtOut").innerHTML=merged?"<b>Merged!</b> Three cells became one larger cell, so the title can sit across the whole table.":"The merged cell has been split back into three separate cells.";
+    fmtDraw();
+  });
+  fmtDraw();
+
+  /* ---- chart ---- */
+  (function(){
+    var s='<svg viewBox="0 0 420 250" role="img" aria-label="Bar chart of snacks sold" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:520px;height:auto;display:block">';
+    s+='<line x1="50" y1="200" x2="400" y2="200" stroke="var(--muted)" stroke-width="2"/><line x1="50" y1="20" x2="50" y2="200" stroke="var(--muted)" stroke-width="2"/>';
+    s+='<text class="svgtxt" x="210" y="16" font-size="15" text-anchor="middle" font-weight="700">Snacks sold</text>';
+    for(var i=1;i<DATA.length;i++){
+      var v=DATA[i][2],h=v*3.4,x=65+(i-1)*68;
+      s+='<rect x="'+x+'" y="'+(200-h)+'" width="48" height="'+h+'" rx="4" fill="var(--cyan)"/>';
+      s+='<text class="svgtxt" x="'+(x+24)+'" y="'+(194-h)+'" font-size="14" text-anchor="middle" font-weight="700">'+v+'</text>';
+      s+='<text class="svgtxt" x="'+(x+24)+'" y="220" font-size="13" text-anchor="middle">'+DATA[i][0]+'</text>';
+    }
+    s+='</svg>';
+    $("chartBox").innerHTML=s;
+  })();
+
+  /* ---- type it ---- */
+  var tasks=[
+    {q:"Write the function that adds up all the numbers from cell B3 to cell B9.",fn:"SUM",rng:"B3:B9"},
+    {q:"Write the function that finds the lowest number from cell E2 to cell E10.",fn:"MIN",rng:"E2:E10"},
+    {q:"Write the function that finds the largest number from cell C1 to cell C12.",fn:"MAX",rng:"C1:C12"},
+    {q:"Write the function that finds the average of the numbers in cells F4 to F9.",fn:"AVERAGE",rng:"F4:F9"},
+    {q:"Write the function that counts how many cells hold numbers from cell D1 to cell D15.",fn:"COUNT",rng:"D1:D15"},
+    {q:"Write the function that adds up all the numbers in the block of cells from B2 to C6.",fn:"SUM",rng:"B2:C6"}
+  ];
+  var ti=0;
+  function tiShow(){
+    $("tiQ").textContent=tasks[ti].q;$("tiIn").value="";
+    $("tiOut").className="out info";$("tiOut").textContent="Type it exactly as it would appear in the formula bar.";
+  }
+  $("tiCheck").addEventListener("click",function(){
+    var t=tasks[ti],raw=$("tiIn").value,o=$("tiOut");
+    if(!raw.trim()){o.className="out bad";o.textContent="Type your answer first.";return;}
+    if(/\s/.test(raw.trim())){o.className="out bad";o.textContent="Functions do not need spaces. Remove them and try again.";return;}
+    var u=raw.toUpperCase(),hasEq=u.charAt(0)==="=",body=hasEq?u.slice(1):u,want=t.fn+"("+t.rng+")";
+    if(body===want){
+      if(hasEq){o.className="out good";o.innerHTML="<b>Perfect!</b> <code>="+want+"</code> starts with =, has the function name, brackets, a colon and no spaces.";}
+      else{o.className="out bad";o.innerHTML="Nearly! The function and range are right, but a formula bar entry must start with <code>=</code>. Try <code>="+want+"</code>.";}
+      return;
+    }
+    if(body.indexOf(t.fn+"(")!==0){o.className="out bad";o.innerHTML="Check the function name. Which one "+(t.fn==="SUM"?"adds":t.fn==="MIN"?"finds the lowest":t.fn==="MAX"?"finds the largest":t.fn==="AVERAGE"?"finds the average":"counts numbers")+"?";return;}
+    if(body.indexOf(")")!==body.length-1||body.indexOf("(")<0){o.className="out bad";o.textContent="Check your brackets. The range goes inside one pair of brackets.";return;}
+    if(body.indexOf(":")<0){o.className="out bad";o.textContent="Use a colon between the first and last cell, like B3:B9.";return;}
+    o.className="out bad";o.textContent="Check the range. Read the question again and look at the first and last cells.";
+  });
+  $("tiNext").addEventListener("click",function(){ti=(ti+1)%tasks.length;tiShow();});
+  $("tiIn").addEventListener("keydown",function(e){if(e.key==="Enter")$("tiCheck").click();});
+  tiShow();
+})();
+</script>
+</body>
+</html>
