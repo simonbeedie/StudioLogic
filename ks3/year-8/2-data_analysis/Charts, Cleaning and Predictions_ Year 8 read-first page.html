@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Charts, Cleaning and Predictions: read this before the quiz</title>
+<style>
+:root{
+  --navy:#12254a; --navy-2:#1d3566; --cyan:#0aa8c9; --cyan-soft:#d9f3f9;
+  --amber:#e08a00; --amber-soft:#fff0d6; --green:#2a9d5c; --green-soft:#dcf4e5; --red:#d64545; --red-soft:#fde3e3;
+  --bg:#f5f8fc; --card:#ffffff; --text:#16233b; --muted:#53607a; --line:#d5deec; --hl:var(--navy);
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --navy:#0b1730; --navy-2:#162b57; --cyan:#35c6e3; --cyan-soft:#10303a;
+    --amber:#ffb23e; --amber-soft:#3a2a0b; --green:#58cf8a; --green-soft:#12301f; --red:#ff8383; --red-soft:#3b1717;
+    --bg:#0c1426; --card:#142039; --text:#e8eefb; --muted:#a3b0cc; --line:#2a3a5e; --hl:var(--cyan);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --navy:#0b1730; --navy-2:#162b57; --cyan:#35c6e3; --cyan-soft:#10303a;
+  --amber:#ffb23e; --amber-soft:#3a2a0b; --green:#58cf8a; --green-soft:#12301f; --red:#ff8383; --red-soft:#3b1717;
+  --bg:#0c1426; --card:#142039; --text:#e8eefb; --muted:#a3b0cc; --line:#2a3a5e; --hl:var(--cyan);
+  color-scheme: dark;
+}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Calibri,Carlito,"Trebuchet MS",Arial,sans-serif;font-size:1.125rem;line-height:1.6}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+h1,h2,h3{font-family:"Trebuchet MS",Calibri,Carlito,Arial,sans-serif;line-height:1.2;margin:0 0 .5em}
+h2{font-size:1.75rem;color:var(--hl)}
+h3{font-size:1.25rem}
+p{margin:0 0 .9em;max-width:68ch}
+code{font-family:Consolas,"Courier New",monospace;background:var(--cyan-soft);padding:.05rem .4rem;border-radius:5px}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+.hero{background:var(--navy);color:#fff;padding:calc(env(safe-area-inset-top,0px) + 2.5rem) 1.25rem 2.5rem}
+.hero-in{max-width:960px;margin:0 auto;display:grid;gap:1.5rem;grid-template-columns:1.1fr .9fr;align-items:center}
+.hero h1{font-size:clamp(2rem,6vw,3.2rem);margin-bottom:.4em}
+.hero p{color:#dbe6fb;font-size:1.2rem}
+.hero .tag{display:inline-block;background:var(--cyan);color:#06222b;font-weight:700;padding:.2rem .8rem;border-radius:99px;margin-bottom:1rem;font-size:1rem}
+.mission{background:var(--navy-2);border:2px solid var(--cyan);border-radius:14px;padding:1rem 1.2rem;font-size:1.05rem;color:#fff}
+.mission strong{color:var(--cyan)}
+.mission ul{margin:.4rem 0 0;padding-left:1.2rem}
+@media (max-width:760px){.hero-in{grid-template-columns:1fr}}
+
+nav.jump{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top,0px) + .5rem) .75rem .5rem}
+nav.jump ul{list-style:none;margin:0 auto;padding:0;max-width:960px;display:flex;gap:.4rem;overflow-x:auto}
+nav.jump a{display:block;white-space:nowrap;text-decoration:none;color:var(--text);background:var(--bg);border:1px solid var(--line);padding:.3rem .8rem;border-radius:99px;font-size:.98rem}
+nav.jump a:hover{border-color:var(--cyan)}
+
+main{max-width:960px;margin:0 auto;padding:1rem 1.25rem 3rem}
+section{padding:2.2rem 0 1rem;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:0}
+.lead{font-size:1.2rem;color:var(--muted)}
+.grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin:1rem 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem}
+.card h3{margin-bottom:.3em}
+.card p:last-child{margin-bottom:0}
+.keyterm{background:var(--cyan-soft);border-left:6px solid var(--cyan);border-radius:8px;padding:.7rem 1rem;margin:1rem 0}
+.keyterm b{color:var(--hl)}
+.watch{background:var(--amber-soft);border-left:6px solid var(--amber);border-radius:8px;padding:.7rem 1rem;margin:1rem 0}
+
+button{font:inherit;cursor:pointer}
+.btn{background:var(--navy);color:#fff;border:0;border-radius:10px;padding:.5rem 1rem;font-weight:700}
+.btn:hover{background:var(--navy-2)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn{background:var(--cyan);color:#06222b}}
+:root[data-theme="dark"] .btn{background:var(--cyan);color:#06222b}
+.btnrow{display:flex;gap:.5rem;flex-wrap:wrap;margin:.6rem 0}
+.tab{background:var(--card);color:var(--text);border:2px solid var(--line);border-radius:10px;padding:.45rem .9rem}
+.tab[aria-pressed="true"]{border-color:var(--cyan);background:var(--cyan-soft);font-weight:700}
+
+.lab{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin:1.2rem 0}
+.lab h3{margin-top:0}
+.lab svg{width:100%;height:auto;display:block;max-width:560px}
+.svgtxt{fill:var(--text);font-family:Calibri,Carlito,Arial,sans-serif}
+.axis{stroke:var(--muted);stroke-width:2}
+.out{padding:.7rem 1rem;border-radius:8px;margin-top:.8rem;min-height:3rem}
+.out.good{background:var(--green-soft);border-left:6px solid var(--green)}
+.out.bad{background:var(--red-soft);border-left:6px solid var(--red)}
+.out.info{background:var(--cyan-soft);border-left:6px solid var(--cyan)}
+.table-wrap{overflow-x:auto}
+
+table.data{border-collapse:collapse;width:100%;max-width:560px;margin:.5rem 0}
+table.data th,table.data td{border:1px solid var(--line);padding:.4rem .7rem;text-align:left;height:2.4rem}
+table.data th{background:var(--cyan-soft)}
+table.data td.pick{cursor:pointer}
+table.data td.pick:hover{background:var(--amber-soft)}
+table.data td.flag{background:var(--amber-soft);outline:2px solid var(--amber);outline-offset:-2px}
+table.data td.right{background:var(--green-soft)}
+table.data td.miss{background:var(--red-soft)}
+table.data td.fixed{background:var(--green-soft)}
+table.data tr.gone td{opacity:.45;text-decoration:line-through}
+
+.clue{width:100%;border-collapse:collapse;margin:.8rem 0}
+.clue th,.clue td{border:1px solid var(--line);padding:.5rem .7rem;text-align:left;vertical-align:top}
+.clue th{background:var(--cyan-soft)}
+.clue td:first-child{background:var(--card)}
+
+.sorter{display:grid;gap:.5rem;max-width:620px}
+.srow{display:flex;gap:.6rem;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:.45rem .8rem}
+.srow.ok{background:var(--green-soft);border-color:var(--green)}
+.srow.no{background:var(--red-soft);border-color:var(--red)}
+.srow .btnrow{margin:0}
+.mini{padding:.3rem .7rem;font-size:1rem}
+
+input[type=range]{width:100%;max-width:420px;accent-color:var(--cyan)}
+label.rng{display:block;font-weight:700;margin:.6rem 0 .2rem}
+
+dl.words{display:grid;grid-template-columns:minmax(130px,220px) 1fr;gap:.4rem 1rem;margin:1rem 0}
+dl.words dt{font-weight:700;color:var(--hl)}
+dl.words dd{margin:0}
+dl.words dt,dl.words dd{padding:.4rem 0;border-bottom:1px solid var(--line)}
+@media (max-width:560px){dl.words{grid-template-columns:1fr}dl.words dt{border-bottom:0;padding-bottom:0}}
+.checklist{list-style:none;padding:0;margin:1rem 0}
+.checklist li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.5rem .9rem;margin-bottom:.5rem}
+.checklist label{display:flex;gap:.7rem;align-items:flex-start;cursor:pointer}
+.checklist input{width:1.3rem;height:1.3rem;margin-top:.2rem;accent-color:var(--cyan)}
+.quiz-cta{margin:1.5rem 0 .5rem;padding:1.2rem 1.3rem;background:var(--card);border:2px solid var(--amber);border-radius:16px;display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between}
+.quiz-cta p{margin:0;max-width:44ch}
+.btn-orange{display:inline-block;background:#f28c00;color:#1a1200;text-decoration:none;font-weight:700;font-size:1.2rem;padding:.8rem 1.6rem;border-radius:12px;border:2px solid #b86500}
+.btn-orange:hover{background:#ffa22a}
+.btn-orange:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+footer{max-width:960px;margin:0 auto;padding:1rem 1.25rem 2rem;color:var(--muted);font-size:.95rem}
+.dash{display:grid;gap:.8rem;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));background:var(--navy);border-radius:14px;padding:1rem;color:#fff;max-width:620px}
+.dash .tile{background:var(--navy-2);border-radius:10px;padding:.6rem .8rem}
+.dash .tile b{display:block;font-size:1.7rem;color:var(--cyan)}
+.dash svg{max-width:100%}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-in">
+    <div>
+      <span class="tag">Year 8 Data Visualisation</span>
+      <h1>Charts, Cleaning and Predictions</h1>
+      <p>Good data scientists do three things well: they clean their data, show it with the right chart, and use it to see what might come next. Learn all three here before your quiz.</p>
+    </div>
+    <div class="mission">
+      <strong>Your mission</strong>
+      <ul>
+        <li>Read each section slowly.</li>
+        <li>Try every activity.</li>
+        <li>Explain each idea to a partner in your own words.</li>
+      </ul>
+      <p style="margin:.7rem 0 0">Tip: quiz questions often tell a short story. Look for the <b>clue words</b> in the story. We will show you how.</p>
+    </div>
+  </div>
+</header>
+
+<nav class="jump" aria-label="Jump to a section">
+  <ul>
+    <li><a href="#vis">Visualisation</a></li>
+    <li><a href="#pick">Choose the chart</a></li>
+    <li><a href="#clean">Cleaning data</a></li>
+    <li><a href="#types">Types and order</a></li>
+    <li><a href="#links">Strength of links</a></li>
+    <li><a href="#predict">Predicting</a></li>
+    <li><a href="#words">Key words</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- ============ VISUALISATION ============ -->
+<section id="vis">
+  <h2>Showing data as pictures</h2>
+  <p class="lead">A page full of numbers is hard to read. A picture lets you see the answer at a glance.</p>
+
+  <div class="keyterm"><b>Data visualisation</b> is the <b>graphical representation of data</b>. In plain words, it means showing data as a picture, such as a chart, graph or map.</div>
+
+  <div class="keyterm"><b>Dashboard:</b> a <b>short, simple visual summary</b> of data, put on one screen using graphs, charts or maps. Think of the dashboard in a car: the most important facts, all in one view.</div>
+
+  <div class="dash" aria-label="Example dashboard">
+    <div class="tile"><span>Clubs members</span><b>128</b></div>
+    <div class="tile"><span>Bar chart</span>
+      <svg viewBox="0 0 120 70" role="img" aria-label="Small bar chart"><rect x="8" y="35" width="20" height="30" fill="#35c6e3"/><rect x="38" y="15" width="20" height="50" fill="#35c6e3"/><rect x="68" y="42" width="20" height="23" fill="#35c6e3"/><rect x="96" y="25" width="16" height="40" fill="#ffb23e"/></svg></div>
+    <div class="tile"><span>Pie chart</span>
+      <svg viewBox="0 0 120 70" role="img" aria-label="Small pie chart"><circle cx="60" cy="35" r="30" fill="#35c6e3"/><path d="M60,35 L60,5 A30,30 0 0 1 90,35 Z" fill="#ffb23e"/><path d="M60,35 L90,35 A30,30 0 0 1 72,62 Z" fill="#58cf8a"/></svg></div>
+    <div class="tile"><span>Line graph</span>
+      <svg viewBox="0 0 120 70" role="img" aria-label="Small line graph"><polyline points="8,60 30,50 52,52 74,30 96,22 114,10" fill="none" stroke="#35c6e3" stroke-width="4"/></svg></div>
+  </div>
+  <p style="margin-top:.8rem">A dashboard puts several small visuals together so you can understand a lot very quickly. It is different from a single chart.</p>
+
+  <div class="watch"><b>Software:</b> you do not need special programs to start. A <b>spreadsheet</b> such as Excel or Google Sheets can turn data into charts in a few clicks. When a question asks which <i>software</i>, <i>tool</i> or <i>package</i> makes a basic visualisation, think <b>spreadsheet</b>. When it asks which <i>chart</i> or <i>graph</i> to use, you need to match the chart to the job (next section).</div>
+</section>
+
+<!-- ============ PICK ============ -->
+<section id="pick">
+  <h2>Choose the right chart</h2>
+  <p class="lead">Each chart is good at one job. The skill is spotting which job a question describes.</p>
+
+  <div class="lab">
+    <h3>The chart gallery</h3>
+    <div class="btnrow" role="group" aria-label="Choose a chart">
+      <button class="tab" type="button" data-g="bar" aria-pressed="true">Bar graph</button>
+      <button class="tab" type="button" data-g="grouped" aria-pressed="false">Side-by-side bars</button>
+      <button class="tab" type="button" data-g="line" aria-pressed="false">Line graph</button>
+      <button class="tab" type="button" data-g="pie" aria-pressed="false">Pie chart</button>
+      <button class="tab" type="button" data-g="scatter" aria-pressed="false">Scatter graph</button>
+    </div>
+    <div id="galBox"></div>
+    <div class="out info" id="galText" role="status"></div>
+  </div>
+
+  <h3>Clue words in questions</h3>
+  <p>When you read a question, hunt for these clues.</p>
+  <div class="table-wrap">
+  <table class="clue">
+    <tr><th>If you see…</th><th>Choose…</th></tr>
+    <tr><td>“compare”, “side by side”, “different categories”</td><td><b>Bar graph</b></td></tr>
+    <tr><td>“compare two years”, “compare two groups for each category”</td><td><b>Side-by-side (grouped) bar chart</b>: two or more bars next to each other for each category</td></tr>
+    <tr><td>“trend”, “changes over time”, “daily”, “monthly”, “over a year”</td><td><b>Line graph</b></td></tr>
+    <tr><td>“parts of a whole”, “share”, “percentage of the total”</td><td><b>Pie chart</b></td></tr>
+    <tr><td>“relationship between two things”, “patterns between two variables”</td><td><b>Scatter graph</b></td></tr>
+  </table>
+  </div>
+
+  <div class="watch"><b>Why not use a bar graph for everything?</b> A bar graph shows <i>separate groups</i>, such as five teams. A line graph joins points in time order, so the eye follows the rise and fall. That is why a line graph is best for trends.</div>
+
+  <div class="lab">
+    <h3>Try it: pick the chart</h3>
+    <p id="pcQ"></p>
+    <div class="btnrow" id="pcBtns">
+      <button class="btn" type="button" data-a="Bar graph">Bar graph</button>
+      <button class="btn" type="button" data-a="Side-by-side bars">Side-by-side bars</button>
+      <button class="btn" type="button" data-a="Line graph">Line graph</button>
+      <button class="btn" type="button" data-a="Pie chart">Pie chart</button>
+      <button class="btn" type="button" data-a="Scatter graph">Scatter graph</button>
+    </div>
+    <div class="out info" id="pcOut" role="status"></div>
+    <div class="btnrow"><button class="btn" type="button" id="pcNext">Next scenario</button></div>
+  </div>
+</section>
+
+<!-- ============ CLEAN ============ -->
+<section id="clean">
+  <h2>Cleaning data</h2>
+  <p class="lead">Real data is messy. Before you chart or analyse it, you must tidy it. Skip this and your charts could lie.</p>
+
+  <div class="keyterm"><b>Data cleaning</b> is the process of <b>finding and removing (or fixing) errors and gaps</b> in a data set. It is how raw data is refined so that it is ready for analysis. Cleaning deals with:
+    <ul style="margin:.4rem 0 0">
+      <li><b>missing values</b>: an empty cell where a number should be;</li>
+      <li><b>symbols instead of numbers</b>, such as # or ?;</li>
+      <li><b>inconsistencies</b>: the same thing written in different ways, such as “two” and “2”.</li>
+    </ul>
+  </div>
+
+  <div class="watch"><b>What to do first?</b> You cannot fix a problem you have not found. So the first step with messy data is to <b>spot the problems</b> (look through the data and find the incomplete or odd entries). Then you clean them: fix them, fill them in, or remove them.</div>
+
+  <div class="lab">
+    <h3>Try it: spot, then clean</h3>
+    <p>A class asked how many pets each person owns. <b>Step 1: click every cell that has a problem.</b> Then check.</p>
+    <div class="table-wrap">
+    <table class="data" id="cTable">
+      <thead><tr><th>Student</th><th>Pets owned</th></tr></thead>
+      <tbody>
+        <tr><td>Ana</td><td class="pick" data-e="0">2</td></tr>
+        <tr><td>Ben</td><td class="pick" data-e="1">#</td></tr>
+        <tr><td>Cal</td><td class="pick" data-e="1"></td></tr>
+        <tr><td>Dev</td><td class="pick" data-e="1">two</td></tr>
+        <tr><td>Eli</td><td class="pick" data-e="0">1</td></tr>
+        <tr><td>Fay</td><td class="pick" data-e="1">?</td></tr>
+        <tr><td>Gus</td><td class="pick" data-e="0">3</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="btnrow"><button class="btn" id="cCheck" type="button">Check: did I spot them all?</button><button class="btn" id="cClean" type="button" disabled>Step 2: clean the data</button></div>
+    <div class="out info" id="cOut" role="status">Find the four cells that are not proper numbers.</div>
+  </div>
+</section>
+
+<!-- ============ TYPES ============ -->
+<section id="types">
+  <h2>Types of data, and putting data in order</h2>
+
+  <div class="keyterm"><b>Quantitative data</b> is <b>numerical</b>: you can count or measure it, such as height or the number of goals.<br>
+  <b>Qualitative data</b> is <b>not numerical</b>: it describes qualities, such as eye colour or favourite food. It is also called <b>categorical data</b>.</div>
+
+  <div class="lab">
+    <h3>Try it: sort the data types</h3>
+    <div class="sorter" id="typeSorter"></div>
+    <div class="out info" id="typeOut" role="status">Choose the right type for each item.</div>
+  </div>
+
+  <div class="keyterm"><b>Sorting</b> means <b>arranging data into a meaningful order</b>: smallest to largest, largest to smallest, or A to Z. It makes the biggest, smallest and middle values easy to find, and it helps you spot patterns.</div>
+
+  <div class="lab">
+    <h3>Try it: sort the rainfall</h3>
+    <p>Rainfall in five towns last month (in millimetres).</p>
+    <div class="btnrow">
+      <button class="btn" type="button" data-s="nameA">A to Z</button>
+      <button class="btn" type="button" data-s="numA">Smallest first</button>
+      <button class="btn" type="button" data-s="numD">Largest first</button>
+    </div>
+    <div class="table-wrap"><table class="data" id="sTable"></table></div>
+    <div class="out info" id="sOut" role="status">Which button makes it quickest to find the wettest town?</div>
+  </div>
+
+  <h3>Outliers: the extreme values</h3>
+  <div class="keyterm"><b>Outlier:</b> a data value that is <b>much higher or much lower</b> than most of the others, so it looks very different from the rest. Different questions describe them in different ways: “extreme values”, “values far from the others”, “significantly different data points”. They all mean outliers.</div>
+  <p>Outliers can be mistakes that need cleaning, or real and interesting results. Either way, you must notice them before you trust your answers.</p>
+</section>
+
+<!-- ============ LINKS ============ -->
+<section id="links">
+  <h2>How strong is the link?</h2>
+  <p class="lead">Two variables might be linked. But how closely? That is the <b>strength of the correlation</b>.</p>
+
+  <div class="keyterm"><b>Correlation</b> describes the relationship between two variables. The <b>strength</b> of a correlation tells you how closely the dots follow a pattern. <b>Strong</b> means the dots are tightly packed near a line. <b>Weak</b> means they are loosely scattered. Direction (positive or negative) is a separate idea.</div>
+
+  <div class="lab">
+    <h3>Try it: change the strength</h3>
+    <div class="btnrow" role="group" aria-label="Direction">
+      <button class="tab" type="button" data-d="pos" aria-pressed="true">Positive direction</button>
+      <button class="tab" type="button" data-d="neg" aria-pressed="false">Negative direction</button>
+    </div>
+    <label class="rng" for="noise">How scattered are the dots?</label>
+    <input type="range" id="noise" min="0" max="100" value="10">
+    <div id="strBox"></div>
+    <div class="out info" id="strOut" role="status"></div>
+  </div>
+
+  <p>To show the relationship between two number variables, and to spot patterns between them, we use a <b>scatter graph</b>. Each dot is one person or one thing, measured on both variables.</p>
+</section>
+
+<!-- ============ PREDICT ============ -->
+<section id="predict">
+  <h2>Predicting what comes next</h2>
+  <p class="lead">Past data can help us make good guesses about the future.</p>
+
+  <div class="keyterm"><b>Forecasting</b> is using past data to <b>predict future trends</b>. To forecast, data scientists build a <b>model</b>: a simple set of rules or a mathematical pattern based on what happened before. This is sometimes called <b>predictive modelling</b>.</div>
+
+  <div class="lab">
+    <h3>Try it: forecast the next three months</h3>
+    <p>A gaming club counts its members each month. Press the button to see a forecast based on the pattern so far.</p>
+    <div class="btnrow">
+      <button class="btn" type="button" id="fcGo">Forecast the next 3 months</button>
+      <button class="btn" type="button" id="fcReal">Show what really happened</button>
+      <button class="btn" type="button" id="fcReset">Start again</button>
+    </div>
+    <div id="fcBox"></div>
+    <div class="out info" id="fcOut" role="status">The dots show the past. Can we predict the future?</div>
+  </div>
+
+  <div class="watch"><b>Remember:</b> a forecast is a good guess, not a promise. The further ahead you predict, the less certain it becomes.</div>
+</section>
+
+<!-- ============ WORDS ============ -->
+<section id="words">
+  <h2>Key words</h2>
+  <p>Say each word out loud and explain it to a partner without looking.</p>
+  <dl class="words">
+    <dt>Data visualisation</dt><dd>Showing data as a picture, such as a chart, graph or map.</dd>
+    <dt>Dashboard</dt><dd>A short visual summary of data using graphs, charts or maps on one screen.</dd>
+    <dt>Spreadsheet</dt><dd>Software, such as Excel, used for basic charts and analysis.</dd>
+    <dt>Bar graph</dt><dd>Compares categories side by side.</dd>
+    <dt>Side-by-side bars</dt><dd>Several bars per category, to compare groups such as two years.</dd>
+    <dt>Line graph</dt><dd>Shows trends over time.</dd>
+    <dt>Pie chart</dt><dd>Shows parts of a whole.</dd>
+    <dt>Scatter graph</dt><dd>Shows the relationship between two number variables.</dd>
+    <dt>Data cleaning</dt><dd>Finding and removing or fixing errors, gaps and inconsistencies.</dd>
+    <dt>Missing value</dt><dd>An empty space where data should be.</dd>
+    <dt>Quantitative data</dt><dd>Data that is numerical.</dd>
+    <dt>Qualitative data</dt><dd>Data that is not numerical, such as colours or opinions.</dd>
+    <dt>Sorting</dt><dd>Arranging data into a meaningful order.</dd>
+    <dt>Outlier</dt><dd>A value far higher or lower than most of the data.</dd>
+    <dt>Correlation</dt><dd>The relationship between two variables. It has a direction and a strength.</dd>
+    <dt>Forecasting</dt><dd>Using a model and past data to predict future trends.</dd>
+  </dl>
+
+  <h3>Before you start the quiz</h3>
+  <p>Tick each one when you could explain it to a friend.</p>
+  <ul class="checklist">
+    <li><label><input type="checkbox"> I can match line, bar, side-by-side bar, pie and scatter graphs to their jobs.</label></li>
+    <li><label><input type="checkbox"> I know to use a spreadsheet for basic visualisation.</label></li>
+    <li><label><input type="checkbox"> I can explain data cleaning and what messy data looks like.</label></li>
+    <li><label><input type="checkbox"> I know that spotting problems comes before cleaning them.</label></li>
+    <li><label><input type="checkbox"> I can tell qualitative data from quantitative data.</label></li>
+    <li><label><input type="checkbox"> I can explain outliers, correlation strength and forecasting.</label></li>
+  </ul>
+
+  <div class="quiz-cta">
+    <p><b>Ready?</b> Log in to Educake to start your quiz. You can look back at this page if you get stuck.</p>
+    <a class="btn-orange" href="https://www.educake.co.uk/" target="_blank" rel="noopener noreferrer">Go to Educake</a>
+  </div>
+</section>
+
+</main>
+<footer>Year 8 Data Visualisation | Read this page first, then complete the quiz in your own words.</footer>
+
+<script>
+(function(){
+  var NS="http://www.w3.org/2000/svg";
+  function $(id){return document.getElementById(id);}
+  function open(){return '<svg viewBox="0 0 420 250" role="img" aria-label="Example chart" xmlns="'+NS+'">';}
+  function axes(){return '<line class="axis" x1="50" y1="200" x2="400" y2="200"/><line class="axis" x1="50" y1="20" x2="50" y2="200"/>';}
+
+  /* ---------- gallery ---------- */
+  var gal={
+    bar:{t:"<b>Bar graph.</b> Compares separate categories side by side. Here, five clubs are compared by number of members. Use it for “compare categories”.",
+      d:function(){var v=[["Chess",14],["Art",22],["Drama",18],["Coding",27],["Choir",9]],s=open()+axes();
+        v.forEach(function(r,i){var h=r[1]*6,x=62+i*66;
+          s+='<rect x="'+x+'" y="'+(200-h)+'" width="46" height="'+h+'" rx="4" fill="var(--cyan)"/><text class="svgtxt" x="'+(x+23)+'" y="'+(194-h)+'" font-size="13" text-anchor="middle" font-weight="700">'+r[1]+'</text><text class="svgtxt" x="'+(x+23)+'" y="220" font-size="13" text-anchor="middle">'+r[0]+'</text>';});
+        return s+'</svg>';}},
+    grouped:{t:"<b>Side-by-side (grouped) bar chart.</b> Each category has two bars, one for each year, so you can compare the years directly. Use it to compare two groups across several categories.",
+      d:function(){var v=[["Spring",20,26],["Summer",34,40],["Autumn",25,22],["Winter",15,31]],s=open()+axes();
+        v.forEach(function(r,i){var x=70+i*82;
+          s+='<rect x="'+x+'" y="'+(200-r[1]*4)+'" width="30" height="'+(r[1]*4)+'" rx="3" fill="var(--cyan)"/><rect x="'+(x+32)+'" y="'+(200-r[2]*4)+'" width="30" height="'+(r[2]*4)+'" rx="3" fill="var(--amber)"/><text class="svgtxt" x="'+(x+31)+'" y="220" font-size="13" text-anchor="middle">'+r[0]+'</text>';});
+        s+='<rect x="280" y="8" width="12" height="12" fill="var(--cyan)"/><text class="svgtxt" x="297" y="19" font-size="13">Year 1</text><rect x="345" y="8" width="12" height="12" fill="var(--amber)"/><text class="svgtxt" x="362" y="19" font-size="13">Year 2</text>';
+        return s+'</svg>';}},
+    line:{t:"<b>Line graph.</b> Shows how something changes over time. The joined-up line makes the trend easy to follow. Use it for “trend”, “over time”, “daily” and “monthly”.",
+      d:function(){var v=[12,15,14,20,26,31,29],s=open()+axes(),p=[];
+        v.forEach(function(y,i){p.push((70+i*52)+","+(200-y*5));});
+        s+='<polyline points="'+p.join(" ")+'" fill="none" stroke="var(--cyan)" stroke-width="4"/>';
+        v.forEach(function(y,i){s+='<circle cx="'+(70+i*52)+'" cy="'+(200-y*5)+'" r="6" fill="var(--navy-2)" stroke="var(--cyan)" stroke-width="3"/><text class="svgtxt" x="'+(70+i*52)+'" y="220" font-size="13" text-anchor="middle">Wk '+(i+1)+'</text>';});
+        return s+'</svg>';}},
+    pie:{t:"<b>Pie chart.</b> Shows how a whole is split into parts. All the slices together make 100%. Use it for “parts of a whole” or “share”.",
+      d:function(){var d=[["Dogs",45,"var(--navy-2)"],["Cats",30,"var(--cyan)"],["Fish",15,"var(--green)"],["Other",10,"var(--amber)"]],s=open(),a0=-Math.PI/2,cx=120,cy=125,r=100;
+        d.forEach(function(x,i){var a1=a0+x[1]/100*2*Math.PI;
+          s+='<path d="M'+cx+','+cy+' L'+(cx+r*Math.cos(a0))+','+(cy+r*Math.sin(a0))+' A'+r+','+r+' 0 '+(x[1]>50?1:0)+' 1 '+(cx+r*Math.cos(a1))+','+(cy+r*Math.sin(a1))+' Z" fill="'+x[2]+'" stroke="var(--card)" stroke-width="3"/><rect x="260" y="'+(60+i*34)+'" width="18" height="18" rx="3" fill="'+x[2]+'"/><text class="svgtxt" x="286" y="'+(75+i*34)+'" font-size="15">'+x[0]+' ('+x[1]+'%)</text>';a0=a1;});
+        return s+'</svg>';}},
+    scatter:{t:"<b>Scatter graph.</b> Each dot shows two measurements at once, so you can see whether the variables are linked and spot patterns. Here, the more hours a runner trains, the lower their mile time.",
+      d:function(){return scat("neg",12,"Hours of training per week","Mile time (minutes)");}}
+  };
+  function showGal(k){
+    $("galBox").innerHTML=gal[k].d();$("galText").innerHTML=gal[k].t;
+    [].forEach.call(document.querySelectorAll("[data-g]"),function(b){b.setAttribute("aria-pressed",b.dataset.g===k?"true":"false");});
+  }
+  [].forEach.call(document.querySelectorAll("[data-g]"),function(b){b.addEventListener("click",function(){showGal(b.dataset.g);});});
+
+  /* ---------- scatter generator ---------- */
+  var seed=11,offs=[];
+  function rnd(){seed=(seed*9301+49297)%233280;return seed/233280;}
+  for(var q=0;q<20;q++)offs.push(rnd()-.5);
+  function scat(dir,noise,xl,yl){
+    var s=open()+axes(),i,x,y;
+    for(i=0;i<20;i++){
+      x=0.05+i*0.047;
+      y=(dir==="pos"?x:1-x)+offs[i]*(noise/100)*1.8;
+      y=Math.max(.04,Math.min(.96,y));
+      s+='<circle cx="'+(50+x*340)+'" cy="'+(200-y*180)+'" r="6" fill="var(--cyan)" stroke="var(--navy-2)" stroke-width="1.5"/>';
+    }
+    s+='<text class="svgtxt" x="225" y="244" font-size="13" text-anchor="middle">'+xl+'</text><text class="svgtxt" x="14" y="110" font-size="13" text-anchor="middle" transform="rotate(-90 14 110)">'+yl+'</text></svg>';
+    return s;
+  }
+
+  /* ---------- pick the chart ---------- */
+  var sc=[
+    {q:"A coach writes down how many goals each of six football teams scored this term and wants to compare them.",a:"Bar graph",w:"Comparing separate categories (teams) calls for a bar graph."},
+    {q:"A student counts the steps they walk every day for a month and wants to see how their steps change.",a:"Line graph",w:"“Every day” and “change” point to a trend over time, so a line graph."},
+    {q:"A vet shows what share of all the animals she treated were dogs, cats, rabbits or birds.",a:"Pie chart",w:"“Share” of a total means parts of a whole, so a pie chart."},
+    {q:"A student wonders whether the hours of sleep they get go together with their reaction time in a game.",a:"Scatter graph",w:"Two number variables and a possible link: a scatter graph."},
+    {q:"A bakery wants to compare its sales in each season, this year against last year.",a:"Side-by-side bars",w:"Two years for each season means two bars side by side in each category."},
+    {q:"A canteen records how many bowls of soup it sells each week of the term, to look for a pattern.",a:"Line graph",w:"“Each week” and “pattern across the term” means a trend over time, so a line graph."},
+    {q:"A charity wants to show how its money is split between food, medicine and shelter.",a:"Pie chart",w:"The money is one whole split into parts, so a pie chart."}
+  ];
+  var pi=0,locked=false;
+  function pcShow(){locked=false;$("pcQ").textContent=sc[pi].q;$("pcOut").className="out info";$("pcOut").textContent="Which chart fits best?";}
+  [].forEach.call(document.querySelectorAll("#pcBtns [data-a]"),function(b){
+    b.addEventListener("click",function(){
+      if(locked)return;var o=$("pcOut");
+      if(b.dataset.a===sc[pi].a){locked=true;o.className="out good";o.innerHTML="<b>Correct: "+sc[pi].a+".</b> "+sc[pi].w;}
+      else{o.className="out bad";o.innerHTML="Not quite. Look for the clue words in the scenario and compare them with the clue table above. Try again.";}
+    });
+  });
+  $("pcNext").addEventListener("click",function(){pi=(pi+1)%sc.length;pcShow();});
+
+  /* ---------- cleaning ---------- */
+  var cells=[].slice.call(document.querySelectorAll("#cTable td.pick"));
+  cells.forEach(function(td){
+    td.tabIndex=0;
+    function tg(){if(td.classList.contains("right")||td.classList.contains("miss")||td.classList.contains("fixed"))return;td.classList.toggle("flag");}
+    td.addEventListener("click",tg);
+    td.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();tg();}});
+  });
+  var spotted=false;
+  $("cCheck").addEventListener("click",function(){
+    var hit=0,wrong=0,miss=0;
+    cells.forEach(function(td){
+      var err=td.dataset.e==="1",fl=td.classList.contains("flag");
+      td.classList.remove("right","miss");
+      if(fl&&err){td.classList.remove("flag");td.classList.add("right");hit++;}
+      else if(fl&&!err)wrong++;
+      else if(!fl&&err){td.classList.add("miss");miss++;}
+    });
+    var o=$("cOut");
+    if(hit===4&&wrong===0){spotted=true;$("cClean").disabled=false;o.className="out good";o.innerHTML="<b>Step 1 done: you spotted all four.</b> A <b>#</b> and a <b>?</b> are symbols, an empty cell is a <b>missing value</b>, and “two” is a word where a number should be. Now press Step 2.";}
+    else{o.className="out bad";o.innerHTML="You found "+hit+" of 4"+(wrong?". "+wrong+" amber cell(s) are actually fine, so click them again to untick":"")+(miss?". Red cells are problems you missed":"")+". Look for anything that is not a proper number.";}
+  });
+  $("cClean").addEventListener("click",function(){
+    if(!spotted)return;
+    var rows=document.querySelectorAll("#cTable tbody tr");
+    rows.forEach(function(tr){
+      var td=tr.cells[1],txt=td.textContent.trim();
+      td.classList.remove("flag","right","miss");
+      if(txt==="two"){td.textContent="2";td.classList.add("fixed");}
+      else if(txt==="#"||txt===""||txt==="?"){tr.classList.add("gone");}
+    });
+    $("cClean").disabled=true;
+    $("cOut").className="out good";
+    $("cOut").innerHTML="<b>Cleaned!</b> “two” was an inconsistency, so we fixed it by changing it to <b>2</b>. The #, ? and empty entries could not be fixed from what we know, so those rows are removed from the analysis (or you could go back and ask the students again). The data is now ready for charts.";
+  });
+
+  /* ---------- data type sorter ---------- */
+  var items=[["Eye colour","q"],["Height in centimetres","n"],["Favourite pizza topping","q"],["Number of siblings","n"],["Shoe size","n"],["Name of a student’s street","q"]];
+  var ts=$("typeSorter"),done=0,cnt={};
+  items.forEach(function(it,i){
+    var d=document.createElement("div");d.className="srow";
+    d.innerHTML='<span>'+it[0]+'</span><span class="btnrow"><button class="btn mini" type="button" data-v="n">Numerical</button><button class="btn mini" type="button" data-v="q">Not numerical</button></span>';
+    ts.appendChild(d);
+    [].forEach.call(d.querySelectorAll("button"),function(b){
+      b.addEventListener("click",function(){
+        if(d.classList.contains("ok"))return;
+        if(b.dataset.v===it[1]){d.classList.remove("no");d.classList.add("ok");cnt[i]=1;
+          var n=Object.keys(cnt).length;
+          $("typeOut").className="out good";
+          $("typeOut").innerHTML=it[1]==="n"?"<b>"+it[0]+"</b> is numerical, so it is <b>quantitative</b> data.":"<b>"+it[0]+"</b> is not numerical, so it is <b>qualitative</b> (categorical) data.";
+          if(n===items.length)$("typeOut").innerHTML+=" All sorted!";
+        }else{d.classList.add("no");$("typeOut").className="out bad";$("typeOut").textContent="Think: could you do sums with it? If it is a number you can measure or count, it is numerical.";}
+      });
+    });
+  });
+
+  /* ---------- sorting rainfall ---------- */
+  var rain=[["Ayton",62],["Brook",35],["Cray",88],["Dale",47],["Eden",71]];
+  function sDraw(rows,hl){
+    var h="<tr><th>Town</th><th>Rainfall (mm)</th></tr>";
+    rows.forEach(function(r,i){h+="<tr><td"+(hl===i?" class='fixed'":"")+">"+r[0]+"</td><td"+(hl===i?" class='fixed'":"")+">"+r[1]+"</td></tr>";});
+    $("sTable").innerHTML=h;
+  }
+  sDraw(rain);
+  [].forEach.call(document.querySelectorAll("[data-s]"),function(b){
+    b.addEventListener("click",function(){
+      var k=b.dataset.s,rows=rain.slice();
+      rows.sort(function(a,c){return k==="nameA"?(a[0]<c[0]?-1:1):(k==="numA"?a[1]-c[1]:c[1]-a[1]);});
+      sDraw(rows,k==="numD"?0:(k==="numA"?4:-1));
+      $("sOut").className="out good";
+      $("sOut").innerHTML=k==="nameA"?"Sorted into alphabetical order. Easy to find a town by name.":(k==="numA"?"Smallest first. The driest town is at the top and the wettest is at the bottom (highlighted).":"Largest first. The wettest town is straight at the top (highlighted). Sorting puts the data into a meaningful order.");
+    });
+  });
+
+  /* ---------- strength ---------- */
+  var dir="pos";
+  function strDraw(){
+    var n=+$("noise").value;
+    $("strBox").innerHTML=scat(dir,n,"Variable one","Variable two");
+    var label=n<=20?"strong":(n<=50?"moderate":(n<=80?"weak":"almost no"));
+    $("strOut").className="out info";
+    $("strOut").innerHTML="This is a <b>"+label+" "+(dir==="pos"?"positive":"negative")+"</b> correlation. "+(n<=20?"The dots stick tightly to a line, so one variable predicts the other very well.":(n<=50?"The dots follow the line quite well, with some spread.":(n<=80?"The dots are loosely scattered. There is still a slight pattern, but it is not reliable.":"The dots are so spread out that there is hardly any pattern at all.")));
+    [].forEach.call(document.querySelectorAll("[data-d]"),function(b){b.setAttribute("aria-pressed",b.dataset.d===dir?"true":"false");});
+  }
+  $("noise").addEventListener("input",strDraw);
+  [].forEach.call(document.querySelectorAll("[data-d]"),function(b){b.addEventListener("click",function(){dir=b.dataset.d;strDraw();});});
+
+  /* ---------- forecast ---------- */
+  var past=[14,17,19,24,26,31],real=[33,32,30];
+  var fcState="start";
+  function fcDraw(){
+    var s=open()+axes(),n=past.length,all=9,i;
+    function px(i){return 70+i*(320/(all-1));}
+    function py(v){return 200-v*4.6;}
+    for(i=0;i<all;i++)s+='<text class="svgtxt" x="'+px(i)+'" y="220" font-size="12" text-anchor="middle">M'+(i+1)+'</text>';
+    s+='<polyline points="'+past.map(function(v,i){return px(i)+","+py(v);}).join(" ")+'" fill="none" stroke="var(--cyan)" stroke-width="4"/>';
+    past.forEach(function(v,i){s+='<circle cx="'+px(i)+'" cy="'+py(v)+'" r="6" fill="var(--navy-2)" stroke="var(--cyan)" stroke-width="3"/>';});
+    var sx=0,sy=0,sxy=0,sxx=0;past.forEach(function(v,i){sx+=i;sy+=v;sxy+=i*v;sxx+=i*i;});
+    var m=(n*sxy-sx*sy)/(n*sxx-sx*sx),c=(sy-m*sx)/n;
+    var f=[];for(i=n;i<all;i++)f.push(Math.round((m*i+c)*10)/10);
+    if(fcState==="forecast"||fcState==="real"){
+      s+='<polyline points="'+px(n-1)+','+py(past[n-1])+' '+f.map(function(v,j){return px(n+j)+","+py(v);}).join(" ")+'" fill="none" stroke="var(--amber)" stroke-width="4" stroke-dasharray="8 6"/>';
+      f.forEach(function(v,j){s+='<circle cx="'+px(n+j)+'" cy="'+py(v)+'" r="6" fill="var(--amber)"/>';});
+    }
+    if(fcState==="real"){
+      s+='<polyline points="'+px(n-1)+','+py(past[n-1])+' '+real.map(function(v,j){return px(n+j)+","+py(v);}).join(" ")+'" fill="none" stroke="var(--red)" stroke-width="3"/>';
+      real.forEach(function(v,j){s+='<rect x="'+(px(n+j)-5)+'" y="'+(py(v)-5)+'" width="10" height="10" fill="var(--red)"/>';});
+    }
+    s+='<text class="svgtxt" x="225" y="244" font-size="13" text-anchor="middle">Month (members of the gaming club)</text></svg>';
+    $("fcBox").innerHTML=s;
+    var o=$("fcOut");
+    if(fcState==="start"){o.className="out info";o.textContent="The dots show the past six months. The number of members keeps rising.";}
+    if(fcState==="forecast"){o.className="out good";o.innerHTML="<b>Forecast:</b> the model continues the pattern, so it predicts about "+f.map(function(v){return Math.round(v);}).join(", ")+" members for the next three months (orange dashes).";}
+    if(fcState==="real"){o.className="out bad";o.innerHTML="Red squares show what really happened: growth slowed down. The forecast was a good guess based on past data, but it was <b>not certain</b>. Real life can change.";}
+  }
+  $("fcGo").addEventListener("click",function(){fcState="forecast";fcDraw();});
+  $("fcReal").addEventListener("click",function(){if(fcState==="start")fcState="forecast";fcState="real";fcDraw();});
+  $("fcReset").addEventListener("click",function(){fcState="start";fcDraw();});
+
+  showGal("bar");pcShow();strDraw();fcDraw();
+})();
+</script>
+</body>
+</html>
